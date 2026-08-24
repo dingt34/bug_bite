@@ -1,0 +1,53 @@
+.page {
+  padding: 24rpx;
+}
+
+.event-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.event-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.event-type {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.event-level {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.event-time {
+  font-size: 24rpx;
+  color: #8A9299;
+  margin-top: 8rpx;
+}
+.event-summary {
+  font-size: 26rpx;
+  color: #3A414A;
+  margin-top: 12rpx;
+  line-height: 1.6;
+}
+.event-review {
+  font-size: 24rpx;
+  color: #F57C00;
+  margin-top: 12rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 120rpx 40rpx;
+  color: #B7C0C7;
+}
+.empty-icon {
+  font-size: 80rpx;
+}
+.empty-text {
+  font-size: 28rpx;
+  margin-top: 20rpx;
+}

@@ -1,0 +1,43 @@
+<view class="page">
+  <view class="head">拍摄或选择一张虫体照片，查看疑似候选</view>
+
+  <!-- 图片区 -->
+  <view class="card">
+    <view class="upload" bindtap="chooseImage">
+      <image wx:if="{{image}}" src="{{image}}" mode="aspectFill" class="preview" />
+      <view wx:else class="upload-placeholder">
+        <view class="placeholder-icon">📷</view>
+        <view class="placeholder-text">拍摄 / 选择虫体照片</view>
+      </view>
+    </view>
+    <view class="tip">仅识别虫体 / 节肢动物图片，不对皮损图片做疾病诊断。</view>
+  </view>
+
+  <!-- 识别按钮 -->
+  <view class="action">
+    <button class="btn-primary" disabled="{{!image || loading}}" bindtap="recognize">{{loading ? '识别中…' : '开始识别'}}</button>
+  </view>
+
+  <!-- 结果区 -->
+  <block wx:if="{{status === 'done'}}">
+    <view class="card">
+      <view class="result-head">
+        <view class="result-title">识别结果</view>
+        <view class="result-provider">百度动物识别 · v1</view>
+      </view>
+
+      <view class="candidate" wx:for="{{result.candidates}}" wx:key="name">
+        <view class="candidate-row">
+          <view class="candidate-name">{{item.name}}</view>
+          <view class="candidate-percent">{{item.percent}}%</view>
+        </view>
+        <view class="candidate-bar">
+          <view class="candidate-fill" style="width: {{item.percent}}%;"></view>
+        </view>
+      </view>
+
+      <view class="uncertain">⚠️ {{result.note}}</view>
+      <view class="uncertain-sub">识别结果不改变风险等级，也不构成诊断。</view>
+    </view>
+  </block>
+</view>

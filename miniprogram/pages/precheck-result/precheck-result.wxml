@@ -1,0 +1,47 @@
+<view class="page" wx:if="{{plan}}">
+  <!-- 计划概要 -->
+  <view class="summary">
+    <view class="summary-line">{{plan.regionCode}} · {{plan.month}} · {{plan.activityType}}</view>
+    <view class="summary-tags">
+      <text class="tag tag-w" wx:for="{{plan.riskTags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 场景提醒 -->
+  <view class="card">
+    <view class="card-title">📌 场景提醒</view>
+    <view class="risk-summary">{{rule.riskSummary}}</view>
+  </view>
+
+  <!-- 准备清单 -->
+  <view class="card">
+    <view class="card-title">🎒 准备清单</view>
+    <view class="check-item" wx:for="{{rule.checklist}}" wx:key="*this">
+      <view class="check-box">✓</view>
+      <view class="check-text">{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 活动中防护 -->
+  <view class="card">
+    <view class="card-title">🛡️ 活动中防护</view>
+    <view class="plain-item" wx:for="{{rule.activityTips}}" wx:key="*this">· {{item}}</view>
+  </view>
+
+  <!-- 返程检查 -->
+  <view class="card">
+    <view class="card-title">🔎 返程检查</view>
+    <view class="plain-item" wx:for="{{rule.returnCheck}}" wx:key="*this">· {{item}}</view>
+  </view>
+
+  <!-- 离线安全卡 -->
+  <view class="card offline-card" bindtap="saveOffline">
+    <view class="offline-left">
+      <view class="offline-title">💾 离线安全卡</view>
+      <view class="offline-sub">缓存本次计划与关键提示，无网络也能查看</view>
+    </view>
+    <view class="offline-btn">缓存</view>
+  </view>
+
+  <view class="footer-note">规则范围仅限浙江省 · 规则版本 v1.0</view>
+</view>

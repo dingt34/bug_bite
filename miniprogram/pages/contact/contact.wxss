@@ -1,0 +1,39 @@
+.page {
+  padding: 24rpx 24rpx 60rpx;
+}
+
+.head {
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 16rpx 8rpx 24rpx;
+}
+
+.type-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.type-icon {
+  font-size: 52rpx;
+  margin-right: 24rpx;
+}
+.type-body {
+  flex: 1;
+}
+.type-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.type-desc {
+  font-size: 24rpx;
+  color: #8A9299;
+  margin-top: 4rpx;
+}
+.type-arrow {
+  font-size: 36rpx;
+  color: #B7C0C7;
+}

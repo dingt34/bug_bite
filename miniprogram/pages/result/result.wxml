@@ -1,0 +1,52 @@
+<view class="page" wx:if="{{content}}">
+  <!-- 风险等级横幅 -->
+  <view class="banner" style="background: {{content.color}};">
+    <view class="banner-icon">{{content.icon}}</view>
+    <view class="banner-title">{{content.levelName}}</view>
+    <view class="banner-sub" wx:if="{{content.isEmergency}}">已触发危险信号，请优先联系急救服务</view>
+  </view>
+
+  <!-- 触发依据 -->
+  <view class="card">
+    <view class="card-title">触发依据</view>
+    <view class="basis">{{content.basis}}</view>
+  </view>
+
+  <!-- 下一步行动 -->
+  <view class="card">
+    <view class="card-title">下一步行动</view>
+    <view class="action-item" wx:for="{{content.actions}}" wx:key="*this">
+      <view class="action-num">{{index + 1}}</view>
+      <view class="action-text">{{item}}</view>
+    </view>
+    <view class="call-btn" wx:if="{{content.isEmergency}}" bindtap="call120">📞 拨打 120</view>
+  </view>
+
+  <!-- 复查条件 -->
+  <view class="card">
+    <view class="card-title">复查条件</view>
+    <view class="review">{{content.review}}</view>
+  </view>
+
+  <!-- 记录清单 -->
+  <view class="card">
+    <view class="card-title">记录清单</view>
+    <view class="check-item" wx:for="{{content.checklist}}" wx:key="*this">
+      <view class="check-box">✓</view>
+      <view class="check-text">{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 就医摘要 -->
+  <view class="card">
+    <view class="card-title">就医沟通摘要</view>
+    <view class="summary-box">{{summary}}</view>
+    <view class="copy-btn" bindtap="copySummary">复制摘要</view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="action-bar">
+    <button class="btn-ghost" bindtap="goHome">返回首页</button>
+    <button class="btn-primary" bindtap="goEvent">查看事件记录</button>
+  </view>
+</view>

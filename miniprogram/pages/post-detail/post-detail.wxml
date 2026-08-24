@@ -1,0 +1,20 @@
+<view class="page" wx:if="{{post}}">
+  <view class="card">
+    <view class="post-head">
+      <view class="post-avatar">{{post.displayName[0]}}</view>
+      <view class="post-meta">
+        <view class="post-name">{{post.displayName}}</view>
+        <view class="post-time">{{post.time}}</view>
+      </view>
+    </view>
+    <view class="post-text">{{post.text}}</view>
+    <image wx:if="{{post.imageRefs && post.imageRefs.length}}" src="{{post.imageRefs[0]}}" mode="widthFix" class="post-img" />
+    <view class="post-tags">
+      <text class="tag" wx:for="{{post.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="notice">⚠️ 个人经历分享，不构成医疗诊断。安全判断请以症状与危险信号为准。</view>
+
+  <view class="report" bindtap="report">🚩 举报</view>
+</view>

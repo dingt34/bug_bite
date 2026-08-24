@@ -1,0 +1,45 @@
+<wxs src="./guide.wxs" module="g" />
+
+<view class="page">
+  <view class="head">补充一些信息，帮助我们给出更准确的分级建议</view>
+
+  <!-- 通用 + 条件追问 -->
+  <view class="card" wx:for="{{questions}}" wx:key="key" wx:for-item="q">
+    <view class="card-title">{{q.label}}</view>
+    <view class="chips">
+      <text
+        class="tag {{g.isSelected(answers[q.key], item) ? 'active' : ''}}"
+        wx:for="{{q.options}}"
+        wx:for-item="item"
+        wx:key="*this"
+        bindtap="onAnswer"
+        data-key="{{q.key}}"
+        data-v="{{item}}"
+        data-type="{{q.type}}"
+      >{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 已采取措施 -->
+  <view class="card">
+    <view class="card-title">已采取措施 <text class="optional">选填</text></view>
+    <view class="chips">
+      <text class="tag {{g.isSelected(actionsTaken, item) ? 'active' : ''}}" wx:for="{{actionOptions}}" wx:key="*this" bindtap="onActionTap" data-v="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 可选证据：图片 -->
+  <view class="card">
+    <view class="card-title">证据图片 <text class="optional">选填</text></view>
+    <view class="upload" bindtap="chooseImage">
+      <image wx:if="{{previewImage}}" src="{{previewImage}}" mode="aspectFill" class="preview" />
+      <view wx:else class="upload-placeholder">＋ 上传虫体/皮损图片</view>
+    </view>
+    <view class="tip">图片仅用于记录与辅助识别，不用于疾病诊断。</view>
+  </view>
+
+  <!-- 提交 -->
+  <view class="submit-wrap">
+    <button class="btn-primary" bindtap="submit">查看分级建议</button>
+  </view>
+</view>

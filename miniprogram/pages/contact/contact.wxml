@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="head">请选择与您情况最接近的接触类型</view>
+
+  <view class="type-card" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
+    <view class="type-icon">{{item.icon}}</view>
+    <view class="type-body">
+      <view class="type-name">{{item.name}}</view>
+      <view class="type-desc">{{item.desc}}</view>
+    </view>
+    <view class="type-arrow">→</view>
+  </view>
+
+  <view class="tip">先做危险信号筛查，再获得行动建议；不确定的事件类型也能继续。</view>
+</view>

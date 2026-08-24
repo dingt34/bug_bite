@@ -1,0 +1,32 @@
+<wxs src="./danger.wxs" module="g" />
+<view class="page">
+  <!-- 顶部说明 -->
+  <view class="head">
+    <view class="head-title">先确认是否有以下危险信号</view>
+    <view class="head-sub">出现任一项，请立即求助，不等待其他信息。</view>
+  </view>
+
+  <!-- 危险信号列表（多选） -->
+  <view class="signal {{g.has(selected, item.key) ? 'signal-on' : ''}}" wx:for="{{signals}}" wx:key="key" bindtap="toggle" data-key="{{item.key}}">
+    <view class="signal-check">{{g.has(selected, item.key) ? '✓' : ''}}</view>
+    <view class="signal-body">
+      <view class="signal-name">{{item.name}}</view>
+      <view class="signal-desc">{{item.desc}}</view>
+    </view>
+  </view>
+
+  <!-- 紧急求助提示（选中危险信号时出现） -->
+  <view class="emergency-banner" wx:if="{{hasDanger}}">
+    <view class="emergency-icon">🚨</view>
+    <view class="emergency-text">检测到危险信号，请立即联系急救服务</view>
+    <view class="emergency-call" bindtap="call120">拨打 120</view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="action">
+    <button class="btn-danger" wx:if="{{hasDanger}}" bindtap="goEmergency">立即求助 · 中断问答</button>
+    <button class="btn-primary" wx:else bindtap="continueGuide">没有以上信号，继续</button>
+  </view>
+
+  <view class="tip">危险信号筛查优先于图片识别；即使没有危险信号，后续也可按症状获得分级建议。</view>
+</view>

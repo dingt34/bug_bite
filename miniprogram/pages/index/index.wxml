@@ -1,0 +1,66 @@
+<view class="page">
+  <!-- 顶部横幅 -->
+  <view class="hero">
+    <view class="hero-glow glow-1"></view>
+    <view class="hero-glow glow-2"></view>
+    <view class="hero-glow glow-3"></view>
+    <view class="hero-bug">🐞</view>
+    <view class="hero-title">虫咬识途</view>
+    <view class="hero-sub">节肢动物接触安全管理助手</view>
+    <view class="hero-scope">📍 当前覆盖：浙江省</view>
+  </view>
+
+  <!-- 非诊断提示 -->
+  <view class="notice">
+    <view class="notice-icon">⚠️</view>
+    <view class="notice-text">本工具提供危险信号筛查与行动提示，不提供疾病或虫种诊断。紧急情况请直接拨打 120。</view>
+  </view>
+
+  <!-- 核心功能 -->
+  <view class="funcs-head">
+    <view class="funcs-title">核心功能</view>
+    <view class="funcs-sub">选择一种方式开始</view>
+  </view>
+
+  <view class="func-entry" hover-class="func-entry-hover" bindtap="goPrecheck">
+    <view class="func-icon">🎒</view>
+    <view class="func-body">
+      <view class="func-title">行前准备</view>
+      <view class="func-desc">输入目的地与出行计划，获得风险提示与准备清单</view>
+      <view class="func-tags">
+        <text class="func-tag">风险提示</text>
+        <text class="func-tag">准备清单</text>
+      </view>
+    </view>
+    <view class="func-arrow">→</view>
+  </view>
+
+  <view class="func-entry" hover-class="func-entry-hover" bindtap="goContact">
+    <view class="func-icon">🦟</view>
+    <view class="func-body">
+      <view class="func-title">昆虫叮咬</view>
+      <view class="func-desc">叮咬、蜇伤、附着虫体，先做危险信号筛查</view>
+      <view class="func-tags">
+        <text class="func-tag">危险筛查</text>
+        <text class="func-tag">行动指引</text>
+      </view>
+    </view>
+    <view class="func-arrow">→</view>
+  </view>
+
+  <view class="func-entry" hover-class="func-entry-hover" bindtap="goIdentify">
+    <view class="func-icon">🐛</view>
+    <view class="func-body">
+      <view class="func-title">识别昆虫</view>
+      <view class="func-desc">拍一张虫体照片，查看疑似候选（仅供参考）</view>
+      <view class="func-tags">
+        <text class="func-tag">拍照识别</text>
+        <text class="func-tag">疑似候选</text>
+      </view>
+    </view>
+    <view class="func-arrow">→</view>
+  </view>
+
+  <!-- 底部免责 -->
+  <view class="footer-note">个人经历与识别结果不构成诊断 · 安全判断以症状和危险信号为准</view>
+</view>

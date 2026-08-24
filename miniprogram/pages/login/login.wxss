@@ -1,0 +1,89 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 48rpx;
+  box-sizing: border-box;
+  background: #F5F6F7;
+}
+
+.brand {
+  text-align: center;
+  margin-top: 120rpx;
+}
+.logo {
+  font-size: 120rpx;
+  line-height: 1;
+}
+.app-name {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #2E7D5B;
+  margin-top: 24rpx;
+}
+.app-slogan {
+  font-size: 26rpx;
+  color: #8A9299;
+  margin-top: 8rpx;
+}
+
+.login-area {
+  width: 100%;
+  margin-top: 120rpx;
+  text-align: center;
+}
+.login-btn {
+  background: #2E7D5B;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 48rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  padding: 0;
+}
+.login-btn::after {
+  border: none;
+}
+.login-btn-hover {
+  background: #256b4c;
+}
+.agree {
+  font-size: 22rpx;
+  color: #B7C0C7;
+  margin-top: 24rpx;
+}
+
+.loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+}
+.spinner {
+  width: 56rpx;
+  height: 56rpx;
+  border: 6rpx solid #E0E8E4;
+  border-top-color: #2E7D5B;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.loading-text {
+  font-size: 26rpx;
+  color: #8A9299;
+  margin-top: 20rpx;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.footer-note {
+  position: absolute;
+  bottom: 80rpx;
+  font-size: 22rpx;
+  color: #B7C0C7;
+  text-align: center;
+  padding: 0 40rpx;
+}

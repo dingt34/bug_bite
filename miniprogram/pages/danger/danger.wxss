@@ -1,0 +1,103 @@
+.page {
+  padding: 24rpx 24rpx 60rpx;
+}
+
+.head {
+  padding: 8rpx 8rpx 24rpx;
+}
+.head-title {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+.head-sub {
+  font-size: 24rpx;
+  color: #8A9299;
+  margin-top: 8rpx;
+}
+
+.signal {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border: 2rpx solid #ECEEF0;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+.signal-on {
+  border-color: #E53935;
+  background: #FDECEA;
+}
+.signal-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid #B7C0C7;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 38rpx;
+  color: #E53935;
+  font-weight: 700;
+}
+.signal-on .signal-check {
+  border-color: #E53935;
+  background: #E53935;
+  color: #fff;
+}
+.signal-body {
+  flex: 1;
+}
+.signal-name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.signal-desc {
+  font-size: 24rpx;
+  color: #8A9299;
+  margin-top: 4rpx;
+}
+
+.emergency-banner {
+  background: #E53935;
+  color: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.emergency-icon {
+  font-size: 44rpx;
+  margin-right: 16rpx;
+}
+.emergency-text {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.emergency-call {
+  background: #fff;
+  color: #E53935;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 10rpx 26rpx;
+  border-radius: 30rpx;
+  margin-top: 16rpx;
+}
+
+.action {
+  margin-top: 32rpx;
+}
+.btn-danger {
+  background: #E53935;
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  padding: 24rpx 0;
+}
+.btn-danger::after {
+  border: none;
+}

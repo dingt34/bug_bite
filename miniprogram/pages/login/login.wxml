@@ -1,0 +1,22 @@
+<view class="page">
+  <!-- 品牌区 -->
+  <view class="brand">
+    <view class="logo">🕷️</view>
+    <view class="app-name">虫咬识途</view>
+    <view class="app-slogan">节肢动物接触安全管理助手</view>
+  </view>
+
+  <!-- 登录区 -->
+  <view class="login-area">
+    <block wx:if="{{!loading}}">
+      <button class="login-btn" hover-class="login-btn-hover" bindtap="doLogin">微信一键登录</button>
+      <view class="agree">登录即代表同意《用户协议》与《隐私政策》</view>
+    </block>
+    <view class="loading-box" wx:else>
+      <view class="spinner"></view>
+      <view class="loading-text">正在登录…</view>
+    </view>
+  </view>
+
+  <view class="footer-note">登录仅用于本地演示，不会上传你的任何信息</view>
+</view>

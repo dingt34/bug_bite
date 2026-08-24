@@ -1,0 +1,119 @@
+/* app.wxss —— 全局样式 */
+page {
+  background: #F5F6F7;
+  color: #2B2F36;
+  font-size: 28rpx;
+  line-height: 1.6;
+  --primary: #2E7D5B;
+  --primary-light: #E7F3EE;
+  --danger: #E53935;
+  --danger-light: #FDECEA;
+  --warn: #F57C00;
+  --warn-light: #FFF3E0;
+  --info: #1976D2;
+  --info-light: #E8F1FC;
+  --text-main: #2B2F36;
+  --text-sub: #8A9299;
+  --border: #ECEEF0;
+  --card: #FFFFFF;
+}
+
+/* 通用卡片 */
+.card {
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin: 20rpx 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+  color: var(--text-main);
+}
+
+.card-sub {
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+
+/* 主按钮 */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  padding: 24rpx 0;
+  text-align: center;
+  border: none;
+}
+.btn-primary::after {
+  border: none;
+}
+.btn-primary[disabled] {
+  background: #B7C9C0;
+  color: #fff;
+}
+
+/* 次级按钮 */
+.btn-ghost {
+  background: #fff;
+  color: var(--primary);
+  border: 2rpx solid var(--primary);
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  padding: 22rpx 0;
+  text-align: center;
+}
+.btn-ghost::after {
+  border: none;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  font-size: 22rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 20rpx;
+  margin: 0 10rpx 10rpx 0;
+  background: #F0F2F4;
+  color: #5A616A;
+}
+.tag.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 2rpx solid var(--primary);
+}
+.tag.danger {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+/* 风险等级色 */
+.risk-emergency { color: #E53935; }
+.risk-consult { color: #F57C00; }
+.risk-observe { color: #2E7D5B; }
+
+.bg-emergency { background: #E53935; }
+.bg-consult { background: #F57C00; }
+.bg-observe { background: #2E7D5B; }
+
+/* 段落提示 */
+.tip {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  background: #F7F8F9;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-top: 16rpx;
+}
+
+/* 分割线 */
+.divider {
+  height: 1rpx;
+  background: var(--border);
+  margin: 24rpx 0;
+}

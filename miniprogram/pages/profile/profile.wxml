@@ -1,0 +1,39 @@
+<view class="page">
+  <!-- 用户卡片 -->
+  <view class="user-card" bindtap="goLogin">
+    <view class="avatar">{{avatarText}}</view>
+    <view class="user-info">
+      <view class="user-name">{{displayName}}</view>
+      <view class="user-sub">{{loginTip}}</view>
+    </view>
+    <view class="user-arrow">→</view>
+  </view>
+
+  <!-- 最近计划 -->
+  <view class="section">
+    <view class="section-title">最近计划</view>
+    <view class="plan-card" bindtap="goPlans" wx:if="{{latestPlan}}">
+      <view class="plan-name">{{latestPlan.destinationName}} · {{latestPlan.month}}</view>
+      <view class="plan-meta">{{latestPlan.activityType}}</view>
+      <view class="plan-tags">
+        <text class="tag" wx:for="{{latestPlan.riskTags}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+    <view class="empty-tip" wx:else>还没有行程计划，去首页创建行前准备</view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="section">
+    <view class="section-title">历史记录</view>
+    <view class="event-item" wx:for="{{events}}" wx:key="id" bindtap="goEventDetail" data-id="{{item.id}}">
+      <view class="event-info">
+        <view class="event-type">{{item.contactTypeName}}</view>
+        <view class="event-time">{{item.occurredAt}}</view>
+      </view>
+      <view class="event-level risk-{{item.riskLevel}}">{{item.levelName}}</view>
+    </view>
+    <view class="empty-tip" wx:if="{{!events.length}}">还没有历史记录</view>
+  </view>
+
+  <view class="footer-note">虫咬识途 v0.1 · 初稿仅含 UI 与本地数据</view>
+</view>

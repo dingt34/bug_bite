@@ -1,0 +1,37 @@
+<view class="page">
+  <!-- 免责声明 -->
+  <view class="disclaimer">💡 社群内容为个人经验分享，不构成医疗诊断，也不参与风险评分。</view>
+
+  <!-- 帖子列表 -->
+  <view class="post-card" wx:for="{{posts}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+    <view class="post-head">
+      <view class="post-avatar">{{item.displayName[0]}}</view>
+      <view class="post-meta">
+        <view class="post-name">{{item.displayName}}</view>
+        <view class="post-time">{{item.time}}</view>
+      </view>
+    </view>
+    <view class="post-text">{{item.text}}</view>
+    <view class="post-tags">
+      <text class="tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="post-actions">
+      <view class="action" catchtap="toggleLike" data-id="{{item.id}}">
+        <text class="action-icon">{{item.liked ? '❤️' : '🤍'}}</text>
+        <text class="action-num">{{item.likeCount}}</text>
+      </view>
+      <view class="action" catchtap="toggleCollect" data-id="{{item.id}}">
+        <text class="action-icon">{{item.collected ? '⭐' : '☆'}}</text>
+        <text class="action-num">{{item.collectCount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!posts.length}}" class="empty">
+    <view class="empty-icon">💬</view>
+    <view class="empty-text">还没有帖子</view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="fab" bindtap="goPublish">＋ 发布</view>
+</view>

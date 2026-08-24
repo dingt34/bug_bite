@@ -1,0 +1,59 @@
+.page {
+  padding: 24rpx;
+}
+
+.post-head {
+  display: flex;
+  align-items: center;
+}
+.post-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  text-align: center;
+  line-height: 72rpx;
+  font-size: 32rpx;
+  margin-right: 20rpx;
+}
+.post-name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.post-time {
+  font-size: 22rpx;
+  color: #B7C0C7;
+}
+.post-text {
+  font-size: 30rpx;
+  color: #2B2F36;
+  margin-top: 20rpx;
+  line-height: 1.7;
+}
+.post-img {
+  width: 100%;
+  border-radius: 16rpx;
+  margin-top: 20rpx;
+}
+.post-tags {
+  margin-top: 16rpx;
+}
+
+.notice {
+  font-size: 24rpx;
+  color: #7A5C00;
+  background: #FFF8E1;
+  border-radius: 16rpx;
+  padding: 18rpx 24rpx;
+  margin: 24rpx 0;
+}
+
+.report {
+  text-align: center;
+  color: #E53935;
+  font-size: 28rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 20rpx;
+}

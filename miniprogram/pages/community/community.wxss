@@ -1,0 +1,98 @@
+.page {
+  padding: 24rpx;
+  padding-bottom: 140rpx;
+}
+
+.disclaimer {
+  font-size: 24rpx;
+  color: #7A5C00;
+  background: #FFF8E1;
+  border-radius: 16rpx;
+  padding: 18rpx 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.post-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.post-head {
+  display: flex;
+  align-items: center;
+}
+.post-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  text-align: center;
+  line-height: 72rpx;
+  font-size: 32rpx;
+  margin-right: 20rpx;
+}
+.post-name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.post-time {
+  font-size: 22rpx;
+  color: #B7C0C7;
+}
+.post-text {
+  font-size: 28rpx;
+  color: #2B2F36;
+  margin-top: 20rpx;
+  line-height: 1.6;
+}
+.post-tags {
+  margin-top: 16rpx;
+}
+.post-actions {
+  display: flex;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F0F2F4;
+}
+.action {
+  display: flex;
+  align-items: center;
+  margin-right: 56rpx;
+}
+.action-icon {
+  font-size: 34rpx;
+  margin-right: 10rpx;
+}
+.action-num {
+  font-size: 26rpx;
+  color: #8A9299;
+}
+
+.empty {
+  text-align: center;
+  padding: 120rpx 40rpx;
+  color: #B7C0C7;
+}
+.empty-icon {
+  font-size: 80rpx;
+}
+.empty-text {
+  font-size: 28rpx;
+  margin-top: 20rpx;
+}
+
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  background: var(--primary);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 24rpx 40rpx;
+  border-radius: 44rpx;
+  box-shadow: 0 6rpx 20rpx rgba(46, 125, 91, 0.4);
+}

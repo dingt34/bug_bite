@@ -1,0 +1,17 @@
+<view class="page">
+  <view class="plan-card" wx:for="{{plans}}" wx:key="id" bindtap="viewPlan" data-id="{{item.id}}">
+    <view class="plan-head">
+      <view class="plan-name">{{item.destinationName}}</view>
+      <view class="plan-status">{{item.status}}</view>
+    </view>
+    <view class="plan-meta">{{item.month}} · {{item.activityType}}</view>
+    <view class="plan-tags">
+      <text class="tag" wx:for="{{item.riskTags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{!plans.length}}" class="empty">
+    <view class="empty-icon">🎒</view>
+    <view class="empty-text">还没有行程计划，去首页创建行前准备吧</view>
+  </view>
+</view>

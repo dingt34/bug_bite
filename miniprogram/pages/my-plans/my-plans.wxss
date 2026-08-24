@@ -1,0 +1,48 @@
+.page {
+  padding: 24rpx;
+}
+
+.plan-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.plan-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.plan-status {
+  font-size: 22rpx;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+.plan-meta {
+  font-size: 26rpx;
+  color: #8A9299;
+  margin-top: 8rpx;
+}
+.plan-tags {
+  margin-top: 16rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 120rpx 40rpx;
+  color: #B7C0C7;
+}
+.empty-icon {
+  font-size: 80rpx;
+}
+.empty-text {
+  font-size: 28rpx;
+  margin-top: 20rpx;
+}

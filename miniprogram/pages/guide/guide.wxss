@@ -1,0 +1,46 @@
+.page {
+  padding: 24rpx 24rpx 60rpx;
+}
+
+.head {
+  font-size: 28rpx;
+  color: #5A616A;
+  padding: 8rpx 8rpx 20rpx;
+}
+
+.optional {
+  font-size: 22rpx;
+  color: #B7C0C7;
+  margin-left: 8rpx;
+  font-weight: 400;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.upload {
+  width: 200rpx;
+  height: 200rpx;
+  border: 2rpx dashed #C8D8D0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.upload-placeholder {
+  font-size: 26rpx;
+  color: #8A9299;
+  text-align: center;
+  padding: 0 20rpx;
+}
+.preview {
+  width: 100%;
+  height: 100%;
+}
+
+.submit-wrap {
+  padding: 20rpx 0 0;
+}
