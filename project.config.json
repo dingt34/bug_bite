@@ -29,7 +29,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.0.0",
-  "appid": "wxb621264aa52e69dc",
+  "appid": "wx1768a4ab35d8616e",
   "projectname": "chongyaoshitu",
   "condition": {},
   "editorSetting": {
@@ -37,5 +37,6 @@
     "tabSize": 2
   },
   "miniprogramRoot": "miniprogram/",
-  "simulatorPluginLibVersion": {}
+  "simulatorPluginLibVersion": {},
+  "isGameTourist": false
 }
