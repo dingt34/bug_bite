@@ -1,12 +1,38 @@
 <view class="page">
   <!-- 用户卡片 -->
   <view class="user-card" bindtap="goLogin">
-    <view class="avatar">{{avatarText}}</view>
+    <view class="avatar">
+      <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
+      <text wx:else>{{avatarText}}</text>
+    </view>
     <view class="user-info">
       <view class="user-name">{{displayName}}</view>
       <view class="user-sub">{{loginTip}}</view>
     </view>
-    <view class="user-arrow">→</view>
+    <view class="user-arrow" wx:if="{{!loggedIn}}">→</view>
+  </view>
+
+  <view class="identity-action" wx:if="{{loggedIn}}" bindtap="logout">{{cloudUser ? '退出微信云身份' : '退出体验身份'}}</view>
+
+  <view class="section" wx:if="{{cloudUser}}">
+    <view class="cloud-sync-card">
+      <view>
+        <view class="cloud-sync-title">微信云同步</view>
+        <view class="cloud-sync-sub">{{syncMessage || '计划、事件、社区数据和图片可跨设备恢复'}}</view>
+      </view>
+      <button class="sync-button" disabled="{{syncing}}" bindtap="syncCloud">{{syncing ? '同步中' : '立即同步'}}</button>
+    </view>
+  </view>
+
+  <!-- 本机数据概览 -->
+  <view class="section">
+    <view class="section-title">本机数据</view>
+    <view class="overview-card">
+      <view class="overview-item" bindtap="goPlans"><view class="overview-num">{{summary.plans}}</view><view class="overview-label">计划</view></view>
+      <view class="overview-item" bindtap="goEvents"><view class="overview-num">{{summary.events}}</view><view class="overview-label">事件</view></view>
+      <view class="overview-item" bindtap="goCommunity"><view class="overview-num">{{summary.posts}}</view><view class="overview-label">发布</view></view>
+      <view class="overview-item" bindtap="goCollections"><view class="overview-num">{{summary.collections}}</view><view class="overview-label">收藏</view></view>
+    </view>
   </view>
 
   <!-- 最近计划 -->
@@ -24,7 +50,10 @@
 
   <!-- 历史记录 -->
   <view class="section">
-    <view class="section-title">历史记录</view>
+    <view class="section-head">
+      <view class="section-title">最近事件</view>
+      <view class="section-more" bindtap="goEvents">查看全部</view>
+    </view>
     <view class="event-item" wx:for="{{events}}" wx:key="id" bindtap="goEventDetail" data-id="{{item.id}}">
       <view class="event-info">
         <view class="event-type">{{item.contactTypeName}}</view>
@@ -35,5 +64,12 @@
     <view class="empty-tip" wx:if="{{!events.length}}">还没有历史记录</view>
   </view>
 
-  <view class="footer-note">虫咬识途 v0.1 · 初稿仅含 UI 与本地数据</view>
+  <view class="section">
+    <view class="menu-item" bindtap="goPrivacy">
+      <view><view class="menu-title">隐私与本机数据</view><view class="menu-sub">查看存储内容、图片和清除选项</view></view>
+      <view class="menu-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="footer-note">虫咬识途 · {{cloudConfigured ? '微信云开发版' : '本地模式（云环境未配置）'}}</view>
 </view>

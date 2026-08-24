@@ -1,29 +1,78 @@
 const mock = require('../../utils/mock.js');
+const planUtils = require('../../utils/plan.js');
+const cloudSync = require('../../utils/cloud-sync.js');
 
 Page({
   data: {
     plan: null,
-    rule: null
+    rule: null,
+    isOffline: false,
+    offlineSaved: false
   },
 
   onLoad(options) {
+    if (options.source === 'offline') {
+      const card = wx.getStorageSync('offlineCard');
+      if (planUtils.isValidOfflineCard(card)) {
+        this.setData({
+          plan: card.plan,
+          rule: card.rule,
+          isOffline: true,
+          offlineSaved: true
+        });
+        return;
+      }
+      this.handleMissingPlan('离线安全卡不存在或已失效');
+      return;
+    }
+
     const planId = options.planId;
-    const plan = wx.getStorageSync('plan_' + planId);
+    const plans = wx.getStorageSync('plans') || [];
+    const latest = wx.getStorageSync('latestPlan');
+    const effectiveId = planId || (latest && latest.id);
+    const plan = plans.find(item => item.id === effectiveId) || wx.getStorageSync('plan_' + effectiveId);
     if (plan) {
-      const rule = mock.PRE_RULES.find(r => r.id === plan.ruleId) || mock.PRE_RULES[1];
-      this.setData({ plan: plan, rule: rule });
-    } else {
-      // 兜底：展示演示计划
-      const rule = mock.PRE_RULES[0];
+      const rule = plan.ruleSnapshot || mock.PRE_RULES.find(r => r.id === plan.ruleId) || mock.PRE_RULES[1];
+      const offlineCard = wx.getStorageSync('offlineCard');
       this.setData({
-        plan: { regionCode: '丽水', month: '8月', activityType: '徒步露营', riskTags: rule.riskTags },
-        rule: rule
+        plan: plan,
+        rule: rule,
+        offlineSaved: planUtils.isValidOfflineCard(offlineCard) && offlineCard.plan.id === plan.id
       });
+    } else {
+      this.handleMissingPlan('未找到对应的行程计划');
     }
   },
 
+  handleMissingPlan(message) {
+    wx.showModal({
+      title: '无法打开计划',
+      content: message,
+      showCancel: false,
+      success: () => {
+        wx.switchTab({ url: '/pages/index/index' });
+      }
+    });
+  },
+
   saveOffline() {
-    wx.setStorageSync('offlineCard', this.data.rule);
-    wx.showToast({ title: '已缓存安全卡', icon: 'success' });
+    const card = planUtils.buildOfflineCard(this.data.plan, this.data.rule);
+    wx.setStorageSync('offlineCard', card);
+    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
+    this.setData({ offlineSaved: true });
+    wx.showToast({ title: this.data.isOffline ? '安全卡已更新' : '已缓存安全卡', icon: 'success' });
+  },
+
+  goBack() {
+    wx.navigateBack({
+      delta: 1,
+      fail: () => {
+        wx.switchTab({ url: '/pages/index/index' });
+      }
+    });
+  },
+
+  goHome() {
+    wx.switchTab({ url: '/pages/index/index' });
   }
 });

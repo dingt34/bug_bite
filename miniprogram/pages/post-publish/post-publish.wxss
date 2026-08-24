@@ -15,6 +15,23 @@
   font-size: 28rpx;
   line-height: 1.6;
 }
+.char-count {
+  color: #A3ABB1;
+  font-size: 22rpx;
+  text-align: right;
+}
+.validation-banner {
+  margin: 0 24rpx 20rpx;
+  padding: 16rpx 20rpx;
+  border: 2rpx solid #F4B7B4;
+  border-radius: 12rpx;
+  background: var(--danger-light);
+  color: var(--danger);
+  font-size: 24rpx;
+}
+.required {
+  color: var(--danger);
+}
 
 .upload {
   width: 160rpx;

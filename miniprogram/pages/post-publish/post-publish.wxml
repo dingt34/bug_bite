@@ -2,7 +2,10 @@
   <view class="card">
     <view class="card-title">分享你的经历</view>
     <textarea class="editor" placeholder="描述你的户外经历、接触情况或处理经验…" maxlength="500" bindinput="onInput" value="{{text}}" />
+    <view class="char-count">{{charCount}} / 500</view>
   </view>
+
+  <view class="validation-banner" wx:if="{{validationMessage}}">{{validationMessage}}</view>
 
   <view class="card">
     <view class="card-title">添加图片 <text class="optional">选填</text></view>
@@ -13,28 +16,28 @@
   </view>
 
   <view class="card">
-    <view class="card-title">地区标签</view>
+    <view class="card-title">地区标签 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{region === item ? 'active' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="onRegionTap" data-v="{{item}}">{{item}}</text>
     </view>
   </view>
 
   <view class="card">
-    <view class="card-title">接触类型标签</view>
+    <view class="card-title">接触类型标签 <text class="required">*</text></view>
     <view class="chips">
       <text class="tag {{contactType === item.key ? 'active' : ''}}" wx:for="{{types}}" wx:key="key" bindtap="onTypeTap" data-v="{{item.key}}" data-name="{{item.name}}">{{item.name}}</text>
     </view>
   </view>
 
   <view class="card">
-    <view class="card-title">阶段标签</view>
+    <view class="card-title">阶段标签 <text class="required">*</text></view>
     <view class="chips">
       <text class="tag {{stage === item ? 'active' : ''}}" wx:for="{{stages}}" wx:key="*this" bindtap="onStageTap" data-v="{{item}}">{{item}}</text>
     </view>
   </view>
 
   <view class="submit-wrap">
-    <button class="btn-primary" disabled="{{!text}}" bindtap="publish">发布</button>
+    <button class="btn-primary" disabled="{{publishing}}" bindtap="publish">{{publishing ? '正在保存并发布…' : '发布'}}</button>
   </view>
-  <view class="tip" style="margin: 0 24rpx;">发布即表示同意：内容为个人经历，不构成诊断，不得发布医疗诊断性表述。</view>
+  <view class="tip" style="margin: 0 24rpx;">请分享可核实的个人经历，避免给他人下诊断或提供处方。演示版内容仅保存在当前设备。</view>
 </view>

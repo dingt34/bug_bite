@@ -1,4 +1,5 @@
 const mock = require('../../utils/mock.js');
+const risk = require('../../utils/risk.js');
 
 Page({
   data: {
@@ -9,7 +10,11 @@ Page({
   },
 
   onLoad(options) {
-    this.setData({ contactType: options.contactType || '' });
+    const contactType = options.contactType || '';
+    const signals = mock.DANGER_SIGNALS.filter(signal => {
+      return !signal.contactTypes || signal.contactTypes.indexOf(contactType) > -1;
+    });
+    this.setData({ contactType: contactType, signals: signals });
   },
 
   toggle(e) {
@@ -28,16 +33,38 @@ Page({
     wx.makePhoneCall({ phoneNumber: '120', fail: () => {} });
   },
 
-  goEmergency() {
+  ensureDraft() {
     const app = getApp();
-    app.globalData.draftEvent.dangerSignals = this.data.selected;
+    if (app.globalData.draftEvent && app.globalData.draftEvent.contactType) {
+      return app.globalData.draftEvent;
+    }
+    const type = mock.CONTACT_TYPES.find(item => item.key === this.data.contactType) || mock.CONTACT_TYPES.find(item => item.key === 'unknown');
+    const timestamp = Date.now();
+    app.globalData.draftEvent = {
+      id: 'event_' + timestamp,
+      contactType: type.key,
+      contactTypeName: type.name,
+      createdAt: '刚刚',
+      createdAtTimestamp: timestamp
+    };
+    return app.globalData.draftEvent;
+  },
+
+  goEmergency() {
+    const draft = this.ensureDraft();
+    draft.dangerSignals = this.data.selected.slice();
+    draft.matchedRules = this.data.selected.map(key => {
+      const signal = mock.DANGER_SIGNALS.find(item => item.key === key);
+      return { id: 'danger_' + key, text: signal ? signal.name : key };
+    });
+    draft.ruleVersion = risk.RULE_VERSION;
     // 命中危险信号 → 紧急求助，跳过问答
     wx.redirectTo({ url: '/pages/result/result?level=emergency&skipGuide=1' });
   },
 
   continueGuide() {
-    const app = getApp();
-    app.globalData.draftEvent.dangerSignals = [];
-    wx.navigateTo({ url: '/pages/guide/guide?contactType=' + this.data.contactType });
+    const draft = this.ensureDraft();
+    draft.dangerSignals = [];
+    wx.navigateTo({ url: '/pages/guide/guide?contactType=' + draft.contactType });
   }
 });

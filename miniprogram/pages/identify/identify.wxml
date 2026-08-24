@@ -1,5 +1,8 @@
 <view class="page">
-  <view class="head">拍摄或选择一张虫体照片，查看疑似候选</view>
+  <view class="head">
+    <view class="head-title">虫体图片辅助识别</view>
+    <view class="head-sub">当前为本地演示模式，结果用于展示流程</view>
+  </view>
 
   <!-- 图片区 -->
   <view class="card">
@@ -11,6 +14,7 @@
       </view>
     </view>
     <view class="tip">仅识别虫体 / 节肢动物图片，不对皮损图片做疾病诊断。</view>
+    <view class="ready-tip" wx:if="{{status === 'ready'}}">图片已准备好，可以开始演示识别。</view>
   </view>
 
   <!-- 识别按钮 -->
@@ -18,18 +22,24 @@
     <button class="btn-primary" disabled="{{!image || loading}}" bindtap="recognize">{{loading ? '识别中…' : '开始识别'}}</button>
   </view>
 
+  <view class="card error-card" wx:if="{{status === 'error'}}">
+    <view class="error-title">操作未完成</view>
+    <view class="error-text">{{errorMessage}}</view>
+    <button class="btn-ghost retry-btn" bindtap="retry">重试</button>
+  </view>
+
   <!-- 结果区 -->
   <block wx:if="{{status === 'done'}}">
     <view class="card">
       <view class="result-head">
-        <view class="result-title">识别结果</view>
-        <view class="result-provider">百度动物识别 · v1</view>
+        <view class="result-title">演示候选</view>
+        <view class="result-provider">{{result.providerName}} · {{result.versionName}}</view>
       </view>
 
       <view class="candidate" wx:for="{{result.candidates}}" wx:key="name">
         <view class="candidate-row">
           <view class="candidate-name">{{item.name}}</view>
-          <view class="candidate-percent">{{item.percent}}%</view>
+          <view class="candidate-percent">演示匹配度 {{item.percent}}%</view>
         </view>
         <view class="candidate-bar">
           <view class="candidate-fill" style="width: {{item.percent}}%;"></view>
@@ -37,7 +47,11 @@
       </view>
 
       <view class="uncertain">⚠️ {{result.note}}</view>
-      <view class="uncertain-sub">识别结果不改变风险等级，也不构成诊断。</view>
+      <view class="uncertain-sub">演示匹配度不是患病概率，也不会进入风险分级。</view>
+      <view class="result-actions">
+        <button class="btn-ghost action-button" bindtap="chooseImage">更换图片</button>
+        <button class="btn-primary action-button" bindtap="goContact">有症状，去安全判断</button>
+      </view>
     </view>
   </block>
 </view>

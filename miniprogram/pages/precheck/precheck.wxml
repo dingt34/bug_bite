@@ -1,13 +1,12 @@
 <wxs src="./precheck.wxs" module="g" />
 <view class="page">
-  <!-- 必填：目的地 -->
+  <!-- 必填：目的地（多选） -->
   <view class="card">
-    <view class="card-title">目的地 <text class="required">*</text></view>
-    <picker mode="selector" range="{{regions}}" value="{{regionIndex}}" bindchange="onRegionChange">
-      <view class="picker {{form.regionCode ? '' : 'placeholder'}}">
-        {{form.regionCode || '选择浙江省内城市'}}
-      </view>
-    </picker>
+    <view class="card-title">目的地（可多选） <text class="required">*</text></view>
+    <view class="chips">
+      <text class="tag {{g.has(form.regionCodes, item) ? 'active' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="onRegionTap" data-v="{{item}}">{{item}}</text>
+    </view>
+    <view class="selection-help">{{form.regionCodes.length ? '已选择 ' + form.regionCodes.length + ' 个地点' : '请选择本次行程会经过的浙江省内城市'}}</view>
   </view>
 
   <!-- 必填：月份 -->
@@ -36,9 +35,9 @@
     </view>
   </view>
 
-  <!-- 选填：是否过夜 -->
+  <!-- 选填：住宿方式 -->
   <view class="card">
-    <view class="card-title">是否过夜 <text class="optional">选填</text></view>
+    <view class="card-title">住宿方式 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{form.overnight === item ? 'active' : ''}}" wx:for="{{overnights}}" wx:key="*this" bindtap="onOvernightTap" data-v="{{item}}">{{item}}</text>
     </view>
@@ -52,9 +51,9 @@
     </view>
   </view>
 
-  <!-- 选填：防护用品 -->
+  <!-- 选填：已准备物品 -->
   <view class="card">
-    <view class="card-title">已有防护用品 <text class="optional">选填</text></view>
+    <view class="card-title">已准备的物品 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{g.has(form.gearTags, item) ? 'active' : ''}}" wx:for="{{gears}}" wx:key="*this" bindtap="onGearTap" data-v="{{item}}">{{item}}</text>
     </view>
@@ -62,7 +61,7 @@
 
   <!-- 提交 -->
   <view class="submit-wrap">
-    <button class="btn-primary" disabled="{{!form.regionCode || !form.month || !form.activityType}}" bindtap="submit">生成行前建议</button>
+    <button class="btn-primary" disabled="{{!form.regionCodes.length || !form.month || !form.activityType}}" bindtap="submit">生成行前建议</button>
   </view>
   <view class="tip" style="margin: 0 24rpx 40rpx;">带 <text class="required">*</text> 为必填项。提交后生成当地风险提示与准备清单。</view>
 </view>

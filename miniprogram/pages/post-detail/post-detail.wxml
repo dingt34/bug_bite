@@ -1,20 +1,34 @@
 <view class="page" wx:if="{{post}}">
   <view class="card">
     <view class="post-head">
-      <view class="post-avatar">{{post.displayName[0]}}</view>
+      <view class="post-avatar">{{post.avatarText}}</view>
       <view class="post-meta">
         <view class="post-name">{{post.displayName}}</view>
         <view class="post-time">{{post.time}}</view>
       </view>
     </view>
     <view class="post-text">{{post.text}}</view>
-    <image wx:if="{{post.imageRefs && post.imageRefs.length}}" src="{{post.imageRefs[0]}}" mode="widthFix" class="post-img" />
+    <image
+      wx:for="{{post.imageRefs}}"
+      wx:key="*this"
+      src="{{item}}"
+      mode="widthFix"
+      class="post-img"
+      bindtap="previewImage"
+      data-src="{{item}}"
+    />
     <view class="post-tags">
       <text class="tag" wx:for="{{post.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="post-actions">
+      <view class="action {{post.liked ? 'action-on' : ''}}" bindtap="toggleLike">{{post.liked ? '❤️' : '🤍'}} {{post.likeCount}}</view>
+      <view class="action {{post.collected ? 'action-on' : ''}}" bindtap="toggleCollect">{{post.collected ? '⭐' : '☆'}} {{post.collectCount}}</view>
     </view>
   </view>
 
   <view class="notice">⚠️ 个人经历分享，不构成医疗诊断。安全判断请以症状与危险信号为准。</view>
 
-  <view class="report" bindtap="report">🚩 举报</view>
+  <button class="btn-primary safety-button" bindtap="goSafety">我也有类似情况，去安全判断</button>
+
+  <view class="report {{reported ? 'reported' : ''}}" bindtap="report">{{reported ? '✓ 已在本地标记' : '🚩 标记不当内容'}}</view>
 </view>

@@ -27,6 +27,13 @@
   flex-wrap: wrap;
 }
 
+.selection-help {
+  margin-top: 8rpx;
+  color: #8A9299;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
 .submit-wrap {
   padding: 20rpx 24rpx 0;
 }

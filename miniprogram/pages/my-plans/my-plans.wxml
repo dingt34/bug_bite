@@ -1,8 +1,26 @@
 <view class="page">
+  <view class="section-title">离线安全卡</view>
+  <view class="offline-card" wx:if="{{offlineCard}}" bindtap="viewOfflineCard">
+    <view class="offline-main">
+      <view class="offline-name">💾 {{offlineCard.plan.destinationName || offlineCard.plan.regionCode}} · {{offlineCard.plan.month}}</view>
+      <view class="offline-meta">{{offlineCard.plan.activityType}} · 点击离线查看</view>
+    </view>
+    <view class="clear-offline" catchtap="clearOfflineCard">清除</view>
+  </view>
+  <view class="offline-empty" wx:else>尚未缓存离线安全卡，可在任一计划详情中缓存</view>
+
+  <view class="section-head">
+    <view class="section-title section-title-inline">行程计划</view>
+    <view class="create-link" bindtap="createPlan">＋ 新建计划</view>
+  </view>
+
   <view class="plan-card" wx:for="{{plans}}" wx:key="id" bindtap="viewPlan" data-id="{{item.id}}">
     <view class="plan-head">
-      <view class="plan-name">{{item.destinationName}}</view>
-      <view class="plan-status">{{item.status}}</view>
+      <view class="plan-name">{{item.destinationName || item.regionCode}}</view>
+      <view class="plan-head-actions">
+        <view class="plan-status">{{item.status || '进行中'}}</view>
+        <view class="delete-plan" catchtap="deletePlan" data-id="{{item.id}}">删除</view>
+      </view>
     </view>
     <view class="plan-meta">{{item.month}} · {{item.activityType}}</view>
     <view class="plan-tags">
@@ -12,6 +30,7 @@
 
   <view wx:if="{{!plans.length}}" class="empty">
     <view class="empty-icon">🎒</view>
-    <view class="empty-text">还没有行程计划，去首页创建行前准备吧</view>
+    <view class="empty-text">还没有行程计划</view>
+    <button class="btn-primary empty-btn" bindtap="createPlan">创建第一条计划</button>
   </view>
 </view>

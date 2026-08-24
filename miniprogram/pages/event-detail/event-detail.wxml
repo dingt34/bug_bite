@@ -11,11 +11,31 @@
     <view class="meta-row" wx:if="{{event.summary}}"><text class="meta-label">情况摘要</text><text class="meta-val">{{event.summary}}</text></view>
   </view>
 
+  <!-- 现场图片 -->
+  <view class="card" wx:if="{{imageGroups.length}}">
+    <view class="card-title">现场图片</view>
+    <view class="image-group" wx:for="{{imageGroups}}" wx:key="key" wx:for-item="group">
+      <view class="image-group-label">{{group.label}}</view>
+      <view class="event-images">
+        <image
+          class="event-image"
+          wx:for="{{group.images}}"
+          wx:key="*this"
+          src="{{item}}"
+          mode="aspectFill"
+          bindtap="previewImage"
+          data-src="{{item}}"
+        />
+      </view>
+    </view>
+    <view class="image-tip">点击图片可放大查看</view>
+  </view>
+
   <!-- 恢复时间线 -->
   <view class="card">
     <view class="card-title">恢复时间线</view>
     <view class="timeline">
-      <view class="tl-item" wx:for="{{timeline}}" wx:key="time">
+      <view class="tl-item" wx:for="{{timeline}}" wx:key="id">
         <view class="tl-dot"></view>
         <view class="tl-body">
           <view class="tl-time">{{item.time}}</view>
@@ -25,10 +45,19 @@
     </view>
   </view>
 
+  <!-- 最新复查 -->
+  <view class="card" wx:if="{{latestReview}}">
+    <view class="card-title">最新复查</view>
+    <view class="review-level risk-{{latestReview.riskLevel}}">{{latestReview.levelName}} · {{latestReview.createdAt}}</view>
+    <view class="review-summary">{{latestReview.summary}}</view>
+    <view class="review-warning" wx:if="{{latestReview.downgradeBlocked}}">紧急事件不可通过自评自动降级，请遵医嘱复查。</view>
+    <view class="review-version">规则版本：{{latestReview.ruleVersion || '未记录'}}</view>
+  </view>
+
   <!-- 就医摘要 -->
   <view class="card">
     <view class="card-title">就医沟通摘要</view>
-    <view class="summary-box">{{event.summary || '暂无摘要'}}</view>
+    <view class="summary-box">{{communicationSummary || '暂无摘要'}}</view>
     <view class="copy-btn" bindtap="copySummary">复制摘要</view>
   </view>
 

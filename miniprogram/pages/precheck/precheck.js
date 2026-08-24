@@ -1,4 +1,7 @@
 const mock = require('../../utils/mock.js');
+const precheckRules = require('../../utils/precheck.js');
+const planUtils = require('../../utils/plan.js');
+const cloudSync = require('../../utils/cloud-sync.js');
 
 Page({
   data: {
@@ -8,11 +11,10 @@ Page({
     habitats: mock.HABITATS,
     companions: mock.COMPANIONS,
     gears: mock.GEARS,
-    overnights: ['是', '否'],
-    regionIndex: -1,
+    overnights: ['当日往返', '户外过夜', '室内住宿'],
     monthIndex: -1,
     form: {
-      regionCode: '',
+      regionCodes: [],
       month: '',
       activityType: '',
       habitatTags: [],
@@ -22,9 +24,8 @@ Page({
     }
   },
 
-  onRegionChange(e) {
-    this.setData({ regionIndex: Number(e.detail.value) });
-    this.setData({ 'form.regionCode': this.data.regions[e.detail.value] });
+  onRegionTap(e) {
+    this.toggleArray('regionCodes', e.currentTarget.dataset.v);
   },
 
   onMonthChange(e) {
@@ -45,15 +46,23 @@ Page({
   },
 
   onCompanionTap(e) {
-    this.toggleArray('companionTags', e.currentTarget.dataset.v);
+    this.toggleArray('companionTags', e.currentTarget.dataset.v, '独自出行');
   },
 
   onGearTap(e) {
-    this.toggleArray('gearTags', e.currentTarget.dataset.v);
+    this.toggleArray('gearTags', e.currentTarget.dataset.v, '暂未准备');
   },
 
-  toggleArray(key, v) {
-    const arr = this.data.form[key];
+  toggleArray(key, v, exclusiveValue) {
+    let arr = this.data.form[key].slice();
+    if (exclusiveValue && v === exclusiveValue) {
+      arr = arr.indexOf(v) > -1 ? [] : [v];
+      this.setData({ ['form.' + key]: arr });
+      return;
+    }
+    if (exclusiveValue) {
+      arr = arr.filter(item => item !== exclusiveValue);
+    }
     const idx = arr.indexOf(v);
     if (idx > -1) {
       arr.splice(idx, 1);
@@ -67,33 +76,36 @@ Page({
 
   submit() {
     const form = this.data.form;
-    if (!form.regionCode || !form.month || !form.activityType) {
+    if (!form.regionCodes.length || !form.month || !form.activityType) {
       wx.showToast({ title: '请完成必填项', icon: 'none' });
       return;
     }
-    // 匹配规则（简化：夏秋季 + 徒步露营命中详细规则，其余命中默认）
-    let rule = mock.PRE_RULES[1];
-    const isWarm = mock.PRE_RULES[0].match.months.indexOf(form.month) > -1;
-    const isOutdoor = mock.PRE_RULES[0].match.activities.indexOf(form.activityType) > -1;
-    if (isWarm && isOutdoor) {
-      rule = mock.PRE_RULES[0];
-    }
+    const rule = precheckRules.evaluatePlan(form);
+    const timestamp = Date.now();
+    const destinationName = form.regionCodes.join('、');
     const plan = Object.assign({}, form, {
-      id: 'plan_' + Date.now(),
+      id: 'plan_' + timestamp,
+      schemaVersion: planUtils.PLAN_SCHEMA_VERSION,
+      regionCode: destinationName,
+      destinationName: destinationName,
       ruleId: rule.id,
-      riskTags: rule.riskTags
+      ruleVersion: rule.ruleVersion,
+      riskTags: rule.riskTags,
+      matchedRules: rule.matchedRules,
+      ruleSnapshot: rule,
+      status: '进行中',
+      createdAtTimestamp: timestamp,
+      updatedAtTimestamp: timestamp
     });
-    // 缓存为最近计划
+    // 保存完整计划列表，并同步最近计划摘要。
     const app = getApp();
-    app.globalData.latestPlan = {
-      id: plan.id,
-      destinationName: form.regionCode,
-      month: form.month,
-      activityType: form.activityType,
-      riskTags: rule.riskTags
-    };
+    const plans = planUtils.upsertPlan(wx.getStorageSync('plans') || [], plan);
+    app.globalData.latestPlan = planUtils.toLatestPlan(plan);
+    wx.setStorageSync('plans', plans);
     wx.setStorageSync('latestPlan', app.globalData.latestPlan);
+    // 保留单计划键，兼容已生成的旧页面链接。
     wx.setStorageSync('plan_' + plan.id, plan);
+    cloudSync.queuePush(wx, app);
     wx.navigateTo({ url: '/pages/precheck-result/precheck-result?planId=' + plan.id });
   }
 });

@@ -1,5 +1,70 @@
 .page {
-  padding: 24rpx;
+  padding: 24rpx 24rpx calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.section-title {
+  color: #5A616A;
+  font-size: 26rpx;
+  font-weight: 600;
+  margin: 8rpx 0 14rpx;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 34rpx;
+}
+
+.section-title-inline {
+  margin: 0;
+}
+
+.create-link {
+  color: var(--primary);
+  font-size: 26rpx;
+  padding: 12rpx 0 12rpx 24rpx;
+}
+
+.offline-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26rpx 28rpx;
+  border: 2rpx dashed #9BC5B1;
+  border-radius: 18rpx;
+  background: var(--primary-light);
+}
+
+.offline-main {
+  flex: 1;
+}
+
+.offline-name {
+  color: var(--primary);
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.offline-meta,
+.offline-empty {
+  color: #8A9299;
+  font-size: 24rpx;
+  margin-top: 6rpx;
+}
+
+.offline-empty {
+  margin-top: 0;
+  padding: 22rpx 24rpx;
+  border-radius: 14rpx;
+  background: #F0F2F4;
+}
+
+.clear-offline,
+.delete-plan {
+  color: #E53935;
+  font-size: 24rpx;
+  padding: 12rpx 0 12rpx 24rpx;
 }
 
 .plan-card {
@@ -14,6 +79,10 @@
   align-items: center;
   justify-content: space-between;
 }
+.plan-head-actions {
+  display: flex;
+  align-items: center;
+}
 .plan-name {
   font-size: 32rpx;
   font-weight: 600;
@@ -24,6 +93,9 @@
   background: var(--primary-light);
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
+}
+.delete-plan {
+  margin-left: 6rpx;
 }
 .plan-meta {
   font-size: 26rpx;
@@ -45,4 +117,8 @@
 .empty-text {
   font-size: 28rpx;
   margin-top: 20rpx;
+}
+
+.empty-btn {
+  margin-top: 28rpx;
 }

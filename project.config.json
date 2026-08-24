@@ -37,6 +37,7 @@
     "tabSize": 2
   },
   "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
   "simulatorPluginLibVersion": {},
   "isGameTourist": false
 }

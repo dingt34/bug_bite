@@ -1,15 +1,10 @@
-const mock = require('../../utils/mock.js');
-
 Page({
   data: {
     events: []
   },
 
   onShow() {
-    let events = wx.getStorageSync('events') || [];
-    if (!events.length) {
-      events = mock.DEMO_EVENTS;
-    }
+    const events = wx.getStorageSync('events') || [];
     this.setData({ events: events });
   },
 

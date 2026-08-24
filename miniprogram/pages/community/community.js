@@ -1,44 +1,58 @@
 const mock = require('../../utils/mock.js');
+const community = require('../../utils/community.js');
+const cloudSync = require('../../utils/cloud-sync.js');
 
 Page({
   data: {
-    posts: []
+    posts: [],
+    filterMode: 'all'
   },
 
   onShow() {
+    const app = getApp();
+    const requestedFilter = app.globalData.communityFilter;
+    if (requestedFilter === 'all' || requestedFilter === 'collected') {
+      this.setData({ filterMode: requestedFilter });
+      app.globalData.communityFilter = null;
+    }
+    this.loadPosts();
+  },
+
+  onHide() {
+    this.setData({ filterMode: 'all' });
+  },
+
+  loadPosts() {
     const local = wx.getStorageSync('posts') || [];
-    const base = local.concat(mock.POSTS);
     const reactions = wx.getStorageSync('postReactions') || {};
-    const posts = base.map(function (p) {
-      const r = reactions[p.id] || {};
-      return Object.assign({}, p, {
-        liked: !!r.liked,
-        likeCount: (p.likeCount || 0) + (r.liked ? 1 : 0),
-        collected: !!r.collected,
-        collectCount: (p.collectCount || 0) + (r.collected ? 1 : 0)
-      });
-    });
+    const posts = community.listPosts(local, mock.POSTS, reactions, this.data.filterMode);
     this.setData({ posts: posts });
+  },
+
+  setFilter(e) {
+    this.setData({ filterMode: e.currentTarget.dataset.mode });
+    this.loadPosts();
   },
 
   toggleLike(e) {
     const id = e.currentTarget.dataset.id;
-    const reactions = wx.getStorageSync('postReactions') || {};
-    const r = reactions[id] || {};
-    r.liked = !r.liked;
-    reactions[id] = r;
+    const reactions = community.toggleReaction(wx.getStorageSync('postReactions') || {}, id, 'liked');
     wx.setStorageSync('postReactions', reactions);
-    this.onShow();
+    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
+    this.loadPosts();
   },
 
   toggleCollect(e) {
     const id = e.currentTarget.dataset.id;
-    const reactions = wx.getStorageSync('postReactions') || {};
-    const r = reactions[id] || {};
-    r.collected = !r.collected;
-    reactions[id] = r;
+    const reactions = community.toggleReaction(wx.getStorageSync('postReactions') || {}, id, 'collected');
     wx.setStorageSync('postReactions', reactions);
-    this.onShow();
+    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
+    this.loadPosts();
+  },
+
+  previewImage(e) {
+    const urls = e.currentTarget.dataset.urls || [];
+    if (urls.length) wx.previewImage({ current: e.currentTarget.dataset.src || urls[0], urls });
   },
 
   goPublish() {

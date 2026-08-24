@@ -39,6 +39,12 @@
   margin-top: 12rpx;
 }
 
+.event-images {
+  margin-top: 10rpx;
+  color: #2E7D5B;
+  font-size: 24rpx;
+}
+
 .empty {
   text-align: center;
   padding: 120rpx 40rpx;

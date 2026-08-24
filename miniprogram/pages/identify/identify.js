@@ -1,11 +1,13 @@
 const mock = require('../../utils/mock.js');
+const recognition = require('../../utils/recognition.js');
 
 Page({
   data: {
     image: '',
-    status: 'idle', // idle | ready | loading | done
+    status: 'idle', // idle | ready | loading | done | error
     loading: false,
-    result: null
+    result: null,
+    errorMessage: ''
   },
 
   chooseImage() {
@@ -13,7 +15,17 @@ Page({
       count: 1,
       sourceType: ['album', 'camera'],
       success: (res) => {
-        this.setData({ image: res.tempFilePaths[0], status: 'ready', result: null });
+        const image = res.tempFilePaths && res.tempFilePaths[0];
+        this.recognitionToken = (this.recognitionToken || 0) + 1;
+        if (!image) {
+          this.setData({ loading: false, status: 'error', result: null, errorMessage: '未能读取所选图片，请重新选择。' });
+          return;
+        }
+        this.setData({ image, status: 'ready', loading: false, result: null, errorMessage: '' });
+      },
+      fail: (error) => {
+        if (error && String(error.errMsg || '').indexOf('cancel') > -1) return;
+        this.setData({ status: 'error', loading: false, result: null, errorMessage: '图片选择失败，请检查相册或相机权限后重试。' });
       }
     });
   },
@@ -22,19 +34,30 @@ Page({
     if (!this.data.image || this.data.loading) {
       return;
     }
-    this.setData({ loading: true, status: 'loading' });
-    // 真实接入：由云函数代理百度动物识别 API（前端不保存 API Key/Secret Key）
+    const token = (this.recognitionToken || 0) + 1;
+    this.recognitionToken = token;
+    this.setData({ loading: true, status: 'loading', result: null, errorMessage: '' });
     setTimeout(() => {
-      const r = mock.RECOGNITION_MOCK;
-      const candidates = r.candidates.map(c => ({
-        name: c.name,
-        percent: Math.round(c.score * 100)
-      }));
-      this.setData({
-        loading: false,
-        status: 'done',
-        result: Object.assign({}, r, { candidates: candidates })
-      });
-    }, 1000);
+      if (this.recognitionToken !== token) return;
+      try {
+        const result = recognition.buildDemoResult(mock.RECOGNITION_MOCK);
+        this.setData({ loading: false, status: 'done', result, errorMessage: '' });
+      } catch (error) {
+        this.setData({ loading: false, status: 'error', result: null, errorMessage: '模拟识别暂时不可用，请稍后重试。' });
+      }
+    }, 700);
+  },
+
+  retry() {
+    if (this.data.image) this.recognize();
+    else this.chooseImage();
+  },
+
+  goContact() {
+    wx.navigateTo({ url: '/pages/contact/contact' });
+  },
+
+  onUnload() {
+    this.recognitionToken = (this.recognitionToken || 0) + 1;
   }
 });

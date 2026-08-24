@@ -2,10 +2,12 @@
 
 <view class="page">
   <view class="head">补充一些信息，帮助我们给出更准确的分级建议</view>
+  <view class="required-note"><text class="required">*</text> 症状与接触情况均为必填项</view>
+  <view class="validation-banner" wx:if="{{validationMessage}}">{{validationMessage}}</view>
 
   <!-- 通用 + 条件追问 -->
   <view class="card" wx:for="{{questions}}" wx:key="key" wx:for-item="q">
-    <view class="card-title">{{q.label}}</view>
+    <view class="card-title">{{q.label}} <text class="required">*</text></view>
     <view class="chips">
       <text
         class="tag {{g.isSelected(answers[q.key], item) ? 'active' : ''}}"
@@ -23,23 +25,44 @@
   <!-- 已采取措施 -->
   <view class="card">
     <view class="card-title">已采取措施 <text class="optional">选填</text></view>
+    <view class="action-help">仅记录已经做过的处理，可多选；用药请遵循说明书或专业人员建议。</view>
     <view class="chips">
       <text class="tag {{g.isSelected(actionsTaken, item) ? 'active' : ''}}" wx:for="{{actionOptions}}" wx:key="*this" bindtap="onActionTap" data-v="{{item}}">{{item}}</text>
     </view>
   </view>
 
-  <!-- 可选证据：图片 -->
+  <!-- 可选证据：虫体与伤口图片分开记录 -->
   <view class="card">
     <view class="card-title">证据图片 <text class="optional">选填</text></view>
-    <view class="upload" bindtap="chooseImage">
-      <image wx:if="{{previewImage}}" src="{{previewImage}}" mode="aspectFill" class="preview" />
-      <view wx:else class="upload-placeholder">＋ 上传虫体/皮损图片</view>
+    <view class="upload-grid">
+      <view class="upload-item">
+        <view class="upload-label">虫体照片</view>
+        <view class="upload" bindtap="chooseImage" data-type="insect">
+          <image wx:if="{{insectImage}}" src="{{insectImage}}" mode="aspectFill" class="preview" />
+          <view wx:else class="upload-placeholder">
+            <view class="upload-plus">＋</view>
+            <view>拍摄或选择虫体</view>
+          </view>
+        </view>
+        <view class="upload-help">尽量拍清整体与特征</view>
+      </view>
+      <view class="upload-item">
+        <view class="upload-label">伤口/皮肤表现</view>
+        <view class="upload" bindtap="chooseImage" data-type="wound">
+          <image wx:if="{{woundImage}}" src="{{woundImage}}" mode="aspectFill" class="preview" />
+          <view wx:else class="upload-placeholder">
+            <view class="upload-plus">＋</view>
+            <view>拍摄或选择伤口</view>
+          </view>
+        </view>
+        <view class="upload-help">保持清晰并包含周边皮肤</view>
+      </view>
     </view>
-    <view class="tip">图片仅用于记录与辅助识别，不用于疾病诊断。</view>
+    <view class="tip">两类图片可任选或同时上传，仅用于记录；图片不会参与风险分级，也不用于疾病诊断。</view>
   </view>
 
   <!-- 提交 -->
   <view class="submit-wrap">
-    <button class="btn-primary" bindtap="submit">查看分级建议</button>
+    <button class="btn-primary" disabled="{{savingImage}}" bindtap="submit">{{savingImage ? '正在保存图片…' : '查看分级建议'}}</button>
   </view>
 </view>

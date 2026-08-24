@@ -10,10 +10,10 @@
 
 .brand {
   text-align: center;
-  margin-top: 120rpx;
+  margin-top: 54rpx;
 }
 .logo {
-  font-size: 120rpx;
+  font-size: 86rpx;
   line-height: 1;
 }
 .app-name {
@@ -30,8 +30,131 @@
 
 .login-area {
   width: 100%;
-  margin-top: 120rpx;
+  margin-top: 38rpx;
   text-align: center;
+}
+.mode-card,
+.cloud-card {
+  margin-bottom: 28rpx;
+  padding: 28rpx;
+  border: 2rpx solid #D9E8E0;
+  border-radius: 20rpx;
+  background: #FFFFFF;
+  text-align: left;
+}
+.mode-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cloud-status {
+  padding: 4rpx 14rpx;
+  border-radius: 18rpx;
+  font-size: 21rpx;
+}
+.cloud-ready {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.cloud-unready {
+  background: var(--warn-light);
+  color: var(--warn);
+}
+.profile-form {
+  display: flex;
+  align-items: center;
+  margin-top: 24rpx;
+}
+.avatar-button {
+  width: 112rpx;
+  height: 112rpx;
+  margin: 0 20rpx 0 0;
+  padding: 0;
+  overflow: hidden;
+  border: 2rpx dashed #BCD2C7;
+  border-radius: 50%;
+  background: #F5FAF7;
+}
+.avatar-button::after {
+  border: none;
+}
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+}
+.avatar-placeholder {
+  padding: 22rpx 12rpx;
+  color: var(--primary);
+  font-size: 20rpx;
+  line-height: 1.45;
+}
+.nickname-input {
+  flex: 1;
+  height: 76rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid #E2E8E5;
+  border-radius: 14rpx;
+  background: #FAFBFB;
+  color: #2B2F36;
+  font-size: 27rpx;
+}
+.cloud-hint {
+  margin-top: 12rpx;
+  color: var(--warn);
+  font-size: 22rpx;
+}
+.divider-row {
+  display: flex;
+  align-items: center;
+  margin: 24rpx 0;
+  color: #A2AAB0;
+  font-size: 22rpx;
+}
+.divider-line {
+  flex: 1;
+  height: 1rpx;
+  margin: 0 18rpx;
+  background: #DFE3E5;
+}
+.mode-title {
+  color: #2B2F36;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.mode-desc {
+  margin-top: 10rpx;
+  color: #6F787F;
+  font-size: 24rpx;
+  line-height: 1.65;
+}
+.understood {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 22rpx 0;
+}
+.check {
+  width: 34rpx;
+  height: 34rpx;
+  margin-right: 12rpx;
+  border: 2rpx solid #AEB8B3;
+  border-radius: 8rpx;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+.check-on {
+  border-color: #2E7D5B;
+  background: #2E7D5B;
+}
+.understood-text {
+  color: #5A616A;
+  font-size: 24rpx;
+}
+.error-message {
+  margin-bottom: 16rpx;
+  color: #E53935;
+  font-size: 23rpx;
 }
 .login-btn {
   background: #2E7D5B;
@@ -42,16 +165,41 @@
   line-height: 96rpx;
   padding: 0;
 }
+.cloud-card .login-btn {
+  margin-top: 24rpx;
+}
+.login-btn[disabled] {
+  background: #B7C9C0;
+  color: #FFFFFF;
+}
 .login-btn::after {
   border: none;
 }
 .login-btn-hover {
   background: #256b4c;
 }
-.agree {
-  font-size: 22rpx;
-  color: #B7C0C7;
-  margin-top: 24rpx;
+.local-button {
+  border: 2rpx solid var(--primary);
+  border-radius: 44rpx;
+  background: #FFFFFF;
+  color: var(--primary);
+  font-size: 27rpx;
+}
+.local-button[disabled] {
+  border-color: #C8D2CD;
+  color: #A8B0AC;
+}
+.local-button::after {
+  border: none;
+}
+.skip-btn {
+  margin-top: 18rpx;
+  background: transparent;
+  color: #2E7D5B;
+  font-size: 26rpx;
+}
+.skip-btn::after {
+  border: none;
 }
 
 .loading-box {
@@ -80,10 +228,9 @@
 }
 
 .footer-note {
-  position: absolute;
-  bottom: 80rpx;
+  margin-top: auto;
+  padding: 42rpx 40rpx 54rpx;
   font-size: 22rpx;
   color: #B7C0C7;
   text-align: center;
-  padding: 0 40rpx;
 }

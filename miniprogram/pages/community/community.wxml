@@ -2,16 +2,30 @@
   <!-- 免责声明 -->
   <view class="disclaimer">💡 社群内容为个人经验分享，不构成医疗诊断，也不参与风险评分。</view>
 
+  <view class="filters">
+    <view class="filter {{filterMode === 'all' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="all">全部分享</view>
+    <view class="filter {{filterMode === 'collected' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="collected">我的收藏</view>
+  </view>
+
   <!-- 帖子列表 -->
   <view class="post-card" wx:for="{{posts}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
     <view class="post-head">
-      <view class="post-avatar">{{item.displayName[0]}}</view>
+      <view class="post-avatar">{{item.avatarText}}</view>
       <view class="post-meta">
         <view class="post-name">{{item.displayName}}</view>
         <view class="post-time">{{item.time}}</view>
       </view>
     </view>
     <view class="post-text">{{item.text}}</view>
+    <image
+      class="post-image"
+      wx:if="{{item.imageRefs && item.imageRefs.length}}"
+      src="{{item.imageRefs[0]}}"
+      mode="aspectFill"
+      catchtap="previewImage"
+      data-src="{{item.imageRefs[0]}}"
+      data-urls="{{item.imageRefs}}"
+    />
     <view class="post-tags">
       <text class="tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
     </view>
@@ -29,7 +43,8 @@
 
   <view wx:if="{{!posts.length}}" class="empty">
     <view class="empty-icon">💬</view>
-    <view class="empty-text">还没有帖子</view>
+    <view class="empty-text">{{filterMode === 'collected' ? '还没有收藏的分享' : '还没有帖子'}}</view>
+    <view class="empty-sub" wx:if="{{filterMode === 'collected'}}">收藏后可以在这里快速找到</view>
   </view>
 
   <!-- 发布按钮 -->

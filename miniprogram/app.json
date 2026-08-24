@@ -1,9 +1,10 @@
 {
   "pages": [
-    "pages/login/login",
     "pages/index/index",
+    "pages/login/login",
     "pages/community/community",
     "pages/profile/profile",
+    "pages/privacy/privacy",
     "pages/precheck/precheck",
     "pages/precheck-result/precheck-result",
     "pages/contact/contact",
@@ -13,6 +14,7 @@
     "pages/my-plans/my-plans",
     "pages/my-events/my-events",
     "pages/event-detail/event-detail",
+    "pages/event-review/event-review",
     "pages/post-publish/post-publish",
     "pages/post-detail/post-detail",
     "pages/identify/identify"

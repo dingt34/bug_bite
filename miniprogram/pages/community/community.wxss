@@ -11,6 +11,27 @@
   padding: 18rpx 24rpx;
   margin-bottom: 24rpx;
 }
+.filters {
+  display: flex;
+  margin-bottom: 20rpx;
+  padding: 6rpx;
+  border-radius: 18rpx;
+  background: #E9ECEE;
+}
+.filter {
+  flex: 1;
+  padding: 14rpx 0;
+  border-radius: 14rpx;
+  color: #717A81;
+  font-size: 25rpx;
+  text-align: center;
+}
+.filter-on {
+  background: #FFFFFF;
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
 
 .post-card {
   background: #fff;
@@ -48,6 +69,13 @@
   margin-top: 20rpx;
   line-height: 1.6;
 }
+.post-image {
+  width: 100%;
+  height: 320rpx;
+  margin-top: 18rpx;
+  border-radius: 16rpx;
+  background: #F0F2F4;
+}
 .post-tags {
   margin-top: 16rpx;
 }
@@ -82,6 +110,10 @@
 .empty-text {
   font-size: 28rpx;
   margin-top: 20rpx;
+}
+.empty-sub {
+  margin-top: 8rpx;
+  font-size: 23rpx;
 }
 
 .fab {

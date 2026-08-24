@@ -1,43 +1,14 @@
 const mock = require('../../utils/mock.js');
-
-const RESULT_CONTENT = {
-  emergency: {
-    levelName: '紧急求助',
-    icon: '🚨',
-    color: '#E53935',
-    isEmergency: true,
-    basis: '已触发危险信号，需优先排除危及生命的紧急情况（呼吸、循环或意识异常）。',
-    actions: ['立即拨打 120 或前往最近急诊', '保持镇定，不要自行驾车', '向急救人员说明接触类型与已出现的危险信号'],
-    review: '遵医嘱；出院后按医生要求复诊，不可自行降级。',
-    checklist: ['危险信号与发生时间', '接触类型与身体部位', '虫体是否移除（如附着）', '已采取的措施']
-  },
-  consult: {
-    levelName: '尽快咨询',
-    icon: '🏥',
-    color: '#F57C00',
-    isEmergency: false,
-    basis: '存在需要专业评估的症状或变化趋势，建议尽快获得医疗意见。',
-    actions: ['尽快联系医疗机构或专业人员', '密切观察症状变化，必要时升级求助', '携带下方就医摘要前往就诊'],
-    review: '建议 24 小时内复查或就诊。',
-    checklist: ['症状变化时间线', '已采取措施', '可复制的就医摘要']
-  },
-  observe: {
-    levelName: '观察记录',
-    icon: '📋',
-    color: '#2E7D5B',
-    isEmergency: false,
-    basis: '未发现高危信号，可先进行安全观察并记录变化。',
-    actions: ['保持局部清洁，避免抓挠', '记录症状变化并拍照留证', '按复查时间更新情况'],
-    review: '3 天后自动复查；若出现危险信号立即升级求助。',
-    checklist: ['观察重点：红肿范围、疼痛瘙痒变化', '自动复查时间', '升级求助条件']
-  }
-};
+const eventUtils = require('../../utils/event.js');
+const RESULT_CONTENT = require('../../utils/result-content.js');
+const cloudSync = require('../../utils/cloud-sync.js');
 
 Page({
   data: {
     level: 'observe',
     content: null,
-    summary: ''
+    summary: '',
+    eventId: ''
   },
 
   onLoad(options) {
@@ -45,36 +16,86 @@ Page({
     const draft = getApp().globalData.draftEvent || {};
     const content = RESULT_CONTENT[level] || RESULT_CONTENT.observe;
     const summary = this.buildSummary(draft, content);
-    this.setData({ level: level, content: content, summary: summary });
-    this.saveEvent(draft, level, content);
+    const event = this.saveEvent(draft, level, content, summary);
+    this.setData({
+      level: level,
+      content: content,
+      summary: summary,
+      eventId: event ? event.id : ''
+    });
   },
 
   buildSummary(draft, content) {
     const parts = [];
+    const answers = draft.answers || {};
     parts.push('接触类型：' + (draft.contactTypeName || '未知'));
+    if (answers.occurredAt) {
+      parts.push('发生时间：' + answers.occurredAt);
+    }
+    if (answers.bodyParts && answers.bodyParts.length) {
+      parts.push('身体部位：' + answers.bodyParts.join('、'));
+    }
+    if (answers.localSymptoms && answers.localSymptoms.length) {
+      parts.push('局部表现：' + answers.localSymptoms.join('、'));
+    }
+    if (answers.systemicSymptoms && answers.systemicSymptoms.length) {
+      parts.push('全身不适：' + answers.systemicSymptoms.join('、'));
+    }
+    if (answers.trend) {
+      parts.push('变化趋势：' + answers.trend);
+    }
+    if (answers.count) {
+      parts.push('数量：' + answers.count);
+    }
+    if (answers.distribution) {
+      parts.push('分布：' + answers.distribution);
+    }
+    if (answers.attachedTime) {
+      parts.push('附着时间：' + answers.attachedTime);
+    }
+    if (answers.removed) {
+      parts.push('移除状态：' + answers.removed);
+    }
+    if (answers.contactMode) {
+      parts.push('接触方式：' + answers.contactMode);
+    }
+    if (answers.environment && answers.environment.length) {
+      parts.push('所处环境：' + answers.environment.join('、'));
+    }
     if (draft.dangerSignals && draft.dangerSignals.length) {
       parts.push('危险信号：' + draft.dangerSignals.map(k => {
         const s = mock.DANGER_SIGNALS.find(d => d.key === k);
         return s ? s.name : k;
       }).join('、'));
     }
+    if (draft.actionsTaken && draft.actionsTaken.length) {
+      parts.push('已采取措施：' + draft.actionsTaken.join('、'));
+    }
     parts.push('分级：' + content.levelName);
+    if (draft.matchedRules && draft.matchedRules.length) {
+      parts.push('触发依据：' + draft.matchedRules.map(rule => rule.text).join('；'));
+    }
     parts.push('建议：' + content.actions[0]);
     return parts.join('\n');
   },
 
-  saveEvent(draft, level, content) {
-    const event = Object.assign({}, draft, {
-      id: 'event_' + Date.now(),
-      riskLevel: level,
+  saveEvent(draft, level, content, summary) {
+    // 直接打开或刷新结果页时没有有效草稿，不创建空白或重复事件。
+    if (!draft || !draft.id || !draft.contactType) {
+      return null;
+    }
+
+    const event = eventUtils.buildEvent(draft, {
+      level: level,
       levelName: content.levelName,
       nextReviewAt: content.review,
-      createdAt: '刚刚'
+      summary: summary
     });
     const events = wx.getStorageSync('events') || [];
-    events.unshift(event);
-    wx.setStorageSync('events', events);
+    wx.setStorageSync('events', eventUtils.upsertEvent(events, event));
+    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
     getApp().globalData.draftEvent = null;
+    return event;
   },
 
   call120() {
