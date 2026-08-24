@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/community/community",
+    "pages/profile/profile",
+    "pages/precheck/precheck",
+    "pages/precheck-result/precheck-result",
+    "pages/contact/contact",
+    "pages/danger/danger",
+    "pages/guide/guide",
+    "pages/result/result",
+    "pages/my-plans/my-plans",
+    "pages/my-events/my-events",
+    "pages/event-detail/event-detail",
+    "pages/post-publish/post-publish",
+    "pages/post-detail/post-detail",
+    "pages/identify/identify"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#2E7D5B",
+    "navigationBarTitleText": "虫咬识途",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F6F7",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#9AA0A6",
+    "selectedColor": "#2E7D5B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "社群",
+        "iconPath": "images/community.png",
+        "selectedIconPath": "images/community-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/mine.png",
+        "selectedIconPath": "images/mine-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
