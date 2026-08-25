@@ -1,7 +1,6 @@
-const mock = require('../../utils/mock.js');
 const auth = require('../../utils/auth.js');
 const community = require('../../utils/community.js');
-const cloudSync = require('../../utils/cloud-sync.js');
+const communityCloud = require('../../utils/community-cloud.js');
 
 Page({
   data: {
@@ -10,7 +9,11 @@ Page({
     comments: [],
     commentText: '',
     commentCount: 0,
-    canDelete: false
+    canDelete: false,
+    loading: true,
+    loadError: '',
+    actionBusy: '',
+    commentSubmitting: false
   },
 
   onLoad(options) {
@@ -18,52 +21,56 @@ Page({
   },
 
   onShow() {
-    const post = community.findPost(
-      wx.getStorageSync('posts') || [],
-      mock.POSTS,
-      wx.getStorageSync('postReactions') || {},
-      this.postId
-    );
-    if (!post) {
-      if (this.missingHandled) return;
-      this.missingHandled = true;
-      wx.showModal({
-        title: '帖子不存在',
-        content: '该帖子可能已被删除。',
-        showCancel: false,
-        success: () => wx.navigateBack()
+    this.loadThread();
+  },
+
+  loadThread() {
+    const token = (this.loadToken || 0) + 1;
+    this.loadToken = token;
+    this.setData({ loading: true, loadError: '' });
+    return communityCloud.getThread(wx, this.postId).then(result => {
+      if (this.loadToken !== token) return;
+      this.setData({
+        post: result.post,
+        reported: result.reported,
+        comments: result.comments,
+        commentCount: result.comments.length,
+        canDelete: !!result.post.canDelete,
+        loading: false,
+        loadError: ''
       });
-      return;
-    }
-    const reports = wx.getStorageSync('reportedPosts') || {};
-    const commentsMap = wx.getStorageSync('postComments') || {};
-    const comments = community.decorateComments(commentsMap[post.id] || []);
-    const user = auth.readLocalUser(wx);
-    const canDelete = !!user && !!post.local && (
-      (post.authorId && post.authorId === user.id) ||
-      (!post.authorId && post.displayName === user.displayName)
-    );
-    this.setData({
-      post,
-      reported: !!reports[post.id],
-      comments,
-      commentCount: comments.length,
-      canDelete
+    }).catch(error => {
+      if (this.loadToken !== token) return;
+      const message = error && error.message ? error.message : '帖子加载失败';
+      this.setData({ loading: false, loadError: message });
+      if (message.indexOf('不存在') > -1 && !this.missingHandled) {
+        this.missingHandled = true;
+        wx.showModal({
+          title: '帖子不存在',
+          content: '该帖子可能已被作者删除。',
+          showCancel: false,
+          success: () => wx.navigateBack()
+        });
+      }
     });
   },
 
   toggleLike() {
-    const reactions = community.toggleReaction(wx.getStorageSync('postReactions') || {}, this.postId, 'liked');
-    wx.setStorageSync('postReactions', reactions);
-    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-    this.onShow();
+    this.toggleReaction('liked');
   },
 
   toggleCollect() {
-    const reactions = community.toggleReaction(wx.getStorageSync('postReactions') || {}, this.postId, 'collected');
-    wx.setStorageSync('postReactions', reactions);
-    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-    this.onShow();
+    this.toggleReaction('collected');
+  },
+
+  toggleReaction(key) {
+    if (this.data.actionBusy) return;
+    this.setData({ actionBusy: key });
+    communityCloud.toggleReaction(wx, this.postId, key)
+      .then(() => key === 'collected' ? communityCloud.getStats(wx).catch(() => null) : null)
+      .then(() => this.loadThread())
+      .catch(error => wx.showToast({ title: error.message || '操作失败', icon: 'none' }))
+      .then(() => this.setData({ actionBusy: '' }));
   },
 
   onCommentInput(e) {
@@ -72,10 +79,10 @@ Page({
 
   submitComment() {
     const user = auth.readLocalUser(wx);
-    if (!user) {
+    if (!user || user.mode !== 'wechat_cloud') {
       wx.showModal({
-        title: '需要登录身份',
-        content: '评论前请先创建体验身份或使用微信云登录。',
+        title: '需要微信云登录',
+        content: '评论会公开保存到云端社区，请先完成微信云登录。',
         confirmText: '去登录',
         success: result => {
           if (result.confirm) wx.navigateTo({ url: '/pages/login/login' });
@@ -88,43 +95,60 @@ Page({
       wx.showToast({ title: validation.message, icon: 'none' });
       return;
     }
-    const commentsMap = wx.getStorageSync('postComments') || {};
-    const comments = (commentsMap[this.postId] || []).slice();
-    comments.push(community.buildComment(validation.text, user));
-    commentsMap[this.postId] = comments;
-    wx.setStorageSync('postComments', commentsMap);
-    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-    this.setData({ commentText: '' });
-    this.onShow();
-    wx.showToast({ title: '评论已发布', icon: 'success' });
+    if (this.data.commentSubmitting) return;
+    this.setData({ commentSubmitting: true });
+    communityCloud.comment(wx, this.postId, validation.text, user)
+      .then(() => communityCloud.getStats(wx).catch(() => null))
+      .then(() => {
+        this.setData({ commentText: '' });
+        return this.loadThread();
+      })
+      .then(() => wx.showToast({ title: '评论已发布', icon: 'success' }))
+      .catch(error => wx.showToast({ title: error.message || '评论发布失败', icon: 'none' }))
+      .then(() => this.setData({ commentSubmitting: false }));
   },
 
-  deletePost() {
-    if (!this.data.canDelete) return;
+  deleteComment(e) {
+    const commentId = e.currentTarget.dataset.id;
+    if (this.data.actionBusy) return;
     wx.showModal({
-      title: '删除我的分享',
-      content: '删除后将不再在社群中显示，且无法恢复。',
+      title: '删除我的评论',
+      content: '删除后无法恢复。',
       confirmText: '删除',
       confirmColor: '#E53935',
       success: result => {
         if (!result.confirm) return;
-        const post = this.data.post;
-        const posts = (wx.getStorageSync('posts') || []).filter(item => item.id !== this.postId);
-        wx.setStorageSync('posts', posts);
-        ['postReactions', 'postComments', 'reportedPosts'].forEach(key => {
-          const values = wx.getStorageSync(key) || {};
-          delete values[this.postId];
-          wx.setStorageSync(key, values);
-        });
-        const tombstones = wx.getStorageSync('cloudTombstones') || {};
-        tombstones.posts = Object.assign({}, tombstones.posts || {}, { [this.postId]: Date.now() });
-        wx.setStorageSync('cloudTombstones', tombstones);
-        (post.imageRefs || []).filter(path => path && path.indexOf('cloud://') !== 0).forEach(path => {
-          wx.removeSavedFile({ filePath: path, fail: () => {} });
-        });
-        cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-        wx.showToast({ title: '分享已删除', icon: 'success' });
-        wx.navigateBack();
+        this.setData({ actionBusy: 'comment-' + commentId });
+        communityCloud.deleteComment(wx, commentId)
+          .then(() => communityCloud.getStats(wx).catch(() => null))
+          .then(() => this.loadThread())
+          .then(() => wx.showToast({ title: '评论已删除', icon: 'success' }))
+          .catch(error => wx.showToast({ title: error.message || '删除失败', icon: 'none' }))
+          .then(() => this.setData({ actionBusy: '' }));
+      }
+    });
+  },
+
+  deletePost() {
+    if (!this.data.canDelete || this.data.actionBusy) return;
+    wx.showModal({
+      title: '删除我的分享',
+      content: '删除后将不再在云端社群显示，且无法恢复。',
+      confirmText: '删除',
+      confirmColor: '#E53935',
+      success: result => {
+        if (!result.confirm) return;
+        this.setData({ actionBusy: 'delete' });
+        communityCloud.deletePost(wx, this.postId)
+          .then(() => communityCloud.getStats(wx).catch(() => null))
+          .then(() => {
+            wx.showToast({ title: '分享已删除', icon: 'success' });
+            wx.navigateBack();
+          })
+          .catch(error => {
+            this.setData({ actionBusy: '' });
+            wx.showToast({ title: error.message || '删除失败', icon: 'none' });
+          });
       }
     });
   },
@@ -136,28 +160,38 @@ Page({
 
   report() {
     if (this.data.reported) {
-      wx.showToast({ title: '已标记并隐藏', icon: 'none' });
+      wx.showToast({ title: '已提交云端审核', icon: 'none' });
       return;
     }
     wx.showModal({
-      title: '标记不当内容',
-      content: '标记后该内容会从你的社群列表隐藏；这不是平台人工审核结果。',
-      confirmText: '确认标记',
+      title: '举报不当内容',
+      content: '举报会提交至云端审核，同时从你的社群列表隐藏。',
+      confirmText: '确认举报',
       confirmColor: '#E53935',
-      success: (res) => {
-        if (res.confirm) {
-          const reports = wx.getStorageSync('reportedPosts') || {};
-          reports[this.postId] = { reportedAtTimestamp: Date.now() };
-          wx.setStorageSync('reportedPosts', reports);
-          cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-          this.setData({ reported: true });
-          wx.showToast({ title: '已标记并隐藏', icon: 'success' });
-        }
+      success: result => {
+        if (!result.confirm) return;
+        this.setData({ actionBusy: 'report' });
+        communityCloud.report(wx, this.postId, '用户标记不当内容')
+          .then(() => {
+            this.setData({ reported: true });
+            wx.showToast({ title: '已提交云端审核', icon: 'success' });
+          })
+          .catch(error => wx.showToast({ title: error.message || '举报失败', icon: 'none' }))
+          .then(() => this.setData({ actionBusy: '' }));
       }
     });
   },
 
+  retryLoad() {
+    this.missingHandled = false;
+    this.loadThread();
+  },
+
   goSafety() {
     wx.navigateTo({ url: '/pages/contact/contact' });
+  },
+
+  onUnload() {
+    this.loadToken = (this.loadToken || 0) + 1;
   }
 });

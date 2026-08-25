@@ -1,6 +1,7 @@
 const FIXED_STORAGE_KEYS = [
   'userInfo', 'plans', 'latestPlan', 'offlineCard', 'events',
-  'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
+  'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones',
+  'communityCloudStats', 'communityMigrationV1'
 ];
 
 function unique(values) {
@@ -23,7 +24,7 @@ function collectImagePaths(snapshot) {
   return unique(paths);
 }
 
-function buildDataSummary(snapshot) {
+function buildDataSummary(snapshot, communityStats) {
   const reactions = snapshot.postReactions || {};
   const user = snapshot.userInfo || {};
   const comments = Object.keys(snapshot.postComments || {}).reduce((count, postId) => {
@@ -32,7 +33,7 @@ function buildDataSummary(snapshot) {
       (!comment.authorId && user.displayName && comment.displayName === user.displayName)
     ).length;
   }, 0);
-  return {
+  const result = {
     plans: (snapshot.plans || []).length,
     events: (snapshot.events || []).length,
     posts: (snapshot.posts || []).length,
@@ -42,6 +43,12 @@ function buildDataSummary(snapshot) {
     hasIdentity: !!snapshot.userInfo,
     hasOfflineCard: !!snapshot.offlineCard
   };
+  if (communityStats && communityStats.updatedAtTimestamp) {
+    result.posts = communityStats.posts || 0;
+    result.collections = communityStats.collections || 0;
+    result.comments = communityStats.comments || 0;
+  }
+  return result;
 }
 
 function readSnapshot(wxApi) {

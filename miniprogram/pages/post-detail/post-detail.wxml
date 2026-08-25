@@ -1,4 +1,16 @@
-<view class="page" wx:if="{{post}}">
+<view class="detail-state" wx:if="{{loading && !post}}">
+  <view class="detail-spinner"></view>
+  <view>正在读取云端帖子…</view>
+</view>
+
+<view class="detail-state detail-error" wx:elif="{{loadError && !post}}">
+  <view class="detail-state-icon">☁️</view>
+  <view class="detail-state-title">帖子暂时无法加载</view>
+  <view class="detail-state-sub">{{loadError}}</view>
+  <button class="detail-retry" bindtap="retryLoad">重新加载</button>
+</view>
+
+<view class="page" wx:elif="{{post}}">
   <view class="card">
     <view class="post-head">
       <view class="post-avatar">{{post.avatarText}}</view>
@@ -31,13 +43,14 @@
     <view class="comment-title">讨论 <text class="comment-count">{{commentCount}}</text></view>
     <view class="comment-composer">
       <input class="comment-input" maxlength="200" value="{{commentText}}" bindinput="onCommentInput" placeholder="分享补充信息或友善交流" confirm-type="send" bindconfirm="submitComment" />
-      <button class="comment-send" bindtap="submitComment">发送</button>
+      <button class="comment-send" disabled="{{commentSubmitting}}" bindtap="submitComment">{{commentSubmitting ? '发送中' : '发送'}}</button>
     </view>
     <view class="comment-item" wx:for="{{comments}}" wx:key="id">
       <view class="comment-avatar">{{item.avatarText}}</view>
       <view class="comment-body">
         <view class="comment-meta"><text class="comment-name">{{item.displayName}}</text><text class="comment-time">{{item.time}}</text></view>
         <view class="comment-text">{{item.text}}</view>
+        <view class="comment-delete" wx:if="{{item.canDelete}}" bindtap="deleteComment" data-id="{{item.id}}">删除我的评论</view>
       </view>
     </view>
     <view class="comment-empty" wx:if="{{!comments.length}}">还没有讨论，欢迎提供有帮助的补充信息</view>
@@ -47,5 +60,5 @@
 
   <button class="btn-primary safety-button" bindtap="goSafety">我也有类似情况，去安全判断</button>
 
-  <view class="report {{reported ? 'reported' : ''}}" bindtap="report">{{reported ? '✓ 已标记并隐藏' : '🚩 标记不当内容'}}</view>
+  <view class="report {{reported ? 'reported' : ''}}" bindtap="report">{{reported ? '✓ 已提交云端审核' : '🚩 举报不当内容'}}</view>
 </view>

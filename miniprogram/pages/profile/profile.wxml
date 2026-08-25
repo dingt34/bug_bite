@@ -3,7 +3,7 @@
   <view class="profile-hero" bindtap="goLogin">
     <view class="hero-main">
       <view class="avatar">
-        <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
+        <image wx:if="{{avatarUrl && !avatarLoadFailed}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
         <text wx:else>{{avatarText}}</text>
       </view>
       <view class="user-info">
@@ -24,7 +24,7 @@
     <view class="hero-sync" wx:if="{{cloudUser}}">
       <view class="sync-copy">
         <view class="sync-title">微信云同步</view>
-        <view class="sync-sub">{{syncMessage || '计划、事件、社区数据和图片可跨设备恢复'}}</view>
+        <view class="sync-sub">{{syncMessage || '计划与事件可跨设备恢复，社群内容独立保存在云端'}}</view>
       </view>
       <button class="sync-button" disabled="{{syncing}}" catchtap="syncCloud">{{syncing ? '同步中' : '立即同步'}}</button>
     </view>

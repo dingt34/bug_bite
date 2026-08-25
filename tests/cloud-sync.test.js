@@ -6,22 +6,18 @@ const cloudSync = require('../miniprogram/utils/cloud-sync.js');
 (async () => {
   const merged = cloudSync.mergeSnapshots({
     plans: [{ id: 'p1', updatedAtTimestamp: 20, destinationName: '本机新版' }],
-    events: [],
-    posts: [],
-    postReactions: { post1: { liked: true } }
+    events: []
   }, {
     plans: [
       { id: 'p1', updatedAtTimestamp: 10, destinationName: '云端旧版' },
       { id: 'p2', updatedAtTimestamp: 15, destinationName: '云端计划' }
     ],
-    events: [{ id: 'e1', updatedAtTimestamp: 5 }],
-    posts: [],
-    postReactions: { post1: { collected: true } }
+    events: [{ id: 'e1', updatedAtTimestamp: 5 }]
   });
   assert.strictEqual(merged.plans.length, 2);
   assert.strictEqual(merged.plans.find(item => item.id === 'p1').destinationName, '本机新版');
   assert.strictEqual(merged.events[0].id, 'e1');
-  assert.deepStrictEqual(merged.postReactions.post1, { collected: true, liked: true });
+  assert.strictEqual(merged.postReactions, undefined);
 
   const deleted = cloudSync.mergeSnapshots({
     plans: [],
@@ -34,17 +30,6 @@ const cloudSync = require('../miniprogram/utils/cloud-sync.js');
   });
   assert.strictEqual(deleted.plans.length, 0);
   assert.strictEqual(deleted.offlineCard, null);
-
-  const deletedPost = cloudSync.mergeSnapshots({
-    posts: [],
-    postComments: { post1: [{ id: 'c1', createdAtTimestamp: 50, text: '本机评论' }] },
-    cloudTombstones: { posts: { post1: 40 } }
-  }, {
-    posts: [{ id: 'post1', createdAtTimestamp: 30 }],
-    postComments: { post1: [{ id: 'c2', createdAtTimestamp: 60, text: '云端评论' }] }
-  });
-  assert.strictEqual(deletedPost.posts.length, 0);
-  assert.deepStrictEqual(deletedPost.postComments.post1.map(item => item.id), ['c1', 'c2']);
 
   assert.deepStrictEqual(
     cloudSync.replacePaths({ imageRefs: ['/tmp/a.jpg'], nested: { path: '/tmp/a.jpg' } }, { '/tmp/a.jpg': 'cloud://env/a.jpg' }),
@@ -81,6 +66,8 @@ const cloudSync = require('../miniprogram/utils/cloud-sync.js');
   await cloudSync.pushNow(wxApi);
   assert.strictEqual(pushedSnapshot.events[0].imageRefs[0], 'cloud://env/event.jpg');
   assert.strictEqual(storage.cloudFileMap['/tmp/event.jpg'], 'cloud://env/event.jpg');
+  assert.strictEqual(pushedSnapshot.posts, undefined);
+  assert.strictEqual(pushedSnapshot.postComments, undefined);
 
   config.ENV_ID = '';
   cloudService.resetForTests();

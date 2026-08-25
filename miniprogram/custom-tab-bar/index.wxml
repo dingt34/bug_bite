@@ -1,0 +1,22 @@
+<view class="custom-tab-bar">
+  <view
+    class="tab-item {{selected === index ? 'tab-item-selected' : ''}}"
+    wx:for="{{list}}"
+    wx:key="pagePath"
+    bindtap="switchTab"
+    data-index="{{index}}"
+    data-path="{{item.pagePath}}"
+    role="button"
+    aria-label="切换到{{item.text}}"
+  >
+    <image
+      class="tab-icon"
+      src="{{selected === index ? item.selectedIconPath : item.iconPath}}"
+      mode="aspectFit"
+    />
+    <text
+      class="tab-text"
+      style="color: {{selected === index ? selectedColor : color}}"
+    >{{item.text}}</text>
+  </view>
+</view>

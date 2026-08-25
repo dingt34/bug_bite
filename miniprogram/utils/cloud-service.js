@@ -60,6 +60,19 @@ function uploadFile(wxApi, cloudPath, filePath) {
   return ensureReady(wxApi).then(() => wxApi.cloud.uploadFile({ cloudPath, filePath }));
 }
 
+function resolveFileURL(wxApi, fileID) {
+  if (typeof fileID !== 'string' || fileID.indexOf('cloud://') !== 0) {
+    return Promise.resolve(fileID || '');
+  }
+  return ensureReady(wxApi)
+    .then(() => wxApi.cloud.getTempFileURL({ fileList: [fileID] }))
+    .then(result => {
+      const file = result && result.fileList && result.fileList[0];
+      return file && file.tempFileURL ? file.tempFileURL : fileID;
+    })
+    .catch(() => fileID);
+}
+
 function deleteFiles(wxApi, fileList) {
   if (!fileList || !fileList.length) return Promise.resolve({ fileList: [] });
   return ensureReady(wxApi).then(() => wxApi.cloud.deleteFile({ fileList }));
@@ -79,6 +92,7 @@ module.exports = {
   login,
   syncData,
   uploadFile,
+  resolveFileURL,
   deleteFiles,
   resetForTests
 };

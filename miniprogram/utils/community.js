@@ -150,6 +150,20 @@ function decorateComments(comments, now) {
   }));
 }
 
+function decorateCloudPost(post, now) {
+  return Object.assign({}, post, {
+    avatarText: post.avatarText || String(post.displayName || '匿').slice(0, 1),
+    time: formatRelativeTime(post.createdAtTimestamp, post.time, now)
+  });
+}
+
+function decorateCloudComment(comment, now) {
+  return Object.assign({}, comment, {
+    avatarText: comment.avatarText || String(comment.displayName || '匿').slice(0, 1),
+    time: formatRelativeTime(comment.createdAtTimestamp, comment.time, now)
+  });
+}
+
 module.exports = {
   mergePosts,
   formatRelativeTime,
@@ -163,5 +177,7 @@ module.exports = {
   buildPost,
   validateComment,
   buildComment,
-  decorateComments
+  decorateComments,
+  decorateCloudPost,
+  decorateCloudComment
 };

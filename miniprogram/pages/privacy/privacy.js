@@ -2,6 +2,7 @@ const privacy = require('../../utils/privacy.js');
 const auth = require('../../utils/auth.js');
 const cloudService = require('../../utils/cloud-service.js');
 const cloudSync = require('../../utils/cloud-sync.js');
+const communityCloud = require('../../utils/community-cloud.js');
 
 Page({
   data: {
@@ -18,7 +19,7 @@ Page({
     const info = wx.getStorageInfoSync();
     const user = auth.readLocalUser(wx);
     this.setData({
-      summary: privacy.buildDataSummary(privacy.readSnapshot(wx)),
+      summary: privacy.buildDataSummary(privacy.readSnapshot(wx), communityCloud.readCachedStats(wx)),
       storageSize: info.currentSize || 0,
       cloudUser: !!user && user.mode === 'wechat_cloud',
       cloudConfigured: cloudService.isConfigured()
@@ -28,7 +29,7 @@ Page({
   clearAllData() {
     wx.showModal({
       title: '清除全部本机数据',
-      content: '将删除体验身份、行程计划、离线卡、事件与图片、社区发布和互动记录。删除后无法恢复。',
+      content: '将删除体验身份、行程计划、离线卡、事件与图片，以及旧版社区缓存。云端社区内容不会被这项操作删除。',
       confirmText: '全部清除',
       confirmColor: '#E53935',
       success: result => {
@@ -55,7 +56,7 @@ Page({
     if (this.data.deletingCloud) return;
     wx.showModal({
       title: '删除微信云端数据',
-      content: '将删除当前微信身份的云端资料、备份数据和已上传图片。本机计划、事件和帖子仍会保留，但会退出云身份。',
+      content: '将删除当前微信身份的云端资料、个人备份、社区发布、评论、互动和相关图片，并退出云身份。',
       confirmText: '删除云端数据',
       confirmColor: '#E53935',
       success: result => {
@@ -64,6 +65,8 @@ Page({
         cloudSync.deleteCloudAccount(wx).then(() => {
           wx.removeStorageSync('userInfo');
           wx.removeStorageSync('cloudFileMap');
+          wx.removeStorageSync('communityCloudStats');
+          wx.removeStorageSync('communityMigrationV1');
           const app = getApp();
           app.globalData.userInfo = null;
           app.globalData.cloudSyncStatus = 'idle';

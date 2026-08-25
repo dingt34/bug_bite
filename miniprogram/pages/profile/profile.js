@@ -3,12 +3,15 @@ const auth = require('../../utils/auth.js');
 const privacy = require('../../utils/privacy.js');
 const cloudService = require('../../utils/cloud-service.js');
 const cloudSync = require('../../utils/cloud-sync.js');
+const communityCloud = require('../../utils/community-cloud.js');
+const tabBar = require('../../utils/tab-bar.js');
 
 Page({
   data: {
     displayName: '点击登录',
     avatarText: '登',
     avatarUrl: '',
+    avatarLoadFailed: false,
     loginTip: '未登录 · 点击登录',
     loggedIn: false,
     cloudUser: false,
@@ -22,7 +25,10 @@ Page({
   },
 
   onShow() {
+    tabBar.syncSelected(this, 2);
     const userInfo = auth.readLocalUser(wx);
+    const avatarResolveToken = (this.avatarResolveToken || 0) + 1;
+    this.avatarResolveToken = avatarResolveToken;
     const latestPlan = wx.getStorageSync('latestPlan') || getApp().globalData.latestPlan;
     let events = wx.getStorageSync('events') || [];
     // 补充风险等级中文名，供列表徽标显示
@@ -31,21 +37,34 @@ Page({
       return Object.assign({}, ev, { levelName: level.name || '' });
     });
 
+    const summary = privacy.buildDataSummary(privacy.readSnapshot(wx), communityCloud.readCachedStats(wx));
     this.setData({
       displayName: userInfo ? userInfo.displayName : '点击登录',
       avatarText: userInfo ? userInfo.avatarText : '登',
       avatarUrl: userInfo ? userInfo.avatarUrl : '',
+      avatarLoadFailed: false,
       loginTip: userInfo
         ? (userInfo.mode === 'wechat_cloud' ? '微信云身份 · 支持跨设备同步' : '本地体验身份 · 数据仅存本机')
         : '未登录 · 点击选择微信云登录或本地体验',
       loggedIn: !!userInfo,
       cloudUser: !!userInfo && userInfo.mode === 'wechat_cloud',
       cloudConfigured: cloudService.isConfigured(),
-      summary: privacy.buildDataSummary(privacy.readSnapshot(wx)),
+      summary,
       latestPlan: latestPlan,
       latestEvent: events.length ? events[0] : null,
       events: events.slice(0, 3)
     });
+    if (userInfo && userInfo.avatarUrl) {
+      cloudService.resolveFileURL(wx, userInfo.avatarUrl).then(avatarUrl => {
+        if (this.avatarResolveToken !== avatarResolveToken) return;
+        this.setData({ avatarUrl, avatarLoadFailed: false });
+      });
+    }
+    if (userInfo && userInfo.mode === 'wechat_cloud') {
+      communityCloud.getStats(wx).then(stats => {
+        this.setData({ summary: Object.assign({}, this.data.summary, stats) });
+      }).catch(() => {});
+    }
   },
 
   goLogin() {
@@ -56,6 +75,10 @@ Page({
 
   goPlans() {
     wx.navigateTo({ url: '/pages/my-plans/my-plans' });
+  },
+
+  onAvatarError() {
+    this.setData({ avatarLoadFailed: true });
   },
 
   goEvents() {

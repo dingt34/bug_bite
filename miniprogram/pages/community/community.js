@@ -1,7 +1,7 @@
 const mock = require('../../utils/mock.js');
 const auth = require('../../utils/auth.js');
-const community = require('../../utils/community.js');
-const cloudSync = require('../../utils/cloud-sync.js');
+const communityCloud = require('../../utils/community-cloud.js');
+const tabBar = require('../../utils/tab-bar.js');
 
 Page({
   data: {
@@ -14,82 +14,134 @@ Page({
       key: item.key,
       name: item.name
     }))),
-    hiddenCount: 0,
-    resultCount: 0
+    resultCount: 0,
+    loading: false,
+    loadingMore: false,
+    loadError: '',
+    hasMore: false,
+    actionPostId: ''
   },
 
   onShow() {
+    tabBar.syncSelected(this, 1);
     const app = getApp();
     const requestedFilter = app.globalData.communityFilter;
     if (['all', 'collected', 'mine', 'commented'].indexOf(requestedFilter) > -1) {
       this.setData({ filterMode: requestedFilter });
       app.globalData.communityFilter = null;
     }
-    this.loadPosts();
+    this.prepareAndLoad();
+  },
+
+  prepareAndLoad() {
+    if (this.preparing) return this.preparing;
+    this.setData({ loading: true, loadError: '' });
+    this.preparing = communityCloud.migrateLegacy(wx, auth.readLocalUser(wx))
+      .catch(error => {
+        wx.showToast({ title: '旧社群数据稍后重试迁移', icon: 'none' });
+        return { migrationError: error };
+      })
+      .then(() => this.loadPosts({ reset: true }))
+      .then(result => {
+        this.preparing = null;
+        return result;
+      });
+    return this.preparing;
   },
 
   onHide() {
     this.setData({ filterMode: 'all' });
   },
 
-  loadPosts() {
-    const local = wx.getStorageSync('posts') || [];
-    const reactions = wx.getStorageSync('postReactions') || {};
-    const reportedPosts = wx.getStorageSync('reportedPosts') || {};
-    const posts = community.listPosts(local, mock.POSTS, reactions, this.data.filterMode, Date.now(), {
+  onPullDownRefresh() {
+    this.loadPosts({ reset: true, pullDown: true });
+  },
+
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loadingMore) this.loadPosts({ append: true });
+  },
+
+  loadPosts(options) {
+    const settings = options || {};
+    const append = !!settings.append;
+    if (append && (!this.data.hasMore || this.data.loadingMore)) return Promise.resolve();
+    const token = (this.loadToken || 0) + 1;
+    this.loadToken = token;
+    this.setData(append
+      ? { loadingMore: true, loadError: '' }
+      : { loading: true, loadError: '', posts: settings.reset ? [] : this.data.posts });
+    return communityCloud.getFeed(wx, {
+      filterMode: this.data.filterMode,
       query: this.data.query,
       topic: this.data.topic,
       sortMode: this.data.sortMode,
-      currentUser: auth.readLocalUser(wx),
-      reportedPosts,
-      postComments: wx.getStorageSync('postComments') || {}
-    });
-    this.setData({
-      posts,
-      resultCount: posts.length,
-      hiddenCount: Object.keys(reportedPosts).length
+      offset: append ? this.data.posts.length : 0,
+      limit: 20
+    }).then(result => {
+      if (this.loadToken !== token) return;
+      const posts = append ? this.data.posts.concat(result.posts) : result.posts;
+      this.setData({
+        posts,
+        resultCount: result.total,
+        hasMore: result.hasMore,
+        loading: false,
+        loadingMore: false,
+        loadError: ''
+      });
+    }).catch(error => {
+      if (this.loadToken !== token) return;
+      this.setData({
+        loading: false,
+        loadingMore: false,
+        loadError: error && error.message ? error.message : '云端社区加载失败'
+      });
+    }).then(() => {
+      if (settings.pullDown && wx.stopPullDownRefresh) wx.stopPullDownRefresh();
     });
   },
 
   setFilter(e) {
     this.setData({ filterMode: e.currentTarget.dataset.mode });
-    this.loadPosts();
+    this.loadPosts({ reset: true });
   },
 
   onSearchInput(e) {
     this.setData({ query: e.detail.value || '' });
-    this.loadPosts();
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => this.loadPosts({ reset: true }), 300);
   },
 
   clearSearch() {
     this.setData({ query: '' });
-    this.loadPosts();
+    this.loadPosts({ reset: true });
   },
 
   setTopic(e) {
     this.setData({ topic: e.currentTarget.dataset.topic || '' });
-    this.loadPosts();
+    this.loadPosts({ reset: true });
   },
 
   setSort(e) {
     this.setData({ sortMode: e.currentTarget.dataset.mode });
-    this.loadPosts();
+    this.loadPosts({ reset: true });
   },
 
   toggleLike(e) {
-    const id = e.currentTarget.dataset.id;
-    const reactions = community.toggleReaction(wx.getStorageSync('postReactions') || {}, id, 'liked');
-    wx.setStorageSync('postReactions', reactions);
-    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-    this.loadPosts();
+    this.toggleReaction(e.currentTarget.dataset.id, 'liked');
   },
 
   toggleCollect(e) {
-    const id = e.currentTarget.dataset.id;
-    const reactions = community.toggleReaction(wx.getStorageSync('postReactions') || {}, id, 'collected');
-    wx.setStorageSync('postReactions', reactions);
-    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-    this.loadPosts();
+    this.toggleReaction(e.currentTarget.dataset.id, 'collected');
+  },
+
+  toggleReaction(id, key) {
+    if (this.data.actionPostId) return;
+    this.setData({ actionPostId: id });
+    communityCloud.toggleReaction(wx, id, key)
+      .then(() => key === 'collected' ? communityCloud.getStats(wx).catch(() => null) : null)
+      .then(() => this.loadPosts({ reset: true }))
+      .catch(error => wx.showToast({ title: error.message || '操作失败', icon: 'none' }))
+      .then(() => this.setData({ actionPostId: '' }));
   },
 
   previewImage(e) {
@@ -103,5 +155,14 @@ Page({
 
   goDetail(e) {
     wx.navigateTo({ url: '/pages/post-detail/post-detail?id=' + e.currentTarget.dataset.id });
+  },
+
+  retryLoad() {
+    this.loadPosts({ reset: true });
+  },
+
+  onUnload() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.loadToken = (this.loadToken || 0) + 1;
   }
 });

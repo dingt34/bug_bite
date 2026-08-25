@@ -1,15 +1,15 @@
 <view class="page">
   <view class="notice">
     <view class="notice-title">本机优先，可选微信云同步</view>
-    <view class="notice-text">未微信云登录时，数据只保存在当前设备；微信云登录后，计划、事件、帖子和相关图片会同步到你配置的微信云开发环境。</view>
+    <view class="notice-text">计划与事件采用本机优先、个人云备份；公共帖子、评论与互动独立保存在云端社区，不再混入个人同步快照。</view>
   </view>
 
   <view class="card">
     <view class="card-title">本机保存的数据</view>
     <view class="data-row"><text>行程计划与离线卡</text><text>{{summary.plans}} 项计划</text></view>
     <view class="data-row"><text>接触事件与症状复查</text><text>{{summary.events}} 条事件</text></view>
-    <view class="data-row"><text>社区发布与互动状态</text><text>{{summary.posts}} 条发布 · {{summary.comments}} 条评论</text></view>
-    <view class="data-row"><text>事件及帖子图片</text><text>{{summary.images}} 张</text></view>
+    <view class="data-row"><text>云端社区参与</text><text>{{summary.posts}} 条发布 · {{summary.comments}} 条评论</text></view>
+    <view class="data-row"><text>本机事件及旧版帖子图片</text><text>{{summary.images}} 张</text></view>
     <view class="data-row"><text>小程序缓存占用</text><text>约 {{storageSize}} KB</text></view>
   </view>
 
@@ -18,12 +18,13 @@
     <view class="boundary-item"><view class="boundary-title">微信身份</view><view class="boundary-text">云函数通过微信调用上下文确认用户标识；头像和昵称仅在用户主动选择、填写后保存。不读取手机号或通讯录。</view></view>
     <view class="boundary-item"><view class="boundary-title">图片识别</view><view class="boundary-text">当前为固定候选的本地流程演示，不向识别服务上传图片。</view></view>
     <view class="boundary-item"><view class="boundary-title">风险判断</view><view class="boundary-text">只使用所选症状和危险信号；照片、社区内容和识别候选不参与分级。</view></view>
+    <view class="boundary-item"><view class="boundary-title">公共社群</view><view class="boundary-text">帖子、评论、点赞、收藏与举报通过云函数保存；作者权限由微信云身份确认，数据库不允许小程序客户端直接读写。</view></view>
     <view class="boundary-item"><view class="boundary-title">未来接入 Agent</view><view class="boundary-text">当前尚未把症状数据发送给 Agent。接入知识库或 Agent 前，需要另行说明使用的数据、用途和保存方式。</view></view>
   </view>
 
   <view class="card danger-zone" wx:if="{{cloudUser}}">
     <view class="card-title">微信云端数据</view>
-    <view class="danger-text">删除云端账户资料、同步快照和已上传图片；本机业务记录仍保留。</view>
+    <view class="danger-text">删除云端账户资料、同步快照、社区发布与互动和已上传图片；本机计划与事件仍保留。</view>
     <button class="clear-button" disabled="{{deletingCloud}}" bindtap="deleteCloudData">{{deletingCloud ? '正在删除…' : '删除微信云端数据'}}</button>
     <view class="cloud-message" wx:if="{{cloudMessage}}">{{cloudMessage}}</view>
   </view>

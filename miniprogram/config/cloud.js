@@ -8,6 +8,7 @@ module.exports = {
   ENV_ID,
   LOGIN_FUNCTION: 'login',
   SYNC_FUNCTION: 'syncData',
+  COMMUNITY_FUNCTION: 'community',
   AI_BOT_ID,
   AI_MODEL: 'hy3'
 };

@@ -1,7 +1,7 @@
 const mock = require('../../utils/mock.js');
 const auth = require('../../utils/auth.js');
 const community = require('../../utils/community.js');
-const cloudSync = require('../../utils/cloud-sync.js');
+const communityCloud = require('../../utils/community-cloud.js');
 
 Page({
   data: {
@@ -15,17 +15,17 @@ Page({
     contactTypeName: '',
     stage: '',
     charCount: 0,
-    imagePersisted: false,
     publishing: false,
     validationMessage: ''
   },
 
   onLoad() {
-    if (!auth.readLocalUser(wx)) {
+    const user = auth.readLocalUser(wx);
+    if (!user || user.mode !== 'wechat_cloud') {
       wx.showModal({
-        title: '需要体验身份',
-        content: '发布内容前需要先创建本地体验身份。',
-        confirmText: '去创建',
+        title: '需要微信云登录',
+        content: '发布到公共云端社区前，需要先完成微信云登录。',
+        confirmText: '去登录',
         success: result => {
           if (result.confirm) wx.navigateTo({ url: '/pages/login/login' });
           else wx.navigateBack();
@@ -44,7 +44,7 @@ Page({
       count: 1,
       success: (res) => {
         const path = res.tempFilePaths && res.tempFilePaths[0];
-        if (path) this.setData({ previewImage: path, imagePersisted: false });
+        if (path) this.setData({ previewImage: path });
       }
     });
   },
@@ -68,8 +68,8 @@ Page({
   publish() {
     if (this.data.publishing) return;
     const userInfo = auth.readLocalUser(wx);
-    if (!userInfo) {
-      wx.showToast({ title: '请先创建体验身份', icon: 'none' });
+    if (!userInfo || userInfo.mode !== 'wechat_cloud') {
+      wx.showToast({ title: '请先完成微信云登录', icon: 'none' });
       return;
     }
     const validation = community.validatePost(this.data);
@@ -79,43 +79,20 @@ Page({
       return;
     }
     this.setData({ publishing: true, validationMessage: '' });
-    this.persistImage(() => this.commitPublish(userInfo, validation.text));
-  },
-
-  persistImage(done) {
-    if (!this.data.previewImage || this.data.imagePersisted) {
-      done();
-      return;
-    }
-    wx.saveFile({
-      tempFilePath: this.data.previewImage,
-      success: res => {
-        this.setData({ previewImage: res.savedFilePath, imagePersisted: true });
-        done();
-      },
-      fail: () => {
-        this.setData({ publishing: false, validationMessage: '图片保存失败，请重试或重新选择图片。' });
-        wx.showModal({
-          title: '图片保存失败',
-          content: '图片尚未保存，帖子不会在图片缺失的情况下发布。',
-          showCancel: false
-        });
-      }
-    });
+    this.commitPublish(userInfo, validation.text);
   },
 
   commitPublish(userInfo, text) {
-    const post = community.buildPost(Object.assign({}, this.data, {
-      text,
-      imageRef: this.data.previewImage
-    }), userInfo);
-    const posts = wx.getStorageSync('posts') || [];
-    posts.unshift(post);
-    wx.setStorageSync('posts', posts);
-    cloudSync.queuePush(wx, typeof getApp === 'function' ? getApp() : null);
-    wx.showToast({ title: '已发布', icon: 'success' });
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 400);
+    communityCloud.publish(wx, Object.assign({}, this.data, { text }), userInfo)
+      .then(() => communityCloud.getStats(wx).catch(() => null))
+      .then(() => {
+        wx.showToast({ title: '已发布到云端', icon: 'success' });
+        setTimeout(() => wx.navigateBack(), 400);
+      })
+      .catch(error => {
+        const message = error && error.message ? error.message : '云端发布失败，请稍后重试';
+        this.setData({ publishing: false, validationMessage: message });
+        wx.showToast({ title: message, icon: 'none' });
+      });
   }
 });

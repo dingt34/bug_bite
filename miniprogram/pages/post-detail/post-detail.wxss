@@ -100,6 +100,10 @@
 .comment-send::after {
   border: none;
 }
+.comment-send[disabled] {
+  background: #AFC8BC;
+  color: #FFFFFF;
+}
 .comment-item {
   display: flex;
   margin-top: 28rpx;
@@ -139,6 +143,11 @@
   font-size: 25rpx;
   line-height: 1.6;
 }
+.comment-delete {
+  margin-top: 10rpx;
+  color: #C65353;
+  font-size: 21rpx;
+}
 .comment-empty {
   padding: 48rpx 10rpx 20rpx;
   color: #9BA5A0;
@@ -168,4 +177,43 @@
 }
 .safety-button {
   margin: 24rpx 0;
+}
+.detail-state {
+  padding: 220rpx 50rpx 80rpx;
+  color: #7C8983;
+  font-size: 25rpx;
+  text-align: center;
+}
+.detail-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  margin: 0 auto 22rpx;
+  border: 5rpx solid #DCE9E3;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+}
+.detail-state-icon {
+  font-size: 64rpx;
+}
+.detail-state-title {
+  margin-top: 14rpx;
+  color: #48554F;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.detail-state-sub {
+  margin-top: 10rpx;
+  color: #929D98;
+  font-size: 22rpx;
+}
+.detail-retry {
+  width: 220rpx;
+  margin-top: 28rpx;
+  border-radius: 34rpx;
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 24rpx;
+}
+.detail-retry::after {
+  border: none;
 }

@@ -1,6 +1,6 @@
 .page {
   padding: 24rpx;
-  padding-bottom: 140rpx;
+  padding-bottom: 180rpx;
 }
 
 .disclaimer {
@@ -193,11 +193,60 @@
   margin-top: 8rpx;
   font-size: 23rpx;
 }
+.cloud-state {
+  padding: 110rpx 36rpx;
+  color: #7C8983;
+  font-size: 25rpx;
+  text-align: center;
+}
+.state-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  margin: 0 auto 22rpx;
+  border: 5rpx solid #DCE9E3;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+}
+.state-error {
+  padding-top: 72rpx;
+}
+.state-icon {
+  font-size: 62rpx;
+}
+.state-title {
+  margin-top: 14rpx;
+  color: #48554F;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.state-sub {
+  margin-top: 10rpx;
+  color: #929D98;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+.retry-button {
+  width: 220rpx;
+  margin-top: 28rpx;
+  border-radius: 34rpx;
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 24rpx;
+}
+.retry-button::after {
+  border: none;
+}
+.load-more {
+  padding: 24rpx 0 44rpx;
+  color: #A0AAA5;
+  font-size: 21rpx;
+  text-align: center;
+}
 
 .fab {
   position: fixed;
   right: 40rpx;
-  bottom: 60rpx;
+  bottom: 132rpx;
   background: var(--primary);
   color: #fff;
   font-size: 30rpx;

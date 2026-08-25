@@ -22,11 +22,23 @@
   </scroll-view>
 
   <view class="feed-tools">
-    <view class="result-count">{{resultCount}} 条分享<text wx:if="{{hiddenCount}}"> · 已隐藏 {{hiddenCount}} 条标记内容</text></view>
+    <view class="result-count">{{resultCount}} 条云端分享</view>
     <view class="sorts">
       <text class="sort {{sortMode === 'latest' ? 'sort-on' : ''}}" bindtap="setSort" data-mode="latest">最新</text>
       <text class="sort {{sortMode === 'hot' ? 'sort-on' : ''}}" bindtap="setSort" data-mode="hot">热门</text>
     </view>
+  </view>
+
+  <view class="cloud-state" wx:if="{{loading && !posts.length}}">
+    <view class="state-spinner"></view>
+    <view>正在连接云端社区…</view>
+  </view>
+
+  <view class="cloud-state state-error" wx:elif="{{loadError && !posts.length}}">
+    <view class="state-icon">☁️</view>
+    <view class="state-title">云端社区暂时无法加载</view>
+    <view class="state-sub">{{loadError}}</view>
+    <button class="retry-button" bindtap="retryLoad">重新加载</button>
   </view>
 
   <!-- 帖子列表 -->
@@ -67,10 +79,16 @@
     </view>
   </view>
 
-  <view wx:if="{{!posts.length}}" class="empty">
+  <view wx:if="{{!loading && !loadError && !posts.length}}" class="empty">
     <view class="empty-icon">💬</view>
     <view class="empty-text">{{query ? '没有找到匹配的分享' : (filterMode === 'collected' ? '还没有收藏的分享' : (filterMode === 'mine' ? '你还没有发布内容' : (filterMode === 'commented' ? '你还没有参与讨论' : '还没有帖子')))}}</view>
     <view class="empty-sub">{{query ? '尝试缩短关键词或切换主题' : (filterMode === 'collected' ? '收藏后可以在这里快速找到' : (filterMode === 'mine' ? '点击右下角发布第一条经历' : (filterMode === 'commented' ? '评论后可在这里找到参与过的帖子' : '成为第一个分享经历的人')))}}</view>
+  </view>
+
+  <view class="load-more" wx:if="{{posts.length}}">
+    <text wx:if="{{loadingMore}}">正在加载更多…</text>
+    <text wx:elif="{{hasMore}}">继续上拉加载</text>
+    <text wx:else>已显示全部云端分享</text>
   </view>
 
   <!-- 发布按钮 -->

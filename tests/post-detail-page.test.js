@@ -1,32 +1,26 @@
 const assert = require('assert');
+const cloudService = require('../miniprogram/utils/cloud-service.js');
 
 let pageDefinition = null;
-let reactions = {};
-let reports = {};
-let comments = {};
-let localPosts = [];
-let tombstones = {};
 let modalTitle = '';
 let navigatedBack = false;
+let postDeleted = false;
+let reported = false;
+let reaction = { liked: false, collected: false };
+let comments = [];
+const post = {
+  id: 'cloud_post_1', displayName: '云用户', avatarText: '云', text: '我的户外经历',
+  createdAtTimestamp: 100, imageRefs: [], tags: [], likeCount: 0, collectCount: 0,
+  commentCount: 0, canDelete: true
+};
 
 global.Page = definition => { pageDefinition = definition; };
 global.wx = {
   getStorageSync(key) {
-    if (key === 'posts') return localPosts;
-    if (key === 'postReactions') return reactions;
-    if (key === 'reportedPosts') return reports;
-    if (key === 'postComments') return comments;
-    if (key === 'cloudTombstones') return tombstones;
-    if (key === 'userInfo') return { id: 'u1', displayName: '山野观察员', avatarText: '山' };
+    if (key === 'userInfo') return { id: 'u1', displayName: '云用户', avatarText: '云', mode: 'wechat_cloud' };
     return null;
   },
-  setStorageSync(key, value) {
-    if (key === 'postReactions') reactions = value;
-    if (key === 'reportedPosts') reports = value;
-    if (key === 'postComments') comments = value;
-    if (key === 'posts') localPosts = value;
-    if (key === 'cloudTombstones') tombstones = value;
-  },
+  setStorageSync() {},
   showModal(options) {
     modalTitle = options.title;
     if (options.success) options.success({ confirm: true });
@@ -34,56 +28,103 @@ global.wx = {
   showToast() {},
   navigateBack() { navigatedBack = true; },
   navigateTo() {},
-  removeSavedFile() {}
+  previewImage() {},
+  cloud: {
+    init() {},
+    callFunction(options) {
+      const data = options.data;
+      if (data.action === 'get') {
+        if (data.postId === 'missing_post' || postDeleted) {
+          return Promise.reject(new Error('帖子不存在或已删除'));
+        }
+        return Promise.resolve({ result: {
+          post: Object.assign({}, post, reaction, {
+            likeCount: reaction.liked ? 1 : 0,
+            collectCount: reaction.collected ? 1 : 0,
+            commentCount: comments.length
+          }),
+          comments: comments.slice(),
+          reported
+        } });
+      }
+      if (data.action === 'toggleReaction') {
+        reaction[data.key] = !reaction[data.key];
+        return Promise.resolve({ result: { reaction } });
+      }
+      if (data.action === 'comment') {
+        comments.push({
+          id: 'comment_1', displayName: data.profile.displayName, avatarText: '云',
+          text: data.text, createdAtTimestamp: 200, canDelete: true
+        });
+        return Promise.resolve({ result: { comment: comments[0] } });
+      }
+      if (data.action === 'deleteComment') {
+        comments = comments.filter(item => item.id !== data.commentId);
+        return Promise.resolve({ result: { success: true } });
+      }
+      if (data.action === 'report') {
+        reported = true;
+        return Promise.resolve({ result: { success: true, reported: true } });
+      }
+      if (data.action === 'deletePost') {
+        postDeleted = true;
+        return Promise.resolve({ result: { success: true } });
+      }
+      if (data.action === 'stats') return Promise.resolve({ result: { posts: postDeleted ? 0 : 1, comments: comments.length, collections: reaction.collected ? 1 : 0 } });
+      return Promise.resolve({ result: {} });
+    }
+  }
 };
 
+cloudService.resetForTests();
 require('../miniprogram/pages/post-detail/post-detail.js');
 
 function createPage() {
   return Object.assign({}, pageDefinition, {
     data: Object.assign({}, pageDefinition.data),
-    setData(update) {
-      this.data = Object.assign({}, this.data, update);
-    }
+    setData(update) { this.data = Object.assign({}, this.data, update); }
   });
 }
 
-const page = createPage();
-page.onLoad({ id: 'post_001' });
-page.onShow();
-assert.strictEqual(page.data.post.id, 'post_001');
-page.toggleLike();
-assert.strictEqual(page.data.post.liked, true);
-assert.strictEqual(page.data.post.likeCount, 13);
-page.toggleCollect();
-assert.strictEqual(page.data.post.collected, true);
-page.onCommentInput({ detail: { value: '谢谢分享这段经历' } });
-page.submitComment();
-assert.strictEqual(page.data.commentCount, 1);
-assert.strictEqual(comments.post_001[0].displayName, '山野观察员');
+(async () => {
+  const page = createPage();
+  page.onLoad({ id: 'cloud_post_1' });
+  await page.loadThread();
+  assert.strictEqual(page.data.post.id, 'cloud_post_1');
 
-page.report();
-assert.strictEqual(page.data.reported, true);
-assert.ok(reports.post_001);
-assert.strictEqual(modalTitle, '标记不当内容');
+  page.toggleLike();
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.strictEqual(page.data.post.liked, true);
+  page.toggleCollect();
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.strictEqual(page.data.post.collected, true);
 
-const missingPage = createPage();
-missingPage.onLoad({ id: 'missing_post' });
-missingPage.onShow();
-assert.strictEqual(missingPage.data.post, null);
-assert.strictEqual(modalTitle, '帖子不存在');
-assert.strictEqual(navigatedBack, true);
+  page.onCommentInput({ detail: { value: '谢谢分享这段经历' } });
+  page.submitComment();
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.strictEqual(page.data.commentCount, 1);
+  assert.strictEqual(page.data.comments[0].canDelete, true);
+  page.deleteComment({ currentTarget: { dataset: { id: 'comment_1' } } });
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.strictEqual(page.data.commentCount, 0);
 
-localPosts = [{
-  id: 'mine_1', authorId: 'u1', displayName: '山野观察员', avatarText: '山',
-  text: '我的户外经历', local: true, createdAtTimestamp: 100, imageRefs: []
-}];
-const ownPage = createPage();
-ownPage.onLoad({ id: 'mine_1' });
-ownPage.onShow();
-assert.strictEqual(ownPage.data.canDelete, true);
-ownPage.deletePost();
-assert.strictEqual(localPosts.length, 0);
-assert.ok(tombstones.posts.mine_1);
+  page.report();
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.strictEqual(page.data.reported, true);
+  assert.strictEqual(modalTitle, '举报不当内容');
 
-console.log('post detail page tests passed');
+  page.deletePost();
+  await new Promise(resolve => setTimeout(resolve, 20));
+  assert.strictEqual(postDeleted, true);
+  assert.strictEqual(navigatedBack, true);
+
+  const missingPage = createPage();
+  missingPage.onLoad({ id: 'missing_post' });
+  await missingPage.loadThread();
+  assert.strictEqual(modalTitle, '帖子不存在');
+  cloudService.resetForTests();
+  console.log('post detail page tests passed');
+})().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

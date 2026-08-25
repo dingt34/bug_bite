@@ -1,5 +1,5 @@
 .page {
-  padding-bottom: 60rpx;
+  padding-bottom: 160rpx;
   background: #F5F6F7;
 }
 

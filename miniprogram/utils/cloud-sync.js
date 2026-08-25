@@ -2,6 +2,7 @@ const auth = require('./auth.js');
 const privacy = require('./privacy.js');
 const cloudService = require('./cloud-service.js');
 const planUtils = require('./plan.js');
+const config = require('../config/cloud.js');
 
 let pushTimer = null;
 
@@ -58,21 +59,9 @@ function mergePostComments(localComments, remoteComments) {
 function mergeSnapshots(localSnapshot, remoteSnapshot) {
   const local = localSnapshot || {};
   const remote = remoteSnapshot || {};
-  const postReactions = {};
-  const reactionIds = Object.keys(remote.postReactions || {}).concat(Object.keys(local.postReactions || {}));
-  reactionIds.forEach(id => {
-    postReactions[id] = Object.assign(
-      {},
-      (remote.postReactions || {})[id] || {},
-      (local.postReactions || {})[id] || {}
-    );
-  });
   const cloudTombstones = mergeTombstones(local.cloudTombstones, remote.cloudTombstones);
   const plans = mergeById(local.plans, remote.plans).filter(plan =>
     (cloudTombstones.plans[plan.id] || 0) < itemTimestamp(plan)
-  );
-  const posts = mergeById(local.posts, remote.posts).filter(post =>
-    (cloudTombstones.posts[post.id] || 0) < itemTimestamp(post)
   );
   const localCardTime = local.offlineCard && local.offlineCard.cachedAtTimestamp || 0;
   const remoteCardTime = remote.offlineCard && remote.offlineCard.cachedAtTimestamp || 0;
@@ -85,10 +74,6 @@ function mergeSnapshots(localSnapshot, remoteSnapshot) {
     latestPlan: plans.length ? planUtils.toLatestPlan(plans[0]) : (local.latestPlan || remote.latestPlan || null),
     offlineCard,
     events: mergeById(local.events, remote.events),
-    posts,
-    postReactions,
-    postComments: mergePostComments(local.postComments, remote.postComments),
-    reportedPosts: Object.assign({}, remote.reportedPosts || {}, local.reportedPosts || {}),
     cloudFileMap: Object.assign({}, remote.cloudFileMap || {}, local.cloudFileMap || {}),
     cloudTombstones
   };
@@ -101,10 +86,6 @@ function readSyncSnapshot(wxApi) {
     latestPlan: snapshot.latestPlan,
     offlineCard: snapshot.offlineCard,
     events: snapshot.events,
-    posts: snapshot.posts,
-    postReactions: snapshot.postReactions,
-    postComments: snapshot.postComments || {},
-    reportedPosts: snapshot.reportedPosts,
     cloudFileMap: snapshot.cloudFileMap || {},
     cloudTombstones: snapshot.cloudTombstones || {}
   };
@@ -113,8 +94,7 @@ function readSyncSnapshot(wxApi) {
 function applySnapshot(wxApi, snapshot) {
   const source = snapshot || {};
   const keys = [
-    'plans', 'latestPlan', 'offlineCard', 'events',
-    'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
+    'plans', 'latestPlan', 'offlineCard', 'events', 'cloudFileMap', 'cloudTombstones'
   ];
   keys.forEach(key => {
     if (source[key] === null || source[key] === undefined) wxApi.removeStorageSync(key);
@@ -201,7 +181,8 @@ function deleteCloudAccount(wxApi) {
   const cloudFiles = fileList.filter((id, index) =>
     typeof id === 'string' && id.indexOf('cloud://') === 0 && fileList.indexOf(id) === index
   );
-  return cloudService.deleteFiles(wxApi, cloudFiles)
+  return cloudService.callFunction(wxApi, config.COMMUNITY_FUNCTION, { action: 'deleteAccount' })
+    .then(() => cloudService.deleteFiles(wxApi, cloudFiles))
     .then(() => cloudService.syncData(wxApi, 'delete'));
 }
 

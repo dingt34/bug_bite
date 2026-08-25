@@ -4,8 +4,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
 const ALLOWED_KEYS = [
-  'plans', 'latestPlan', 'offlineCard', 'events',
-  'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
+  'plans', 'latestPlan', 'offlineCard', 'events', 'cloudFileMap', 'cloudTombstones'
 ];
 
 function normalizeSnapshot(snapshot) {
