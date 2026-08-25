@@ -39,5 +39,5 @@
   <view class="submit-wrap">
     <button class="btn-primary" disabled="{{publishing}}" bindtap="publish">{{publishing ? '正在保存并发布…' : '发布'}}</button>
   </view>
-  <view class="tip" style="margin: 0 24rpx;">请分享可核实的个人经历，避免给他人下诊断或提供处方。演示版内容仅保存在当前设备。</view>
+  <view class="tip" style="margin: 0 24rpx;">请分享可核实的个人经历，避免给他人下诊断或提供处方。内容先保存在本机，微信云登录后自动同步。</view>
 </view>

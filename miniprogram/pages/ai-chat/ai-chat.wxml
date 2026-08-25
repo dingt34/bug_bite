@@ -1,0 +1,100 @@
+<view class="page">
+  <view class="safety-notice" bindtap="goContact">
+    <view class="notice-icon">⚠️</view>
+    <view class="notice-copy"><view class="notice-title">AI建议不替代医疗诊断</view><view class="notice-sub">出现严重或快速加重症状，请直接进入安全判断或呼叫120</view></view>
+    <view class="notice-arrow">→</view>
+  </view>
+
+  <view class="ai-status {{aiAvailable ? 'status-ready' : 'status-off'}}">
+    <text class="status-dot"></text>{{modeText}} · {{statusMessage}}
+  </view>
+
+  <scroll-view class="chat-scroll" scroll-y scroll-with-animation scroll-into-view="{{scrollIntoView}}">
+    <view class="message-row {{item.role === 'user' ? 'message-user' : 'message-assistant'}}" wx:for="{{messages}}" wx:key="id" id="message-{{item.id}}">
+      <view class="message-avatar">{{item.role === 'user' ? '我' : 'AI'}}</view>
+      <view class="message-content">
+        <view class="message-images" wx:if="{{item.images && item.images.length}}">
+          <view class="message-image-wrap" wx:for="{{item.images}}" wx:key="kind">
+            <image class="message-image" src="{{item.path}}" mode="aspectFill" />
+            <view class="message-image-label">{{item.label}}</view>
+          </view>
+        </view>
+        <view class="message-bubble {{item.error ? 'bubble-error' : ''}}">
+          <view wx:if="{{item.loading && !item.content}}" class="typing"><text></text><text></text><text></text></view>
+          <text wx:else selectable>{{item.content}}</text>
+        </view>
+        <view class="ai-label" wx:if="{{item.role === 'assistant' && item.id !== 'welcome'}}">AI生成内容，请结合危险信号判断</view>
+      </view>
+    </view>
+    <view class="scroll-spacer"></view>
+  </scroll-view>
+
+  <view class="composer">
+    <scroll-view class="quick-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="quick-row">
+        <view class="record-chip" bindtap="sendRecords">📋 发送我的记录</view>
+        <view class="quick-chip" wx:for="{{quickQuestions}}" wx:key="*this" bindtap="sendQuick" data-text="{{item}}">{{item}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="image-previews" wx:if="{{images.length}}">
+      <view class="preview-wrap" wx:for="{{images}}" wx:key="kind">
+        <image class="preview-image" src="{{item.path}}" mode="aspectFill" />
+        <view class="preview-label">{{item.label}}</view>
+        <view class="preview-remove" bindtap="removeImage" data-kind="{{item.kind}}">×</view>
+      </view>
+    </view>
+
+    <view class="attachment-row">
+      <view class="attach-button" bindtap="chooseImage" data-kind="insect">🐛 虫体图片</view>
+      <view class="attach-button" bindtap="chooseImage" data-kind="wound">🩹 伤口图片</view>
+      <view class="attachment-tip">发送后临时云图片会清理</view>
+    </view>
+
+    <view class="input-row">
+      <textarea class="chat-input" value="{{inputText}}" bindinput="onInput" maxlength="1000" auto-height placeholder="描述接触情况、症状变化或想了解的问题…" disabled="{{sending}}" />
+      <button class="send-button" disabled="{{sending}}" bindtap="sendMessage">{{sending ? '回复中' : '发送'}}</button>
+    </view>
+  </view>
+
+  <view class="record-selector-mask" wx:if="{{recordSelectorVisible}}" catchtap="closeRecordSelector"></view>
+  <view class="record-selector" wx:if="{{recordSelectorVisible}}">
+    <view class="selector-handle"></view>
+    <view class="selector-header">
+      <view>
+        <view class="selector-title">选择要发送的记录</view>
+        <view class="selector-subtitle">仅发送勾选记录的文字摘要，不发送历史图片</view>
+      </view>
+      <view class="selector-close" bindtap="closeRecordSelector">×</view>
+    </view>
+
+    <scroll-view class="selector-list" scroll-y>
+      <view class="selector-section" wx:if="{{selectablePlans.length}}">
+        <view class="selector-section-title">行程计划</view>
+        <view class="selector-item {{record.selected ? 'selector-item-selected' : ''}}" wx:for="{{selectablePlans}}" wx:for-item="record" wx:key="key" bindtap="toggleRecord" data-type="plan" data-index="{{record.index}}">
+          <view class="selector-check">{{record.selected ? '✓' : ''}}</view>
+          <view class="selector-copy">
+            <view class="selector-record-title">{{record.title}}</view>
+            <view class="selector-record-subtitle">{{record.subtitle}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="selector-section" wx:if="{{selectableEvents.length}}">
+        <view class="selector-section-title">接触事件与复查</view>
+        <view class="selector-item {{record.selected ? 'selector-item-selected' : ''}}" wx:for="{{selectableEvents}}" wx:for-item="record" wx:key="key" bindtap="toggleRecord" data-type="event" data-index="{{record.index}}">
+          <view class="selector-check">{{record.selected ? '✓' : ''}}</view>
+          <view class="selector-copy">
+            <view class="selector-record-title">{{record.title}}</view>
+            <view class="selector-record-subtitle">{{record.subtitle}}</view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="selector-actions">
+      <button class="selector-cancel" bindtap="closeRecordSelector">取消</button>
+      <button class="selector-confirm" disabled="{{!selectedRecordCount}}" bindtap="confirmSendRecords">发送所选（{{selectedRecordCount}}）</button>
+    </view>
+  </view>
+</view>

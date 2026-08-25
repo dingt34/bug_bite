@@ -48,19 +48,19 @@
     <view class="func-arrow">→</view>
   </view>
 
-  <view class="func-entry" hover-class="func-entry-hover" bindtap="goIdentify">
-    <view class="func-icon">🐛</view>
+  <view class="func-entry ai-entry" hover-class="func-entry-hover" bindtap="goAiChat">
+    <view class="func-icon ai-icon">✨</view>
     <view class="func-body">
-      <view class="func-title">识别昆虫</view>
-      <view class="func-desc">拍一张虫体照片，查看疑似候选（仅供参考）</view>
+      <view class="func-title">AI建议助手</view>
+      <view class="func-desc">对话咨询安全建议，可发送虫体/伤口图片和自己的事件记录</view>
       <view class="func-tags">
-        <text class="func-tag">拍照识别</text>
-        <text class="func-tag">疑似候选</text>
+        <text class="func-tag">AI对话</text>
+        <text class="func-tag">图片与记录</text>
       </view>
     </view>
     <view class="func-arrow">→</view>
   </view>
 
   <!-- 底部免责 -->
-  <view class="footer-note">个人经历与识别结果不构成诊断 · 安全判断以症状和危险信号为准</view>
+  <view class="footer-note">个人经历与AI建议不构成诊断 · 安全判断以症状和危险信号为准</view>
 </view>

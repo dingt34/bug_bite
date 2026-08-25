@@ -17,7 +17,7 @@
     "pages/event-review/event-review",
     "pages/post-publish/post-publish",
     "pages/post-detail/post-detail",
-    "pages/identify/identify"
+    "pages/ai-chat/ai-chat"
   ],
   "window": {
     "navigationBarBackgroundColor": "#2E7D5B",

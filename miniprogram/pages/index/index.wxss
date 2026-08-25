@@ -136,6 +136,13 @@
   flex-shrink: 0;
   background: #F0F6F3;
 }
+.ai-entry {
+  border: 1rpx solid #D8E9E1;
+  background: linear-gradient(135deg, #FFFFFF, #F4FAF7);
+}
+.ai-icon {
+  background: linear-gradient(135deg, #E3F3EB, #FFF4D8);
+}
 .func-body {
   flex: 1;
 }

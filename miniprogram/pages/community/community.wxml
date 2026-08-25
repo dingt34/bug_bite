@@ -2,9 +2,31 @@
   <!-- 免责声明 -->
   <view class="disclaimer">💡 社群内容为个人经验分享，不构成医疗诊断，也不参与风险评分。</view>
 
+  <view class="search-box">
+    <text class="search-icon">⌕</text>
+    <input class="search-input" value="{{query}}" bindinput="onSearchInput" placeholder="搜索经历、地区、标签或发布者" confirm-type="search" />
+    <text class="search-clear" wx:if="{{query}}" bindtap="clearSearch">清除</text>
+  </view>
+
   <view class="filters">
     <view class="filter {{filterMode === 'all' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="all">全部分享</view>
     <view class="filter {{filterMode === 'collected' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="collected">我的收藏</view>
+    <view class="filter {{filterMode === 'mine' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="mine">我的发布</view>
+    <view class="filter {{filterMode === 'commented' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="commented">我的评论</view>
+  </view>
+
+  <scroll-view class="topic-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="topic-row">
+      <view class="topic-chip {{topic === item.key ? 'topic-on' : ''}}" wx:for="{{topics}}" wx:key="key" bindtap="setTopic" data-topic="{{item.key}}">{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="feed-tools">
+    <view class="result-count">{{resultCount}} 条分享<text wx:if="{{hiddenCount}}"> · 已隐藏 {{hiddenCount}} 条标记内容</text></view>
+    <view class="sorts">
+      <text class="sort {{sortMode === 'latest' ? 'sort-on' : ''}}" bindtap="setSort" data-mode="latest">最新</text>
+      <text class="sort {{sortMode === 'hot' ? 'sort-on' : ''}}" bindtap="setSort" data-mode="hot">热门</text>
+    </view>
   </view>
 
   <!-- 帖子列表 -->
@@ -38,13 +60,17 @@
         <text class="action-icon">{{item.collected ? '⭐' : '☆'}}</text>
         <text class="action-num">{{item.collectCount}}</text>
       </view>
+      <view class="action" catchtap="goDetail" data-id="{{item.id}}">
+        <text class="action-icon comment-icon">💬</text>
+        <text class="action-num">{{item.commentCount}}</text>
+      </view>
     </view>
   </view>
 
   <view wx:if="{{!posts.length}}" class="empty">
     <view class="empty-icon">💬</view>
-    <view class="empty-text">{{filterMode === 'collected' ? '还没有收藏的分享' : '还没有帖子'}}</view>
-    <view class="empty-sub" wx:if="{{filterMode === 'collected'}}">收藏后可以在这里快速找到</view>
+    <view class="empty-text">{{query ? '没有找到匹配的分享' : (filterMode === 'collected' ? '还没有收藏的分享' : (filterMode === 'mine' ? '你还没有发布内容' : (filterMode === 'commented' ? '你还没有参与讨论' : '还没有帖子')))}}</view>
+    <view class="empty-sub">{{query ? '尝试缩短关键词或切换主题' : (filterMode === 'collected' ? '收藏后可以在这里快速找到' : (filterMode === 'mine' ? '点击右下角发布第一条经历' : (filterMode === 'commented' ? '评论后可在这里找到参与过的帖子' : '成为第一个分享经历的人')))}}</view>
   </view>
 
   <!-- 发布按钮 -->

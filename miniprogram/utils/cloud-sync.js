@@ -32,10 +32,27 @@ function mergeTombstones(localTombstones, remoteTombstones) {
   Object.keys(local.plans || {}).forEach(id => {
     plans[id] = Math.max(plans[id] || 0, local.plans[id] || 0);
   });
+  const posts = Object.assign({}, remote.posts || {});
+  Object.keys(local.posts || {}).forEach(id => {
+    posts[id] = Math.max(posts[id] || 0, local.posts[id] || 0);
+  });
   return {
     plans,
+    posts,
     offlineCard: Math.max(local.offlineCard || 0, remote.offlineCard || 0)
   };
+}
+
+function mergePostComments(localComments, remoteComments) {
+  const result = {};
+  const postIds = Object.keys(remoteComments || {}).concat(Object.keys(localComments || {}));
+  postIds.forEach(postId => {
+    result[postId] = mergeById(
+      (localComments || {})[postId] || [],
+      (remoteComments || {})[postId] || []
+    ).sort((a, b) => itemTimestamp(a) - itemTimestamp(b));
+  });
+  return result;
 }
 
 function mergeSnapshots(localSnapshot, remoteSnapshot) {
@@ -54,6 +71,9 @@ function mergeSnapshots(localSnapshot, remoteSnapshot) {
   const plans = mergeById(local.plans, remote.plans).filter(plan =>
     (cloudTombstones.plans[plan.id] || 0) < itemTimestamp(plan)
   );
+  const posts = mergeById(local.posts, remote.posts).filter(post =>
+    (cloudTombstones.posts[post.id] || 0) < itemTimestamp(post)
+  );
   const localCardTime = local.offlineCard && local.offlineCard.cachedAtTimestamp || 0;
   const remoteCardTime = remote.offlineCard && remote.offlineCard.cachedAtTimestamp || 0;
   const newestCardTime = Math.max(localCardTime, remoteCardTime);
@@ -65,8 +85,9 @@ function mergeSnapshots(localSnapshot, remoteSnapshot) {
     latestPlan: plans.length ? planUtils.toLatestPlan(plans[0]) : (local.latestPlan || remote.latestPlan || null),
     offlineCard,
     events: mergeById(local.events, remote.events),
-    posts: mergeById(local.posts, remote.posts),
+    posts,
     postReactions,
+    postComments: mergePostComments(local.postComments, remote.postComments),
     reportedPosts: Object.assign({}, remote.reportedPosts || {}, local.reportedPosts || {}),
     cloudFileMap: Object.assign({}, remote.cloudFileMap || {}, local.cloudFileMap || {}),
     cloudTombstones
@@ -82,6 +103,7 @@ function readSyncSnapshot(wxApi) {
     events: snapshot.events,
     posts: snapshot.posts,
     postReactions: snapshot.postReactions,
+    postComments: snapshot.postComments || {},
     reportedPosts: snapshot.reportedPosts,
     cloudFileMap: snapshot.cloudFileMap || {},
     cloudTombstones: snapshot.cloudTombstones || {}
@@ -92,7 +114,7 @@ function applySnapshot(wxApi, snapshot) {
   const source = snapshot || {};
   const keys = [
     'plans', 'latestPlan', 'offlineCard', 'events',
-    'posts', 'postReactions', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
+    'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
   ];
   keys.forEach(key => {
     if (source[key] === null || source[key] === undefined) wxApi.removeStorageSync(key);
@@ -186,6 +208,7 @@ function deleteCloudAccount(wxApi) {
 module.exports = {
   mergeById,
   mergeTombstones,
+  mergePostComments,
   mergeSnapshots,
   readSyncSnapshot,
   applySnapshot,

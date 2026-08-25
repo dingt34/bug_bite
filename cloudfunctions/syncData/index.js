@@ -5,7 +5,7 @@ const db = cloud.database();
 
 const ALLOWED_KEYS = [
   'plans', 'latestPlan', 'offlineCard', 'events',
-  'posts', 'postReactions', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
+  'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
 ];
 
 function normalizeSnapshot(snapshot) {

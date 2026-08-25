@@ -1,4 +1,15 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+
+const resultTemplate = fs.readFileSync(
+  path.join(__dirname, '../miniprogram/pages/precheck-result/precheck-result.wxml'),
+  'utf8'
+);
+assert.ok(
+  resultTemplate.includes('<button class="btn-ghost" wx:if="{{!isOffline}}" bindtap="goBack">继续计划</button>'),
+  '离线安全卡不应显示“继续计划”按钮'
+);
 
 let pageDefinition = null;
 const plan = {

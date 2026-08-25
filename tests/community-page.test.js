@@ -30,6 +30,12 @@ assert.strictEqual(page.data.filterMode, 'collected');
 assert.strictEqual(page.data.posts.length, 1);
 assert.strictEqual(page.data.posts[0].id, 'post_001');
 assert.strictEqual(app.globalData.communityFilter, null);
+page.onSearchInput({ detail: { value: '不存在的关键词' } });
+assert.strictEqual(page.data.posts.length, 0);
+page.clearSearch();
+assert.strictEqual(page.data.posts.length, 1);
+page.setSort({ currentTarget: { dataset: { mode: 'hot' } } });
+assert.strictEqual(page.data.sortMode, 'hot');
 page.onHide();
 assert.strictEqual(page.data.filterMode, 'all');
 

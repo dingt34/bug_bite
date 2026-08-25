@@ -24,11 +24,28 @@
       <view class="action {{post.liked ? 'action-on' : ''}}" bindtap="toggleLike">{{post.liked ? '❤️' : '🤍'}} {{post.likeCount}}</view>
       <view class="action {{post.collected ? 'action-on' : ''}}" bindtap="toggleCollect">{{post.collected ? '⭐' : '☆'}} {{post.collectCount}}</view>
     </view>
+    <view class="delete-own" wx:if="{{canDelete}}" bindtap="deletePost">删除我的分享</view>
+  </view>
+
+  <view class="card comment-card">
+    <view class="comment-title">讨论 <text class="comment-count">{{commentCount}}</text></view>
+    <view class="comment-composer">
+      <input class="comment-input" maxlength="200" value="{{commentText}}" bindinput="onCommentInput" placeholder="分享补充信息或友善交流" confirm-type="send" bindconfirm="submitComment" />
+      <button class="comment-send" bindtap="submitComment">发送</button>
+    </view>
+    <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+      <view class="comment-avatar">{{item.avatarText}}</view>
+      <view class="comment-body">
+        <view class="comment-meta"><text class="comment-name">{{item.displayName}}</text><text class="comment-time">{{item.time}}</text></view>
+        <view class="comment-text">{{item.text}}</view>
+      </view>
+    </view>
+    <view class="comment-empty" wx:if="{{!comments.length}}">还没有讨论，欢迎提供有帮助的补充信息</view>
   </view>
 
   <view class="notice">⚠️ 个人经历分享，不构成医疗诊断。安全判断请以症状与危险信号为准。</view>
 
   <button class="btn-primary safety-button" bindtap="goSafety">我也有类似情况，去安全判断</button>
 
-  <view class="report {{reported ? 'reported' : ''}}" bindtap="report">{{reported ? '✓ 已在本地标记' : '🚩 标记不当内容'}}</view>
+  <view class="report {{reported ? 'reported' : ''}}" bindtap="report">{{reported ? '✓ 已标记并隐藏' : '🚩 标记不当内容'}}</view>
 </view>

@@ -1,6 +1,6 @@
 const FIXED_STORAGE_KEYS = [
   'userInfo', 'plans', 'latestPlan', 'offlineCard', 'events',
-  'posts', 'postReactions', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
+  'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones'
 ];
 
 function unique(values) {
@@ -25,11 +25,19 @@ function collectImagePaths(snapshot) {
 
 function buildDataSummary(snapshot) {
   const reactions = snapshot.postReactions || {};
+  const user = snapshot.userInfo || {};
+  const comments = Object.keys(snapshot.postComments || {}).reduce((count, postId) => {
+    return count + (snapshot.postComments[postId] || []).filter(comment =>
+      (comment.authorId && comment.authorId === user.id) ||
+      (!comment.authorId && user.displayName && comment.displayName === user.displayName)
+    ).length;
+  }, 0);
   return {
     plans: (snapshot.plans || []).length,
     events: (snapshot.events || []).length,
     posts: (snapshot.posts || []).length,
     collections: Object.keys(reactions).filter(id => reactions[id] && reactions[id].collected).length,
+    comments,
     images: collectImagePaths(snapshot).length,
     hasIdentity: !!snapshot.userInfo,
     hasOfflineCard: !!snapshot.offlineCard
@@ -45,6 +53,7 @@ function readSnapshot(wxApi) {
     events: wxApi.getStorageSync('events') || [],
     posts: wxApi.getStorageSync('posts') || [],
     postReactions: wxApi.getStorageSync('postReactions') || {},
+    postComments: wxApi.getStorageSync('postComments') || {},
     reportedPosts: wxApi.getStorageSync('reportedPosts') || {},
     cloudFileMap: wxApi.getStorageSync('cloudFileMap') || {},
     cloudTombstones: wxApi.getStorageSync('cloudTombstones') || {}

@@ -8,7 +8,7 @@
     <view class="card-title">本机保存的数据</view>
     <view class="data-row"><text>行程计划与离线卡</text><text>{{summary.plans}} 项计划</text></view>
     <view class="data-row"><text>接触事件与症状复查</text><text>{{summary.events}} 条事件</text></view>
-    <view class="data-row"><text>社区发布与互动状态</text><text>{{summary.posts}} 条发布</text></view>
+    <view class="data-row"><text>社区发布与互动状态</text><text>{{summary.posts}} 条发布 · {{summary.comments}} 条评论</text></view>
     <view class="data-row"><text>事件及帖子图片</text><text>{{summary.images}} 张</text></view>
     <view class="data-row"><text>小程序缓存占用</text><text>约 {{storageSize}} KB</text></view>
   </view>

@@ -15,8 +15,9 @@ Page({
     cloudConfigured: false,
     syncing: false,
     syncMessage: '',
-    summary: { plans: 0, events: 0, posts: 0, collections: 0 },
+    summary: { plans: 0, events: 0, posts: 0, collections: 0, comments: 0 },
     latestPlan: null,
+    latestEvent: null,
     events: []
   },
 
@@ -42,6 +43,7 @@ Page({
       cloudConfigured: cloudService.isConfigured(),
       summary: privacy.buildDataSummary(privacy.readSnapshot(wx)),
       latestPlan: latestPlan,
+      latestEvent: events.length ? events[0] : null,
       events: events.slice(0, 3)
     });
   },
@@ -61,12 +63,17 @@ Page({
   },
 
   goCommunity() {
-    getApp().globalData.communityFilter = 'all';
+    getApp().globalData.communityFilter = 'mine';
     wx.switchTab({ url: '/pages/community/community' });
   },
 
   goCollections() {
     getApp().globalData.communityFilter = 'collected';
+    wx.switchTab({ url: '/pages/community/community' });
+  },
+
+  goComments() {
+    getApp().globalData.communityFilter = 'commented';
     wx.switchTab({ url: '/pages/community/community' });
   },
 

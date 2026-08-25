@@ -9,7 +9,7 @@ Page({
     wx.navigateTo({ url: '/pages/contact/contact' });
   },
 
-  goIdentify() {
-    wx.navigateTo({ url: '/pages/identify/identify' });
+  goAiChat() {
+    wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
   }
 });

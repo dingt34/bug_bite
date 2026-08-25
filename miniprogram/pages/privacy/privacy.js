@@ -5,7 +5,7 @@ const cloudSync = require('../../utils/cloud-sync.js');
 
 Page({
   data: {
-    summary: { plans: 0, events: 0, posts: 0, collections: 0, images: 0 },
+    summary: { plans: 0, events: 0, posts: 0, collections: 0, comments: 0, images: 0 },
     storageSize: 0,
     cleared: false,
     cloudUser: false,

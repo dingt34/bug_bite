@@ -35,6 +35,17 @@ const cloudSync = require('../miniprogram/utils/cloud-sync.js');
   assert.strictEqual(deleted.plans.length, 0);
   assert.strictEqual(deleted.offlineCard, null);
 
+  const deletedPost = cloudSync.mergeSnapshots({
+    posts: [],
+    postComments: { post1: [{ id: 'c1', createdAtTimestamp: 50, text: '本机评论' }] },
+    cloudTombstones: { posts: { post1: 40 } }
+  }, {
+    posts: [{ id: 'post1', createdAtTimestamp: 30 }],
+    postComments: { post1: [{ id: 'c2', createdAtTimestamp: 60, text: '云端评论' }] }
+  });
+  assert.strictEqual(deletedPost.posts.length, 0);
+  assert.deepStrictEqual(deletedPost.postComments.post1.map(item => item.id), ['c1', 'c2']);
+
   assert.deepStrictEqual(
     cloudSync.replacePaths({ imageRefs: ['/tmp/a.jpg'], nested: { path: '/tmp/a.jpg' } }, { '/tmp/a.jpg': 'cloud://env/a.jpg' }),
     { imageRefs: ['cloud://env/a.jpg'], nested: { path: 'cloud://env/a.jpg' } }

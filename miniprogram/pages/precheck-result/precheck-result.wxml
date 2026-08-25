@@ -53,7 +53,7 @@
   <view class="footer-note">规则范围仅限浙江省 · 规则版本 {{rule.ruleVersion || 'v1.0'}}</view>
 
   <view class="action-bar">
-    <button class="btn-ghost" bindtap="goBack">继续计划</button>
+    <button class="btn-ghost" wx:if="{{!isOffline}}" bindtap="goBack">继续计划</button>
     <button class="btn-primary" bindtap="goHome">返回首页</button>
   </view>
 </view>

@@ -1,72 +1,97 @@
 <view class="page">
-  <!-- 用户卡片 -->
-  <view class="user-card" bindtap="goLogin">
-    <view class="avatar">
-      <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
-      <text wx:else>{{avatarText}}</text>
-    </view>
-    <view class="user-info">
-      <view class="user-name">{{displayName}}</view>
-      <view class="user-sub">{{loginTip}}</view>
-    </view>
-    <view class="user-arrow" wx:if="{{!loggedIn}}">→</view>
-  </view>
-
-  <view class="identity-action" wx:if="{{loggedIn}}" bindtap="logout">{{cloudUser ? '退出微信云身份' : '退出体验身份'}}</view>
-
-  <view class="section" wx:if="{{cloudUser}}">
-    <view class="cloud-sync-card">
-      <view>
-        <view class="cloud-sync-title">微信云同步</view>
-        <view class="cloud-sync-sub">{{syncMessage || '计划、事件、社区数据和图片可跨设备恢复'}}</view>
+  <!-- 身份与同步 -->
+  <view class="profile-hero" bindtap="goLogin">
+    <view class="hero-main">
+      <view class="avatar">
+        <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
+        <text wx:else>{{avatarText}}</text>
       </view>
-      <button class="sync-button" disabled="{{syncing}}" bindtap="syncCloud">{{syncing ? '同步中' : '立即同步'}}</button>
+      <view class="user-info">
+        <view class="user-name">{{displayName}}</view>
+        <view class="user-sub">{{loginTip}}</view>
+      </view>
+      <view class="user-arrow" wx:if="{{!loggedIn}}">→</view>
+      <view class="identity-badge" wx:else>{{cloudUser ? '云同步' : '本机'}}</view>
+    </view>
+
+    <view class="hero-login-hint" wx:if="{{!loggedIn}}">登录后可统计你的发布、评论和收藏</view>
+
+    <view class="identity-row" wx:if="{{loggedIn}}">
+      <view class="identity-state"><text class="state-dot"></text>{{cloudUser ? '微信云身份' : '本地体验身份'}}</view>
+      <view class="identity-action" catchtap="logout">退出当前身份</view>
+    </view>
+
+    <view class="hero-sync" wx:if="{{cloudUser}}">
+      <view class="sync-copy">
+        <view class="sync-title">微信云同步</view>
+        <view class="sync-sub">{{syncMessage || '计划、事件、社区数据和图片可跨设备恢复'}}</view>
+      </view>
+      <button class="sync-button" disabled="{{syncing}}" catchtap="syncCloud">{{syncing ? '同步中' : '立即同步'}}</button>
     </view>
   </view>
 
-  <!-- 本机数据概览 -->
+  <!-- 数据概览 -->
   <view class="section">
-    <view class="section-title">本机数据</view>
+    <view class="section-title">数据概览</view>
     <view class="overview-card">
-      <view class="overview-item" bindtap="goPlans"><view class="overview-num">{{summary.plans}}</view><view class="overview-label">计划</view></view>
-      <view class="overview-item" bindtap="goEvents"><view class="overview-num">{{summary.events}}</view><view class="overview-label">事件</view></view>
-      <view class="overview-item" bindtap="goCommunity"><view class="overview-num">{{summary.posts}}</view><view class="overview-label">发布</view></view>
-      <view class="overview-item" bindtap="goCollections"><view class="overview-num">{{summary.collections}}</view><view class="overview-label">收藏</view></view>
+      <view class="overview-head">
+        <view><view class="overview-title">安全记录</view><view class="overview-sub">行程准备与接触事件</view></view>
+        <view class="overview-total">{{summary.plans + summary.events}} 项</view>
+      </view>
+      <view class="overview-grid safety-grid">
+        <view class="overview-item" bindtap="goPlans"><view class="overview-icon safety-icon">🧭</view><view><view class="overview-num">{{summary.plans}}</view><view class="overview-label">行程计划</view></view></view>
+        <view class="overview-item" bindtap="goEvents"><view class="overview-icon event-icon">📋</view><view><view class="overview-num">{{summary.events}}</view><view class="overview-label">接触事件</view></view></view>
+      </view>
+
+      <view class="overview-divider"></view>
+
+      <view class="overview-head community-head">
+        <view><view class="overview-title">社群参与</view><view class="overview-sub">分享、讨论与收藏记录</view></view>
+        <view class="overview-total">{{summary.posts + summary.comments + summary.collections}} 次</view>
+      </view>
+      <view class="overview-grid community-grid">
+        <view class="overview-item community-item" bindtap="goCommunity"><view class="overview-num">{{summary.posts}}</view><view class="overview-label">我的发布</view></view>
+        <view class="overview-item community-item" bindtap="goComments"><view class="overview-num">{{summary.comments}}</view><view class="overview-label">我的评论</view></view>
+        <view class="overview-item community-item" bindtap="goCollections"><view class="overview-num">{{summary.collections}}</view><view class="overview-label">我的收藏</view></view>
+      </view>
     </view>
   </view>
 
-  <!-- 最近计划 -->
+  <!-- 近期记录 -->
   <view class="section">
-    <view class="section-title">最近计划</view>
+    <view class="section-title">近期记录</view>
+
+    <view class="record-label">最近计划</view>
     <view class="plan-card" bindtap="goPlans" wx:if="{{latestPlan}}">
-      <view class="plan-name">{{latestPlan.destinationName}} · {{latestPlan.month}}</view>
-      <view class="plan-meta">{{latestPlan.activityType}}</view>
-      <view class="plan-tags">
-        <text class="tag" wx:for="{{latestPlan.riskTags}}" wx:key="*this">{{item}}</text>
+      <view class="record-icon">🗺️</view>
+      <view class="plan-content">
+        <view class="plan-name">{{latestPlan.destinationName}} · {{latestPlan.month}}</view>
+        <view class="plan-meta">{{latestPlan.activityType}}</view>
+        <view class="plan-tags"><text class="tag" wx:for="{{latestPlan.riskTags}}" wx:key="*this">{{item}}</text></view>
       </view>
+      <view class="record-arrow">→</view>
     </view>
-    <view class="empty-tip" wx:else>还没有行程计划，去首页创建行前准备</view>
+    <view class="empty-tip" wx:else bindtap="goPlans">还没有行程计划，点击开始准备</view>
+
+    <view class="record-label event-label">最近事件</view>
+    <view class="plan-card event-card" wx:if="{{latestEvent}}" bindtap="goEvents">
+      <view class="record-icon event-record-icon">🩹</view>
+      <view class="plan-content">
+        <view class="plan-name">{{latestEvent.contactTypeName}}</view>
+        <view class="plan-meta">{{latestEvent.occurredAt}}</view>
+        <view class="plan-tags"><text class="event-status risk-{{latestEvent.riskLevel}}">{{latestEvent.levelName}}</text></view>
+      </view>
+      <view class="record-arrow">→</view>
+    </view>
+    <view class="empty-tip" wx:else bindtap="goEvents">还没有接触事件记录</view>
   </view>
 
-  <!-- 历史记录 -->
+  <!-- 管理入口 -->
   <view class="section">
-    <view class="section-head">
-      <view class="section-title">最近事件</view>
-      <view class="section-more" bindtap="goEvents">查看全部</view>
-    </view>
-    <view class="event-item" wx:for="{{events}}" wx:key="id" bindtap="goEventDetail" data-id="{{item.id}}">
-      <view class="event-info">
-        <view class="event-type">{{item.contactTypeName}}</view>
-        <view class="event-time">{{item.occurredAt}}</view>
-      </view>
-      <view class="event-level risk-{{item.riskLevel}}">{{item.levelName}}</view>
-    </view>
-    <view class="empty-tip" wx:if="{{!events.length}}">还没有历史记录</view>
-  </view>
-
-  <view class="section">
+    <view class="section-title">管理与设置</view>
     <view class="menu-item" bindtap="goPrivacy">
-      <view><view class="menu-title">隐私与本机数据</view><view class="menu-sub">查看存储内容、图片和清除选项</view></view>
+      <view class="menu-icon">🛡️</view>
+      <view class="menu-content"><view class="menu-title">隐私与数据管理</view><view class="menu-sub">查看本机数据、图片、云端备份和清除选项</view></view>
       <view class="menu-arrow">→</view>
     </view>
   </view>

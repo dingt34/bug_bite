@@ -34,9 +34,49 @@ function decoratePost(post, reactions, now) {
   });
 }
 
-function listPosts(localPosts, demoPosts, reactions, filterMode, now) {
-  const posts = mergePosts(localPosts, demoPosts).map(post => decoratePost(post, reactions, now));
-  return filterMode === 'collected' ? posts.filter(post => post.collected) : posts;
+function postHeat(post) {
+  return (post.likeCount || 0) * 2 + (post.collectCount || 0) * 3;
+}
+
+function matchesQuery(post, query) {
+  const keyword = String(query || '').trim().toLowerCase();
+  if (!keyword) return true;
+  return [post.text, post.displayName, post.region].concat(post.tags || [])
+    .some(value => String(value || '').toLowerCase().indexOf(keyword) > -1);
+}
+
+function listPosts(localPosts, demoPosts, reactions, filterMode, now, options) {
+  const settings = options || {};
+  const reportedPosts = settings.reportedPosts || {};
+  let posts = mergePosts(localPosts, demoPosts)
+    .map(post => Object.assign({}, decoratePost(post, reactions, now), {
+      commentCount: ((settings.postComments || {})[post.id] || []).length
+    }))
+    .filter(post => !reportedPosts[post.id]);
+  if (filterMode === 'collected') posts = posts.filter(post => post.collected);
+  if (filterMode === 'mine') {
+    const user = settings.currentUser || {};
+    posts = posts.filter(post =>
+      (post.authorId && post.authorId === user.id) ||
+      (!post.authorId && post.local && post.displayName === user.displayName)
+    );
+  }
+  if (filterMode === 'commented') {
+    const user = settings.currentUser || {};
+    const postComments = settings.postComments || {};
+    posts = posts.filter(post => (postComments[post.id] || []).some(comment =>
+      (comment.authorId && comment.authorId === user.id) ||
+      (!comment.authorId && user.displayName && comment.displayName === user.displayName)
+    ));
+  }
+  if (settings.topic) posts = posts.filter(post => post.contactType === settings.topic);
+  posts = posts.filter(post => matchesQuery(post, settings.query));
+  if (settings.sortMode === 'hot') {
+    posts.sort((a, b) => postHeat(b) - postHeat(a) || (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+  } else if (settings.sortMode === 'latest') {
+    posts.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+  }
+  return posts;
 }
 
 function findPost(localPosts, demoPosts, reactions, id, now) {
@@ -65,6 +105,7 @@ function buildPost(input, userInfo, timestamp) {
   const time = timestamp || Date.now();
   return {
     id: 'post_local_' + time,
+    authorId: userInfo.id || '',
     displayName: userInfo.displayName,
     avatarText: userInfo.avatarText || String(userInfo.displayName).slice(0, 1),
     createdAtTimestamp: time,
@@ -81,6 +122,34 @@ function buildPost(input, userInfo, timestamp) {
   };
 }
 
+function validateComment(text) {
+  const value = String(text || '').trim();
+  if (value.length < 2) return { valid: false, message: '评论至少需要 2 个字。' };
+  if (value.length > 200) return { valid: false, message: '评论不能超过 200 个字。' };
+  return { valid: true, text: value };
+}
+
+function buildComment(text, userInfo, timestamp) {
+  const time = timestamp || Date.now();
+  return {
+    id: 'comment_' + time + '_' + Math.random().toString(36).slice(2, 7),
+    authorId: userInfo.id || '',
+    displayName: userInfo.displayName,
+    avatarText: userInfo.avatarText || String(userInfo.displayName || '匿').slice(0, 1),
+    text: String(text || '').trim(),
+    createdAtTimestamp: time,
+    time: '刚刚'
+  };
+}
+
+function decorateComments(comments, now) {
+  return (comments || []).slice().sort((a, b) =>
+    (a.createdAtTimestamp || 0) - (b.createdAtTimestamp || 0)
+  ).map(comment => Object.assign({}, comment, {
+    time: formatRelativeTime(comment.createdAtTimestamp, comment.time, now)
+  }));
+}
+
 module.exports = {
   mergePosts,
   formatRelativeTime,
@@ -88,6 +157,11 @@ module.exports = {
   listPosts,
   findPost,
   toggleReaction,
+  postHeat,
+  matchesQuery,
   validatePost,
-  buildPost
+  buildPost,
+  validateComment,
+  buildComment,
+  decorateComments
 };
