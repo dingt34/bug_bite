@@ -1,5 +1,39 @@
 <wxs src="./precheck.wxs" module="g" />
 <view class="page">
+  <view class="card route-card">
+    <view class="card-title">路线规划 <text class="optional">选填</text></view>
+    <view class="route-help">可直接填写具体地点，例如“浙江大学玉泉校区”到“西湖”；下方“目的地”仍可补充途经城市。</view>
+    <view class="route-pickers">
+      <view class="route-picker-wrap">
+        <view class="route-label">起点</view>
+        <input class="route-input" value="{{form.routeStart}}" placeholder="如：浙江大学玉泉校区" maxlength="40" bindinput="onRouteStartInput" />
+      </view>
+      <view class="route-arrow">→</view>
+      <view class="route-picker-wrap">
+        <view class="route-label">终点</view>
+        <input class="route-input" value="{{form.routeEnd}}" placeholder="如：西湖" maxlength="40" bindinput="onRouteEndInput" />
+      </view>
+    </view>
+    <button class="route-plan-button" loading="{{routeLoading}}" disabled="{{!form.routeStart || !form.routeEnd || routeLoading}}" bindtap="planRoute">{{routeLoading ? '正在规划…' : '在地图上规划路线'}}</button>
+    <view class="route-message" wx:if="{{routeMessage}}">{{routeMessage}}</view>
+    <map wx:if="{{routeOptions.length}}" class="route-map" latitude="{{mapLatitude}}" longitude="{{mapLongitude}}" scale="{{mapScale}}" markers="{{routeMarkers}}" polyline="{{routePolylines}}" show-location="{{false}}"></map>
+    <view class="route-options" wx:if="{{routeOptions.length}}">
+      <view class="route-option {{selectedRouteIndex === index ? 'selected' : ''}}" wx:for="{{routeOptions}}" wx:key="id" bindtap="selectRoute" data-index="{{index}}">
+        <view><text class="route-option-name">{{item.name}}</text><text class="route-option-detail">约 {{item.distanceText}} · {{item.durationText}}</text></view>
+        <view class="route-option-state">{{selectedRouteIndex === index ? '当前查看' : '查看'}}</view>
+      </view>
+    </view>
+    <view class="route-summary" wx:if="{{routePreview.summary}}">{{routePreview.summary}}</view>
+    <view class="route-insects" wx:if="{{routePreview.insects.length}}">
+      <view class="route-insects-title">沿途可能遇到</view>
+      <view class="insect-item" wx:for="{{routePreview.insects}}" wx:key="name">
+        <view class="insect-name">{{item.name}}</view>
+        <view class="insect-reason">{{item.reason}}</view>
+      </view>
+      <view class="route-note">提示基于路线两端、季节和已选生境生成；实际情况以现场环境为准。</view>
+    </view>
+  </view>
+
   <!-- 必填：目的地（多选） -->
   <view class="card">
     <view class="card-title">目的地（可多选） <text class="required">*</text></view>
