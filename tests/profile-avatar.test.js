@@ -3,6 +3,7 @@ const assert = require('assert');
 (async () => {
   let pageDefinition = null;
   let tempUrlCalls = 0;
+  let resolvedTempURL = 'https://example.test/avatar.jpg';
   const userInfo = {
     id: 'cloud_openid-test',
     cloudUserId: 'openid-test',
@@ -21,7 +22,7 @@ const assert = require('assert');
         tempUrlCalls += 1;
         assert.deepStrictEqual(options.fileList, [userInfo.avatarUrl]);
         return Promise.resolve({
-          fileList: [{ fileID: userInfo.avatarUrl, tempFileURL: 'https://example.test/avatar.jpg' }]
+          fileList: [{ fileID: userInfo.avatarUrl, tempFileURL: resolvedTempURL }]
         });
       },
       callFunction() { return Promise.reject(new Error('stats unavailable in avatar test')); }
@@ -42,6 +43,11 @@ const assert = require('assert');
   });
 
   page.onShow();
+  assert.notStrictEqual(
+    page.data.avatarUrl,
+    userInfo.avatarUrl,
+    '云文件 ID 解析完成前不应直接交给 image 组件渲染'
+  );
   await new Promise(resolve => setTimeout(resolve, 10));
 
   assert.strictEqual(tempUrlCalls, 1, '个人页应将云头像解析成可访问地址');
@@ -50,6 +56,13 @@ const assert = require('assert');
 
   page.onAvatarError();
   assert.strictEqual(page.data.avatarLoadFailed, true, '头像加载失败时应启用文字头像回退');
+
+  resolvedTempURL = '';
+  page.onShow();
+  assert.strictEqual(page.data.avatarUrl, '', '重新解析期间应继续显示文字头像');
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.strictEqual(page.data.avatarUrl, '', '解析失败后不应回填 cloud 文件 ID');
+  assert.strictEqual(page.data.avatarLoadFailed, true, '解析失败后应保持文字头像回退');
 
   console.log('profile avatar tests passed');
 })().catch(error => {

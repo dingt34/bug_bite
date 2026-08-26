@@ -68,9 +68,9 @@ function resolveFileURL(wxApi, fileID) {
     .then(() => wxApi.cloud.getTempFileURL({ fileList: [fileID] }))
     .then(result => {
       const file = result && result.fileList && result.fileList[0];
-      return file && file.tempFileURL ? file.tempFileURL : fileID;
+      return file && file.tempFileURL ? file.tempFileURL : '';
     })
-    .catch(() => fileID);
+    .catch(() => '');
 }
 
 function deleteFiles(wxApi, fileList) {

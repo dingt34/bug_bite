@@ -27,6 +27,8 @@ Page({
   onShow() {
     tabBar.syncSelected(this, 2);
     const userInfo = auth.readLocalUser(wx);
+    const storedAvatarUrl = userInfo && userInfo.avatarUrl ? userInfo.avatarUrl : '';
+    const avatarNeedsResolve = storedAvatarUrl.indexOf('cloud://') === 0;
     const avatarResolveToken = (this.avatarResolveToken || 0) + 1;
     this.avatarResolveToken = avatarResolveToken;
     const latestPlan = wx.getStorageSync('latestPlan') || getApp().globalData.latestPlan;
@@ -41,7 +43,7 @@ Page({
     this.setData({
       displayName: userInfo ? userInfo.displayName : '点击登录',
       avatarText: userInfo ? userInfo.avatarText : '登',
-      avatarUrl: userInfo ? userInfo.avatarUrl : '',
+      avatarUrl: avatarNeedsResolve ? '' : storedAvatarUrl,
       avatarLoadFailed: false,
       loginTip: userInfo
         ? (userInfo.mode === 'wechat_cloud' ? '微信云身份 · 支持跨设备同步' : '本地体验身份 · 数据仅存本机')
@@ -54,10 +56,10 @@ Page({
       latestEvent: events.length ? events[0] : null,
       events: events.slice(0, 3)
     });
-    if (userInfo && userInfo.avatarUrl) {
-      cloudService.resolveFileURL(wx, userInfo.avatarUrl).then(avatarUrl => {
+    if (storedAvatarUrl) {
+      cloudService.resolveFileURL(wx, storedAvatarUrl).then(avatarUrl => {
         if (this.avatarResolveToken !== avatarResolveToken) return;
-        this.setData({ avatarUrl, avatarLoadFailed: false });
+        this.setData({ avatarUrl, avatarLoadFailed: !avatarUrl });
       });
     }
     if (userInfo && userInfo.mode === 'wechat_cloud') {
