@@ -42,12 +42,13 @@ Page({
   },
 
   onLoad() {
+    this.conversationId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
     const status = aiService.getStatus(wx);
     this.setData({
       aiAvailable: status.available,
       imageAvailable: status.imageAvailable,
-      modeText: status.mode === 'agent' ? '云开发 Agent' : '云开发文字模型',
-      statusMessage: status.reason || (status.imageAvailable ? '支持文字、虫体图片和伤口图片' : '文字聊天可用；配置 Agent ID 后可分析图片')
+      modeText: '扣子 Agent',
+      statusMessage: status.reason || '支持文字多轮对话；图片输入正在接入验证'
     });
   },
 
@@ -158,13 +159,13 @@ Page({
       return;
     }
     if (!this.data.aiAvailable) {
-      wx.showToast({ title: '当前基础库不支持云开发AI', icon: 'none' });
+      wx.showToast({ title: '当前基础库不支持云函数', icon: 'none' });
       return;
     }
     if (images.length && !this.data.imageAvailable) {
       wx.showModal({
         title: '图片聊天尚未配置',
-        content: '文字聊天可以直接使用。若要发送图片，请先在云开发控制台创建 Agent，并将 Agent ID 填入 cloud.js。',
+        content: '当前已部署的扣子 API 只确认支持文字输入。请先用文字描述虫体或伤口特征，图片能力会在接口验证后开放。',
         showCancel: false
       });
       return;
@@ -202,6 +203,7 @@ Page({
           message: requestText,
           history,
           fileIds,
+          conversationId: this.conversationId,
           onText: text => {
             if (this.requestToken !== token) return;
             this.updateAssistantMessage(assistantId, text, true);
