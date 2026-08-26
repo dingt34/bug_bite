@@ -15,6 +15,10 @@ Page({
     wx.navigateTo({ url: '/pages/contact/contact' });
   },
 
+  goInsectGuide() {
+    wx.navigateTo({ url: '/pages/insect-guide/insect-guide' });
+  },
+
   goAiChat() {
     wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
   }

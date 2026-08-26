@@ -140,6 +140,13 @@
   border: 1rpx solid #D8E9E1;
   background: linear-gradient(135deg, #FFFFFF, #F4FAF7);
 }
+.guide-entry {
+  border: 1rpx solid #E5E1CA;
+  background: linear-gradient(135deg, #FFFFFF, #FBFAF1);
+}
+.guide-icon {
+  background: linear-gradient(135deg, #EEF5E9, #FFF5D9);
+}
 .ai-icon {
   background: linear-gradient(135deg, #E3F3EB, #FFF4D8);
 }
