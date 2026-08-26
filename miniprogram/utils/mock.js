@@ -2,11 +2,11 @@
 
 // ===== 五类接触事件 =====
 const CONTACT_TYPES = [
-  { key: 'bite', name: '叮咬', desc: '被咬了一口，如蚊、蠓、蜱等', icon: '🦟' },
-  { key: 'sting', name: '蜇伤', desc: '被刺/蜇到，如蜂、蝎、刺毛虫', icon: '🐝' },
-  { key: 'attachment', name: '发现附着虫体', desc: '虫体仍在皮肤或衣物上，如蜱、蚂蟥', icon: '🕷️' },
-  { key: 'contact', name: '接触后皮疹/不适', desc: '接触后局部红、痒、痛等反应', icon: '🌿' },
-  { key: 'unknown', name: '不确定', desc: '不清楚发生了什么', icon: '❓' }
+  { key: 'bite', name: '吸血或普通叮咬', desc: '如蚊、蠓、跳蚤等造成的叮咬', icon: '🦟' },
+  { key: 'sting', name: '蜂、蚁等蜇伤', desc: '被蜂、蚁、蝎或带毒刺毛的虫体刺伤', icon: '🐝' },
+  { key: 'attachment', name: '虫体附着', desc: '虫体仍附着在皮肤上，如蜱、蚂蟥', icon: '🕷️' },
+  { key: 'contact', name: '毒毛、体液或皮肤接触', desc: '接触虫体、毒毛或体液后出现皮肤不适', icon: '🌿' },
+  { key: 'unknown', name: '暂时不能确定', desc: '没有看清虫体或不清楚如何接触', icon: '❓' }
 ];
 
 // ===== 危险信号（先行闸门）=====
@@ -27,44 +27,54 @@ const DANGER_SIGNALS = [
 const COMMON_QUESTIONS = [
   {
     key: 'occurredAt', label: '发生时间', type: 'picker',
-    options: ['刚刚', '1小时内', '1–6小时', '6–24小时', '超过24小时']
+    group: '接触情况', help: '选择最接近的时间范围',
+    options: ['刚刚', '1小时内', '1–6小时', '6–24小时', '超过24小时', '暂时不清楚']
   },
   {
-    key: 'bodyParts', label: '身体部位', type: 'chips',
-    options: ['头面部', '颈部', '上肢', '下肢', '躯干', '手足']
+    key: 'bodyParts', label: '当前受影响部位', type: 'chips',
+    group: '症状位置', help: '选择目前出现叮咬、蜇伤或不适的部位，可多选',
+    options: ['头皮/耳后', '眼周', '口唇/口腔', '颈部', '上肢', '下肢', '躯干', '手足']
   },
   {
-    key: 'localSymptoms', label: '局部表现', type: 'chips',
-    options: ['红肿', '疼痛', '瘙痒', '出血点', '水疱', '无明显']
+    key: 'localSymptoms', label: '当前局部表现', type: 'chips',
+    group: '局部症状', help: '按现在看到或感觉到的表现选择，可多选',
+    options: ['红斑/红肿', '瘙痒/风团', '疼痛/灼热', '出血/皮肤破损', '水疱', '渗液/脓液', '红肿范围扩大', '无明显']
   },
   {
-    key: 'systemicSymptoms', label: '全身不适', type: 'chips',
-    options: ['发热', '恶心呕吐', '乏力', '皮疹扩散', '无明显']
+    key: 'systemicSymptoms', label: '当前全身表现', type: 'chips',
+    group: '全身症状', help: '指不只局限于接触部位的表现，可多选',
+    options: ['全身风团/皮疹', '发热/寒战', '恶心/呕吐/腹痛', '头晕/明显乏力', '头痛/肌肉酸痛', '无明显']
   },
   {
     key: 'trend', label: '变化趋势', type: 'single',
-    options: ['正在好转', '保持不变', '逐渐加重']
+    group: '变化情况', help: '与症状刚出现时相比，选择整体变化',
+    options: ['刚发生，暂不清楚', '正在好转', '基本不变', '逐渐加重']
+  },
+  {
+    key: 'dailyImpact', label: '对日常活动的影响', type: 'single',
+    group: '影响程度', help: '包括睡眠、行走和正常活动',
+    options: ['无影响', '轻微影响', '影响睡眠或活动', '无法正常活动']
   }
 ];
 
 // ===== 条件追问（按事件类型）=====
 const SPECIFIC_QUESTIONS = {
   bite: [
-    { key: 'count', label: '叮咬数量', type: 'single', options: ['单处', '少数几处'] }
+    { key: 'count', label: '叮咬数量', type: 'single', group: '接触范围', help: '大量、多处叮咬应在危险筛查中选择', options: ['单处', '少数几处'] }
   ],
   sting: [
-    { key: 'count', label: '蜇伤数量', type: 'single', options: ['单处', '少数几处'] },
-    { key: 'distribution', label: '分布', type: 'single', options: ['局部集中', '分散全身'] }
+    { key: 'count', label: '蜇伤数量', type: 'single', group: '接触范围', help: '大量、多处蜇伤应在危险筛查中选择', options: ['单处', '少数几处'] },
+    { key: 'distribution', label: '蜇伤分布', type: 'single', group: '接触范围', help: '选择蜇伤是否集中在同一区域', options: ['局部集中', '分散在多个部位'] }
   ],
   attachment: [
-    { key: 'attachedTime', label: '附着时间', type: 'single', options: ['不清楚', '数小时', '超过24小时'] },
-    { key: 'removed', label: '是否已移除', type: 'single', options: ['已完整移除', '部分残留', '未移除'] }
+    { key: 'attachedTime', label: '估计附着时间', type: 'single', group: '虫体状态', help: '不知道准确时间时请选择“不清楚”', options: ['不足1小时', '1–24小时', '超过24小时', '不清楚'] },
+    { key: 'removed', label: '虫体当前状态', type: 'single', group: '虫体状态', help: '不要强挖难以移除的疑似残留部分', options: ['已完整移除', '疑似有残留', '仍未移除'] }
   ],
   contact: [
-    { key: 'contactMode', label: '接触方式', type: 'single', options: ['皮肤直接接触', '草地/植物', '动物接触', '室内', '不清楚'] }
+    { key: 'contactMode', label: '可能的接触方式', type: 'single', group: '接触方式', help: '选择最接近的一项', options: ['直接碰到虫体', '接触毒毛/虫茧', '接触虫体体液', '接触衣物或物品', '可能吸入飘散毒毛', '不清楚'] }
   ],
   unknown: [
-    { key: 'environment', label: '所处环境', type: 'chips', options: ['草丛', '林地', '水域边', '室内', '夜间'] }
+    { key: 'environment', label: '当时所处环境', type: 'chips', group: '接触线索', help: '用于保留环境线索，可多选', options: ['草丛/灌木', '林地/落叶层', '水域边', '室内住宿', '接触动物', '夜间户外'] }
   ]
 };
 

@@ -52,7 +52,7 @@ page.copyImageSource({ currentTarget: { dataset: { url: page.data.item.images[0]
 assert.ok(copiedUrl.includes('commons.wikimedia.org'));
 
 page.goContact();
-assert.strictEqual(navigatedUrl, '/pages/contact/contact');
+assert.strictEqual(navigatedUrl, '/pages/danger/danger');
 
 const template = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/insect-detail/insect-detail.wxml'), 'utf8');
 assert.ok(template.includes('<swiper'));

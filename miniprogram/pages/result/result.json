@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "分级建议"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "safety-nav": "/components/safety-nav/safety-nav"
+  }
 }

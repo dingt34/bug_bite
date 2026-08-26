@@ -1,5 +1,9 @@
+<safety-nav current="2" bind:stepchange="onStepChange" />
 <view class="page">
-  <view class="head">请选择与您情况最接近的接触类型</view>
+  <view class="head">
+    <view class="head-title">发生了哪类接触？</view>
+    <view class="head-sub">选择最接近的一项，不确定也可以继续</view>
+  </view>
 
   <view class="type-card" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
     <view class="type-icon">{{item.icon}}</view>
@@ -10,5 +14,5 @@
     <view class="type-arrow">→</view>
   </view>
 
-  <view class="tip">先做危险信号筛查，再获得行动建议；不确定的事件类型也能继续。</view>
+  <view class="tip">接触类型用于选择后续问题，不代表虫种或疾病诊断。</view>
 </view>

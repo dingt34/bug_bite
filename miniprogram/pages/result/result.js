@@ -8,20 +8,24 @@ Page({
     level: 'observe',
     content: null,
     summary: '',
-    eventId: ''
+    eventId: '',
+    eventSnapshot: null,
+    allowStepBack: false
   },
 
   onLoad(options) {
     const level = options.level || 'observe';
     const draft = getApp().globalData.draftEvent || {};
-    const content = RESULT_CONTENT[level] || RESULT_CONTENT.observe;
+    const content = RESULT_CONTENT.getResultContent(level, draft.contactType);
     const summary = this.buildSummary(draft, content);
     const event = this.saveEvent(draft, level, content, summary);
     this.setData({
       level: level,
       content: content,
       summary: summary,
-      eventId: event ? event.id : ''
+      eventId: event ? event.id : '',
+      eventSnapshot: event,
+      allowStepBack: level !== 'emergency' && !!event
     });
   },
 
@@ -43,6 +47,9 @@ Page({
     }
     if (answers.trend) {
       parts.push('变化趋势：' + answers.trend);
+    }
+    if (answers.dailyImpact) {
+      parts.push('日常活动影响：' + answers.dailyImpact);
     }
     if (answers.count) {
       parts.push('数量：' + answers.count);
@@ -106,6 +113,20 @@ Page({
     wx.setClipboardData({ data: this.data.summary, success: () => {
       wx.showToast({ title: '已复制', icon: 'success' });
     }});
+  },
+
+  onStepChange(e) {
+    const target = Number(e.detail.step);
+    const snapshot = this.data.eventSnapshot;
+    if (!snapshot || target < 1 || target >= 4) return;
+    getApp().globalData.draftEvent = Object.assign({}, snapshot, {
+      answers: Object.assign({}, snapshot.answers || {}),
+      imageRefs: (snapshot.imageRefs || []).slice(),
+      imageRecords: (snapshot.imageRecords || []).map(item => Object.assign({}, item)),
+      actionsTaken: (snapshot.actionsTaken || []).slice(),
+      matchedRules: (snapshot.matchedRules || []).map(item => Object.assign({}, item))
+    });
+    wx.navigateBack({ delta: 4 - target });
   },
 
   goHome() {

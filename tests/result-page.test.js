@@ -2,6 +2,7 @@ const assert = require('assert');
 
 let pageDefinition = null;
 let storedEvents = [];
+let backDelta = 0;
 const app = {
   globalData: {
     draftEvent: {
@@ -36,7 +37,8 @@ global.wx = {
     if (key === 'events') {
       storedEvents = value;
     }
-  }
+  },
+  navigateBack(options) { backDelta = options.delta; }
 };
 
 require('../miniprogram/pages/result/result.js');
@@ -73,5 +75,10 @@ const repeatedPage = createPage();
 repeatedPage.onLoad({ level: 'observe' });
 assert.strictEqual(storedEvents.length, 1);
 assert.ok(storedEvents[0].summary.includes('变化趋势：正在好转'));
+
+repeatedPage.onStepChange({ detail: { step: 3 } });
+assert.strictEqual(backDelta, 1);
+assert.strictEqual(app.globalData.draftEvent.id, 'event_page_001');
+assert.notStrictEqual(app.globalData.draftEvent.answers, repeatedPage.data.eventSnapshot.answers);
 
 console.log('result page tests passed');

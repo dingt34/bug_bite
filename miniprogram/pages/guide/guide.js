@@ -5,11 +5,11 @@ Page({
   data: {
     questions: [],
     answers: {},
+    answeredCount: 0,
+    questionCount: 0,
+    completionPercent: 0,
     actionsTaken: [],
-    actionOptions: [
-      '清水和肥皂清洁', '冷敷', '避免抓挠', '抬高患肢',
-      '按说明书或医嘱用药', '已咨询专业人员', '已就医', '未处理'
-    ],
+    actionOptions: [],
     insectImage: '',
     woundImage: '',
     persistedImages: { insect: false, wound: false },
@@ -27,7 +27,39 @@ Page({
     questions.forEach(q => {
       answers[q.key] = q.type === 'chips' ? [] : '';
     });
-    this.setData({ contactType: contactType, questions: questions, answers: answers });
+    this.setData({
+      contactType: contactType,
+      questions: questions,
+      answers: answers,
+      questionCount: questions.length,
+      actionOptions: this.buildActionOptions(contactType)
+    });
+  },
+
+  buildActionOptions(contactType) {
+    const common = [
+      '已用肥皂和清水清洁', '已隔布冷敷', '已避免抓挠', '已抬高肿胀肢体',
+      '已按说明书或医嘱用药', '已咨询专业人员', '已就医', '尚未处理'
+    ];
+    const specific = {
+      sting: ['已移除可见蜂刺'],
+      attachment: ['已用细尖镊子移除虫体'],
+      contact: ['已用胶带轻粘去除疑似毒毛', '眼部接触后已用清水冲洗']
+    };
+    return (specific[contactType] || []).concat(common);
+  },
+
+  getCompletion(questions, answers) {
+    const answeredCount = questions.filter(question => {
+      const value = answers[question.key];
+      return question.type === 'chips'
+        ? Array.isArray(value) && value.length > 0
+        : value !== undefined && value !== null && value !== '';
+    }).length;
+    return {
+      answeredCount,
+      completionPercent: questions.length ? Math.round(answeredCount * 100 / questions.length) : 0
+    };
   },
 
   onAnswer(e) {
@@ -50,16 +82,22 @@ Page({
     } else {
       answers[ds.key] = ds.v;
     }
-    this.setData({ answers: answers, validationMessage: '' });
+    const completion = this.getCompletion(this.data.questions, answers);
+    this.setData({
+      answers: answers,
+      validationMessage: '',
+      answeredCount: completion.answeredCount,
+      completionPercent: completion.completionPercent
+    });
   },
 
   onActionTap(e) {
     const v = e.currentTarget.dataset.v;
     let arr = this.data.actionsTaken.slice();
-    if (v === '未处理') {
-      arr = arr.indexOf('未处理') > -1 ? [] : ['未处理'];
+    if (v === '尚未处理') {
+      arr = arr.indexOf('尚未处理') > -1 ? [] : ['尚未处理'];
     } else {
-      arr = arr.filter(item => item !== '未处理');
+      arr = arr.filter(item => item !== '尚未处理');
       const idx = arr.indexOf(v);
       if (idx > -1) {
         arr.splice(idx, 1);
@@ -98,6 +136,12 @@ Page({
     }
 
     this.persistImage(() => this.finishSubmit());
+  },
+
+  onStepChange(e) {
+    const target = Number(e.detail.step);
+    const delta = 3 - target;
+    if (delta > 0) wx.navigateBack({ delta });
   },
 
   persistImage(done) {

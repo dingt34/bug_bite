@@ -3,9 +3,16 @@
 }
 
 .head {
-  font-size: 30rpx;
-  font-weight: 600;
   padding: 16rpx 8rpx 24rpx;
+}
+.head-title {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+.head-sub {
+  margin-top: 6rpx;
+  color: #737D85;
+  font-size: 24rpx;
 }
 
 .type-card {
@@ -16,6 +23,11 @@
   padding: 30rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid transparent;
+}
+.type-card:active {
+  border-color: var(--primary);
+  background: var(--primary-light);
 }
 .type-icon {
   font-size: 52rpx;
@@ -30,7 +42,7 @@
 }
 .type-desc {
   font-size: 24rpx;
-  color: #8A9299;
+  color: #737D85;
   margin-top: 4rpx;
 }
 .type-arrow {

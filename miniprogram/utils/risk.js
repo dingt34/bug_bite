@@ -1,7 +1,7 @@
 // 接触后分级规则（课程演示版）
 // 规则只使用危险信号、症状、趋势和受伤范围；图片识别结果不参与分级。
 
-const RULE_VERSION = 'contact-demo-1.2.0';
+const RULE_VERSION = 'contact-demo-1.3.0';
 
 function hasAnswer(question, answers) {
   const value = answers[question.key];
@@ -32,7 +32,7 @@ function evaluateRisk(contactType, answers) {
 
   const local = answers.localSymptoms || [];
   const notableLocal = local.filter(item => [
-    '水疱', '出血点', '渗液/脓液', '红肿范围扩大'
+    '水疱', '出血点', '出血/皮肤破损', '渗液/脓液', '红肿范围扩大'
   ].indexOf(item) > -1);
   if (notableLocal.length) {
     match('notable_local_symptoms', '局部出现需要关注的表现：' + notableLocal.join('、'));
@@ -52,8 +52,10 @@ function evaluateRisk(contactType, answers) {
     match('daily_activity_limited', '症状已导致无法正常活动');
   }
 
-  if (contactType === 'sting' && answers.distribution === '分散全身') {
-    match('widespread_sting', '蜇伤分布范围为分散全身');
+  if (contactType === 'sting' && (
+    answers.distribution === '分散全身' || answers.distribution === '分散在多个部位'
+  )) {
+    match('widespread_sting', '蜇伤分散在多个身体部位');
   }
 
   if (contactType === 'attachment' && [

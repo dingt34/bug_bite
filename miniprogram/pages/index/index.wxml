@@ -36,13 +36,13 @@
   </view>
 
   <view class="func-entry" hover-class="func-entry-hover" bindtap="goContact">
-    <view class="func-icon">🦟</view>
+    <view class="func-icon">🛡️</view>
     <view class="func-body">
-      <view class="func-title">昆虫叮咬</view>
-      <view class="func-desc">叮咬、蜇伤、附着虫体，先做危险信号筛查</view>
+      <view class="func-title">虫咬与接触处置</view>
+      <view class="func-desc">叮咬、蜇伤、虫体附着或毒毛体液接触，先判断危险信号</view>
       <view class="func-tags">
         <text class="func-tag">危险筛查</text>
-        <text class="func-tag">行动指引</text>
+        <text class="func-tag">分步处置</text>
       </view>
     </view>
     <view class="func-arrow">→</view>

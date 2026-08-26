@@ -21,6 +21,6 @@ Page({
   },
 
   goContact() {
-    wx.navigateTo({ url: '/pages/contact/contact' });
+    wx.navigateTo({ url: '/pages/danger/danger' });
   }
 });
