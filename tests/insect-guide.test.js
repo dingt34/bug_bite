@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const guide = require('../miniprogram/utils/insect-guide.js');
 
-assert.strictEqual(guide.list().length, 14);
+assert.strictEqual(guide.list().length, 29);
 assert.deepStrictEqual(
   guide.list({ group: 'attached' }).map(item => item.id),
-  ['tick', 'brown_dog_tick']
+  ['tick', 'brown_dog_tick', 'chigger', 'head_louse', 'scabies_mite']
 );
 assert.deepStrictEqual(
   guide.list({ query: '床虱' }).map(item => item.id),

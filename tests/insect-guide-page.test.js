@@ -24,10 +24,10 @@ const page = Object.assign({}, pageDefinition, {
 });
 
 page.onLoad({});
-assert.strictEqual(page.data.items.length, 14);
+assert.strictEqual(page.data.items.length, 29);
 
 page.setGroup({ currentTarget: { dataset: { group: 'attached' } } });
-assert.deepStrictEqual(page.data.items.map(item => item.id), ['tick', 'brown_dog_tick']);
+assert.deepStrictEqual(page.data.items.map(item => item.id), ['tick', 'brown_dog_tick', 'chigger', 'head_louse', 'scabies_mite']);
 
 page.setData({ activeGroup: 'all' });
 page.onSearchInput({ detail: { value: '床虱' } });
