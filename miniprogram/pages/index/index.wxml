@@ -48,6 +48,19 @@
     <view class="func-arrow">→</view>
   </view>
 
+  <view class="func-entry guide-entry" hover-class="func-entry-hover" bindtap="goInsectGuide">
+    <view class="func-icon guide-icon">🔎</view>
+    <view class="func-body">
+      <view class="func-title">常见虫种对比图鉴</view>
+      <view class="func-desc">用多张实物图对照具体物种的外形、环境与接触方式</view>
+      <view class="func-tags">
+        <text class="func-tag">14 个物种 · 42 张图</text>
+        <text class="func-tag">2～3 种对比</text>
+      </view>
+    </view>
+    <view class="func-arrow">→</view>
+  </view>
+
   <view class="func-entry ai-entry" hover-class="func-entry-hover" bindtap="goAiChat">
     <view class="func-icon ai-icon">✨</view>
     <view class="func-body">

@@ -17,7 +17,10 @@
     "pages/event-review/event-review",
     "pages/post-publish/post-publish",
     "pages/post-detail/post-detail",
-    "pages/ai-chat/ai-chat"
+    "pages/ai-chat/ai-chat",
+    "pages/insect-guide/insect-guide",
+    "pages/insect-detail/insect-detail",
+    "pages/insect-compare/insect-compare"
   ],
   "window": {
     "navigationBarBackgroundColor": "#2E7D5B",
