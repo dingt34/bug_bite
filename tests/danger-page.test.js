@@ -38,7 +38,7 @@ app.globalData.draftEvent = null;
 const guidePage = createPage();
 guidePage.onLoad({ contactType: 'attachment' });
 guidePage.continueGuide();
-assert.strictEqual(app.globalData.draftEvent.contactType, 'attachment');
-assert.strictEqual(navigatedUrl, '/pages/guide/guide?contactType=attachment');
+assert.strictEqual(app.globalData.draftEvent, null);
+assert.strictEqual(navigatedUrl, '/pages/contact/contact');
 
 console.log('danger page tests passed');

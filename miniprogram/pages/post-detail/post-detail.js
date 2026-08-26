@@ -188,7 +188,7 @@ Page({
   },
 
   goSafety() {
-    wx.navigateTo({ url: '/pages/contact/contact' });
+    wx.navigateTo({ url: '/pages/danger/danger' });
   },
 
   onUnload() {

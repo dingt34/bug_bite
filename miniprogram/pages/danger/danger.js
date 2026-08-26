@@ -11,10 +11,7 @@ Page({
 
   onLoad(options) {
     const contactType = options.contactType || '';
-    const signals = mock.DANGER_SIGNALS.filter(signal => {
-      return !signal.contactTypes || signal.contactTypes.indexOf(contactType) > -1;
-    });
-    this.setData({ contactType: contactType, signals: signals });
+    this.setData({ contactType: contactType, signals: mock.DANGER_SIGNALS });
   },
 
   toggle(e) {
@@ -63,8 +60,6 @@ Page({
   },
 
   continueGuide() {
-    const draft = this.ensureDraft();
-    draft.dangerSignals = [];
-    wx.navigateTo({ url: '/pages/guide/guide?contactType=' + draft.contactType });
+    wx.navigateTo({ url: '/pages/contact/contact' });
   }
 });

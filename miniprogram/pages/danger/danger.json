@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "危险信号筛查"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "safety-nav": "/components/safety-nav/safety-nav"
+  }
 }

@@ -1,4 +1,5 @@
 <wxs src="./danger.wxs" module="g" />
+<safety-nav current="1" />
 <view class="page">
   <!-- 顶部说明 -->
   <view class="head">
@@ -25,7 +26,7 @@
   <!-- 底部操作 -->
   <view class="action">
     <button class="btn-danger" wx:if="{{hasDanger}}" bindtap="goEmergency">立即求助 · 中断问答</button>
-    <button class="btn-primary" wx:else bindtap="continueGuide">没有以上信号，继续</button>
+    <button class="btn-primary" wx:else bindtap="continueGuide">没有以上信号，选择接触类型</button>
   </view>
 
   <view class="tip">危险信号筛查优先于图片识别；即使没有危险信号，后续也可按症状获得分级建议。</view>

@@ -10,6 +10,9 @@ assert.strictEqual(mock.DANGER_SIGNALS.find(signal => signal.key === 'multi').co
 assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'trend').options.includes('快速加重'), false);
 assert.strictEqual(mock.SPECIFIC_QUESTIONS.bite[0].options.includes('大量多处'), false);
 assert.strictEqual(mock.SPECIFIC_QUESTIONS.sting[0].options.includes('大量多处'), false);
+assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'bodyParts').options.includes('眼周'), true);
+assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'localSymptoms').options.includes('渗液/脓液'), true);
+assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'dailyImpact').options.includes('无法正常活动'), true);
 assert.deepStrictEqual(
   mock.REVIEW_QUESTIONS.common.map(question => question.key),
   ['bodyParts', 'localSymptoms', 'systemicSymptoms', 'trend', 'dailyImpact']
@@ -40,10 +43,10 @@ assert.strictEqual(
 assert.strictEqual(
   risk.evaluateRisk('sting', {
     systemicSymptoms: ['无明显'],
-    localSymptoms: ['红肿'],
-    trend: '保持不变',
+    localSymptoms: ['红斑/红肿'],
+    trend: '基本不变',
     count: '少数几处',
-    distribution: '分散全身'
+    distribution: '分散在多个部位'
   }).level,
   'consult'
 );

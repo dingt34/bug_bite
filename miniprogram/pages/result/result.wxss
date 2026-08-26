@@ -28,6 +28,30 @@
   border-radius: 12rpx;
   padding: 20rpx;
 }
+.basis-note {
+  margin-top: 12rpx;
+  color: #8A9299;
+  font-size: 22rpx;
+}
+
+.card-kicker {
+  display: inline-block;
+  margin-bottom: 8rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 16rpx;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.small-title {
+  font-size: 28rpx;
+}
+
+.seek-card {
+  border-left: 8rpx solid #F57C00;
+}
 
 .action-item {
   display: flex;
@@ -65,6 +89,47 @@
 .review {
   font-size: 28rpx;
   color: #3A414A;
+}
+
+.seek-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+.seek-icon {
+  width: 34rpx;
+  height: 34rpx;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #FFF3E0;
+  color: #C85F00;
+  text-align: center;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 34rpx;
+}
+.seek-text {
+  flex: 1;
+  color: #3A414A;
+  font-size: 27rpx;
+  line-height: 1.6;
+}
+.review-plan {
+  margin-top: 20rpx;
+  padding: 16rpx 18rpx;
+  border-radius: 12rpx;
+  background: #FFF8ED;
+  color: #8A5200;
+  font-size: 24rpx;
+}
+.source-note {
+  margin-top: 16rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid #ECEEF0;
+  color: #9AA0A6;
+  font-size: 20rpx;
+  line-height: 1.5;
 }
 
 .check-item {

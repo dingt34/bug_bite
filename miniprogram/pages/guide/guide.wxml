@@ -1,13 +1,24 @@
 <wxs src="./guide.wxs" module="g" />
-
+<safety-nav current="3" bind:stepchange="onStepChange" />
 <view class="page">
-  <view class="head">补充一些信息，帮助我们给出更准确的分级建议</view>
-  <view class="required-note"><text class="required">*</text> 症状与接触情况均为必填项</view>
+  <view class="head">
+    <view class="head-title">记录当前症状与证据</view>
+    <view class="head-sub">这些信息用于规则分级，不用于疾病或虫种诊断</view>
+  </view>
+  <view class="completion-card">
+    <view class="completion-row">
+      <view><text class="required">*</text> 症状与接触情况均为必填项</view>
+      <view class="completion-count">已完成 {{answeredCount}} / {{questionCount}}</view>
+    </view>
+    <view class="completion-track"><view class="completion-value" style="width: {{completionPercent}}%;"></view></view>
+  </view>
   <view class="validation-banner" wx:if="{{validationMessage}}">{{validationMessage}}</view>
 
   <!-- 通用 + 条件追问 -->
-  <view class="card" wx:for="{{questions}}" wx:key="key" wx:for-item="q">
+  <view class="card question-card" wx:for="{{questions}}" wx:key="key" wx:for-item="q">
+    <view class="question-meta"><text class="question-index">{{index + 1}}</text><text class="question-group">{{q.group}}</text></view>
     <view class="card-title">{{q.label}} <text class="required">*</text></view>
+    <view class="question-help" wx:if="{{q.help}}">{{q.help}}</view>
     <view class="chips">
       <text
         class="tag {{g.isSelected(answers[q.key], item) ? 'active' : ''}}"
@@ -25,7 +36,7 @@
   <!-- 已采取措施 -->
   <view class="card">
     <view class="card-title">已采取措施 <text class="optional">选填</text></view>
-    <view class="action-help">仅记录已经做过的处理，可多选；用药请遵循说明书或专业人员建议。</view>
+    <view class="action-help">仅记录已经完成的处理，可多选；这里不是操作建议，用药请遵循说明书或专业人员建议。</view>
     <view class="chips">
       <text class="tag {{g.isSelected(actionsTaken, item) ? 'active' : ''}}" wx:for="{{actionOptions}}" wx:key="*this" bindtap="onActionTap" data-v="{{item}}">{{item}}</text>
     </view>

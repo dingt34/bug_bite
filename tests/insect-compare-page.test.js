@@ -27,7 +27,7 @@ assert.ok(page.data.comparison.rows.some(row => row.label === '常见环境'));
 assert.ok(page.data.comparison.items.every(item => item.coverImage.endsWith('.webp')));
 
 page.goContact();
-assert.strictEqual(navigatedUrl, '/pages/contact/contact');
+assert.strictEqual(navigatedUrl, '/pages/danger/danger');
 page.backToGuide();
 assert.strictEqual(backed, true);
 

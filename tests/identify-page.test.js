@@ -36,6 +36,6 @@ assert.strictEqual(page.data.status, 'error');
 assert.ok(page.data.errorMessage.includes('图片选择失败'));
 
 page.goContact();
-assert.strictEqual(navigatedUrl, '/pages/contact/contact');
+assert.strictEqual(navigatedUrl, '/pages/danger/danger');
 
 console.log('identify page tests passed');

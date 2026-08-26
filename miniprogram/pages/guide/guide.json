@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "情况补充"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "safety-nav": "/components/safety-nav/safety-nav"
+  }
 }
