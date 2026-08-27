@@ -96,6 +96,7 @@
   width: 100%;
   white-space: nowrap;
 }
+.region-scroll { margin-bottom: 14rpx; }
 .topic-row {
   display: inline-flex;
   padding-right: 20rpx;
@@ -191,6 +192,11 @@
   font-size: 29rpx;
   line-height: 1.7;
 }
+.route-share-card { margin-top: 20rpx; padding: 20rpx; border: 1rpx solid #CFE4D9; border-radius: 16rpx; background: linear-gradient(135deg, #F3FAF6, #FFFFFF); }
+.route-share-badge { color: #2E7D5B; font-size: 21rpx; font-weight: 600; }
+.route-share-path { margin-top: 10rpx; color: #26342D; font-size: 25rpx; font-weight: 600; line-height: 1.65; }
+.route-arrow { margin: 0 8rpx; color: #74A38D; }
+.route-share-meta { margin-top: 8rpx; color: #75827C; font-size: 21rpx; }
 .post-image {
   width: 100%;
   height: 320rpx;

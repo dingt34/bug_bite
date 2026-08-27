@@ -30,6 +30,8 @@
   border-radius: 18rpx;
   background: #F3F8F5;
 }
+.route-import { border-color: #BFDCCF; background: #F3FAF6; }
+.route-remove { flex: none; padding: 16rpx; color: #A06A54; font-size: 22rpx; }
 .event-import-icon {
   flex-shrink: 0;
   width: 50rpx;

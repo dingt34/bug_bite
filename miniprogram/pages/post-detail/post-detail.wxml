@@ -20,6 +20,17 @@
         <view class="post-time">{{post.time}}{{post.edited ? ' · 已编辑' : ''}}</view>
       </view>
     </view>
+    <view class="route-share-card" wx:if="{{post.routePlan}}">
+      <view class="route-share-badge">本次路线 · {{post.region}}</view>
+      <view class="route-share-path">
+        <text>{{post.routePlan.startName}}</text>
+        <block wx:for="{{post.routePlan.waypointNames}}" wx:key="*this" wx:for-item="stop">
+          <text class="route-arrow">→</text><text>{{stop}}</text>
+        </block>
+        <text class="route-arrow">→</text><text>{{post.routePlan.endName}}</text>
+      </view>
+      <view class="route-share-meta">{{post.routePlan.modeName}} · {{post.routePlan.routeName}} · {{post.routePlan.distanceText}} · {{post.routePlan.durationText}}</view>
+    </view>
     <view class="post-text">{{post.text}}</view>
     <image
       wx:for="{{post.imageRefs}}"

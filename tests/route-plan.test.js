@@ -22,6 +22,19 @@ assert.strictEqual(selected.routeName, '推荐路线');
 assert.strictEqual(selected.waypointName, '途经点');
 assert.strictEqual(selected.points.length, 1);
 
+const multiSelected = route.buildSelectedRoute({
+  id: 'b', name: '途经路线', distanceText: '18 km', durationText: '50 分钟', points: []
+}, {
+  startName: '杭州东站', endName: '莫干山', mode: 'driving',
+  waypoints: [
+    { name: '西湖', place: { city: '杭州市', title: '西湖' } },
+    { name: '南浔古镇', place: { city: '湖州市', title: '南浔古镇' } }
+  ],
+  selectedPlaces: { startName: { city: '杭州市' }, endName: { city: '湖州市' } }
+}, 2000);
+assert.deepStrictEqual(multiSelected.waypointNames, ['西湖', '南浔古镇']);
+assert.deepStrictEqual(multiSelected.regions, ['杭州', '湖州']);
+
 assert.ok(route.getErrorMessage({ errMsg: 'FUNCTION_NOT_FOUND' }).includes('尚未部署'));
 assert.ok(route.getErrorMessage({ errMsg: 'WebserviceAPI' }).includes('权限'));
 assert.ok(route.getErrorMessage({ errMsg: 'FUNCTIONS_EXECUTE_FAIL' }).includes('重新部署'));

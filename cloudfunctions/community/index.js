@@ -104,6 +104,10 @@ async function listPosts(event, openid) {
     userCommunityState(openid)
   ]);
   let posts = (postsResult.data || []).filter(post => !state.reported[post._id]);
+  if (event.region) {
+    const selectedRegion = domain.text(event.region, 32).replace(/^浙江省?/, '').replace(/市$/, '');
+    posts = posts.filter(post => domain.text(post.region, 32).replace(/^浙江省?/, '').replace(/市$/, '') === selectedRegion);
+  }
   if (filterMode === 'collected') posts = posts.filter(post => state.reactions[post._id] && state.reactions[post._id].collected);
   if (filterMode === 'commented') posts = posts.filter(post => state.commented[post._id]);
   posts = posts.filter(post => domain.matchesQuery(post, event.query));

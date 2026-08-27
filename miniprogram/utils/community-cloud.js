@@ -22,12 +22,24 @@ function uploadImage(wxApi, filePath) {
   return cloudService.uploadFile(wxApi, cloudPath, filePath).then(result => result.fileID);
 }
 
+function regionKey(value) {
+  return String(value || '').trim().replace(/^浙江省?/, '').replace(/市$/, '');
+}
+
 function getFeed(wxApi, filters) {
-  return call(wxApi, 'list', filters).then(result => ({
-    posts: (result.posts || []).map(item => community.decorateCloudPost(item)),
-    total: result.total || 0,
-    hasMore: !!result.hasMore
-  }));
+  return call(wxApi, 'list', filters).then(result => {
+    const source = result.posts || [];
+    const selectedRegion = regionKey(filters && filters.region);
+    const filtered = selectedRegion
+      ? source.filter(item => regionKey(item.region) === selectedRegion)
+      : source;
+    const backendIgnoredRegion = selectedRegion && filtered.length !== source.length;
+    return {
+      posts: filtered.map(item => community.decorateCloudPost(item)),
+      total: backendIgnoredRegion ? filtered.length : (result.total || 0),
+      hasMore: !!result.hasMore
+    };
+  });
 }
 
 function getThread(wxApi, postId) {
@@ -46,6 +58,7 @@ function publish(wxApi, draft, profile) {
       profile,
       post: {
         text: draft.text,
+        routePlan: draft.routePlan,
         region: draft.region,
         contactType: draft.contactType,
         contactTypeName: draft.contactTypeName,
@@ -68,6 +81,7 @@ function update(wxApi, postId, draft) {
       postId,
       post: {
         text: draft.text,
+        routePlan: draft.routePlan,
         region: draft.region,
         contactType: draft.contactType,
         contactTypeName: draft.contactTypeName,

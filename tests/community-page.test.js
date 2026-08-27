@@ -7,6 +7,7 @@ let pageDefinition = null;
 const app = { globalData: { communityFilter: 'collected' } };
 let lastListRequest = null;
 let reactionCalls = 0;
+let simulateStaleRegionBackend = false;
 
 global.Page = definition => { pageDefinition = definition; };
 global.getApp = () => app;
@@ -26,6 +27,13 @@ global.wx = {
       const data = options.data;
       if (data.action === 'list') {
         lastListRequest = data;
+        if (simulateStaleRegionBackend) {
+          const posts = [
+            { id: 'hz_post', region: '杭州', displayName: '杭州用户', text: '杭州经历', tags: [] },
+            { id: 'huzhou_post', region: '湖州', displayName: '湖州用户', text: '湖州经历', tags: [] }
+          ];
+          return Promise.resolve({ result: { posts, total: posts.length, hasMore: false } });
+        }
         const posts = data.query ? [] : [{
           id: 'cloud_post_1', displayName: '云端作者', text: '林地经历',
           createdAtTimestamp: Date.now() - 1000, liked: false, collected: true,
@@ -87,6 +95,13 @@ const page = Object.assign({}, pageDefinition, {
   page.setSort({ currentTarget: { dataset: { mode: 'hot' } } });
   await new Promise(resolve => setTimeout(resolve, 10));
   assert.strictEqual(page.data.sortMode, 'hot');
+
+  simulateStaleRegionBackend = true;
+  page.setRegion({ currentTarget: { dataset: { region: '湖州' } } });
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.strictEqual(lastListRequest.region, '湖州', '页面应把所选地区传给云函数');
+  assert.deepStrictEqual(page.data.posts.map(post => post.region), ['湖州'],
+    '即使旧版云函数忽略地区参数，页面也只能展示所选地区');
   page.onHide();
   assert.strictEqual(page.data.filterMode, 'all');
   const template = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/community/community.wxml'), 'utf8');

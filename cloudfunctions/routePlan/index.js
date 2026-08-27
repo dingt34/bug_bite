@@ -45,7 +45,14 @@ async function locate(address) {
   const data = await request('/ws/place/v1/suggestion', { keyword: address, region: '浙江', region_fix: 1, key: MAP_KEY });
   const place = data.data && data.data[0];
   if (!place || !place.location) throw new Error('未找到地点：' + address);
-  return { latitude: Number(place.location.lat), longitude: Number(place.location.lng), title: place.title || address };
+  return {
+    latitude: Number(place.location.lat),
+    longitude: Number(place.location.lng),
+    title: place.title || address,
+    address: String(place.address || ''),
+    city: String(place.city || ''),
+    district: String(place.district || '')
+  };
 }
 
 function normalizeSelectedPlace(place, fallbackTitle) {
@@ -53,7 +60,14 @@ function normalizeSelectedPlace(place, fallbackTitle) {
   const latitude = Number(place.latitude);
   const longitude = Number(place.longitude);
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
-  return { latitude, longitude, title: String(place.title || fallbackTitle || '').trim() };
+  return {
+    latitude,
+    longitude,
+    title: String(place.title || fallbackTitle || '').trim(),
+    address: String(place.address || ''),
+    city: String(place.city || ''),
+    district: String(place.district || '')
+  };
 }
 
 async function resolvePlace(text, selectedPlace) {
@@ -128,18 +142,21 @@ async function getRoutes(start, end, mode, policy, waypoint, multiple) {
   });
 }
 
-async function getRouteThroughWaypoint(start, waypoint, end, mode) {
-  const first = await getRoutes(start, waypoint, mode, null, null, false);
-  const second = await getRoutes(waypoint, end, mode, null, null, false);
-  if (!first.length || !second.length) return null;
-  const firstRoute = first[0];
-  const secondRoute = second[0];
-  const points = firstRoute.points.concat(secondRoute.points.slice(1));
-  const distance = firstRoute.distance + secondRoute.distance;
-  const duration = firstRoute.duration + secondRoute.duration;
+async function getRouteThroughWaypoints(start, waypoints, end, mode) {
+  const stops = [start].concat(waypoints || [], [end]);
+  const legs = [];
+  for (let index = 0; index < stops.length - 1; index += 1) {
+    const routes = await getRoutes(stops[index], stops[index + 1], mode, null, null, false);
+    if (!routes.length) return null;
+    legs.push(routes[0]);
+  }
+  const points = legs.reduce((all, leg, index) => all.concat(index ? leg.points.slice(1) : leg.points), []);
+  const distance = legs.reduce((total, leg) => total + leg.distance, 0);
+  const duration = legs.reduce((total, leg) => total + leg.duration, 0);
+  const names = (waypoints || []).map(item => '“' + item.title + '”').join('、');
   return {
     id: mode + '_via',
-    name: '经过“' + waypoint.title + '”',
+    name: '途经 ' + names,
     distance,
     duration,
     distanceText: formatDistance(distance),
@@ -162,19 +179,24 @@ async function planRoute(event) {
   if (!MAP_KEY) return { routes: [], message: '尚未配置地图服务 Key' };
   const startText = String(event.start || '').trim();
   const endText = String(event.end || '').trim();
-  const waypointText = String(event.waypoint || '').trim();
+  const waypointTexts = (Array.isArray(event.waypoints) ? event.waypoints : [event.waypoint])
+    .map(item => String(item || '').trim()).filter(Boolean).slice(0, 5);
   const mode = MODE_CONFIG[event.mode] ? event.mode : 'walking';
   if (!startText || !endText) throw new Error('请填写起点和终点');
   // Keep requests sequential so a personal developer account only needs
   // one concurrent request quota for each WebService API.
   const start = await resolvePlace(startText, event.startPlace);
   const end = await resolvePlace(endText, event.endPlace);
-  const waypoint = waypointText ? await resolvePlace(waypointText, event.waypointPlace) : null;
+  const waypointPlaces = Array.isArray(event.waypointPlaces) ? event.waypointPlaces : [event.waypointPlace];
+  const waypoints = [];
+  for (let index = 0; index < waypointTexts.length; index += 1) {
+    waypoints.push(await resolvePlace(waypointTexts[index], waypointPlaces[index]));
+  }
   const config = MODE_CONFIG[mode];
   const results = [];
   const firstPolicy = config.policies[0];
   try {
-    results.push({ status: 'fulfilled', value: await getRoutes(start, end, mode, firstPolicy, waypoint, true) });
+    results.push({ status: 'fulfilled', value: await getRoutes(start, end, mode, firstPolicy, null, true) });
   } catch (reason) {
     results.push({ status: 'rejected', reason });
   }
@@ -187,14 +209,15 @@ async function planRoute(event) {
     for (const policy of config.policies.slice(1)) {
       if (routes.length >= 3) break;
       try {
-        routes = uniqueRoutes(routes.concat(await getRoutes(start, end, mode, policy, waypoint, false)));
+        routes = uniqueRoutes(routes.concat(await getRoutes(start, end, mode, policy, null, false)));
       } catch (reason) {
         results.push({ status: 'rejected', reason });
       }
     }
-  } else if (waypoint) {
+  }
+  if (waypoints.length) {
     try {
-      const viaRoute = await getRouteThroughWaypoint(start, waypoint, end, mode);
+      const viaRoute = await getRouteThroughWaypoints(start, waypoints, end, mode);
       if (viaRoute) routes = uniqueRoutes([viaRoute].concat(routes));
     } catch (reason) {
       results.push({ status: 'rejected', reason });
@@ -206,7 +229,7 @@ async function planRoute(event) {
     if (failedRequest) throw failedRequest.reason;
     throw new Error('未能找到可用路线');
   }
-  return { start, waypoint, end, mode, modeName: config.name, routes };
+  return { start, waypoint: waypoints[0] || null, waypoints, end, mode, modeName: config.name, routes };
 }
 
 exports.main = async event => {

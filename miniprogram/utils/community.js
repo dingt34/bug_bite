@@ -50,6 +50,10 @@ function matchesQuery(post, query) {
     .some(value => String(value || '').toLowerCase().indexOf(keyword) > -1);
 }
 
+function regionKey(value) {
+  return String(value || '').trim().replace(/^浙江省?/, '').replace(/市$/, '');
+}
+
 function listPosts(localPosts, demoPosts, reactions, filterMode, now, options) {
   const settings = options || {};
   const reportedPosts = settings.reportedPosts || {};
@@ -75,6 +79,7 @@ function listPosts(localPosts, demoPosts, reactions, filterMode, now, options) {
     ));
   }
   if (settings.topic) posts = posts.filter(post => post.contactType === settings.topic);
+  if (settings.region) posts = posts.filter(post => regionKey(post.region) === regionKey(settings.region));
   posts = posts.filter(post => matchesQuery(post, settings.query));
   if (settings.sortMode === 'hot') {
     posts.sort((a, b) => postHeat(b, now) - postHeat(a, now) ||
@@ -119,6 +124,7 @@ function buildPost(input, userInfo, timestamp) {
     createdAtTimestamp: time,
     time: '刚刚',
     text: String(input.text || '').trim(),
+    routePlan: input.routePlan || null,
     imageRefs: input.imageRef ? [input.imageRef] : [],
     tags: [input.region, input.contactTypeName, input.stage].filter(Boolean),
     contactType: input.contactType,

@@ -21,31 +21,33 @@
       </view>
     </view>
     <view class="place-line"></view>
-    <view class="add-waypoint-row" wx:if="{{!waypointEnabled}}" bindtap="addWaypoint">
+    <view class="add-waypoint-row" wx:if="{{waypoints.length < 5}}" bindtap="addWaypoint">
       <view class="add-waypoint-icon">＋</view>
-      <view>添加途经点</view>
+      <view>添加途经点（{{waypoints.length}} / 5）</view>
     </view>
-    <view class="place-block" wx:if="{{waypointEnabled}}">
+    <block wx:for="{{waypoints}}" wx:key="id" wx:for-item="waypoint" wx:for-index="waypointIndex">
+    <view class="place-block">
       <view class="place-row">
         <view class="place-dot waypoint-dot"></view>
         <view class="place-field">
-          <view class="field-label">途经点（选填，可生成对比路线）</view>
+          <view class="field-label">途经点 {{waypointIndex + 1}}</view>
           <view class="input-with-action">
-            <input class="place-input waypoint-input" value="{{form.waypointName}}" placeholder="如：黄龙体育中心" maxlength="40" bindinput="onWaypointInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="waypointName" />
-            <view class="clear-waypoint" catchtap="clearWaypoint">移除</view>
+            <input class="place-input waypoint-input" value="{{waypoint.name}}" placeholder="如：黄龙体育中心" maxlength="40" bindinput="onWaypointInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="waypoint" data-index="{{waypointIndex}}" />
+            <view class="clear-waypoint" catchtap="clearWaypoint" data-index="{{waypointIndex}}">移除</view>
           </view>
         </view>
       </view>
-      <view class="suggest-panel" wx:if="{{activeSuggestKey === 'waypointName'}}">
+      <view class="suggest-panel" wx:if="{{activeSuggestKey === 'waypoint_' + waypointIndex}}">
         <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view>
         <view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
-        <view class="suggest-item" wx:for="{{suggestions}}" wx:key="id" catchtap="selectSuggestion" data-key="waypointName" data-index="{{index}}">
-          <view class="suggest-title">{{item.title}}</view>
-          <view class="suggest-address">{{item.city}}{{item.district}} · {{item.address}}</view>
+        <view class="suggest-item" wx:for="{{suggestions}}" wx:for-item="suggestion" wx:for-index="suggestionIndex" wx:key="id" catchtap="selectSuggestion" data-key="waypoint_{{waypointIndex}}" data-index="{{suggestionIndex}}">
+          <view class="suggest-title">{{suggestion.title}}</view>
+          <view class="suggest-address">{{suggestion.city}}{{suggestion.district}} · {{suggestion.address}}</view>
         </view>
       </view>
     </view>
     <view class="place-line"></view>
+    </block>
     <view class="place-block">
       <view class="place-row">
         <view class="place-dot end-dot"></view>
@@ -85,6 +87,7 @@
       <view class="route-state">{{selectedIndex === index ? '已选择' : '选择'}}</view>
     </view>
     <button class="confirm-button" bindtap="confirmRoute">确认路线并返回行前准备</button>
-    <view class="route-notice">驾车最多提供三条地图备选方案；步行与骑行在填写途经点后提供“途经路线”和“直接路线”对比。路线仅供行前规划参考。</view>
+    <button class="share-route-button" bindtap="shareRoute">保存并添加到经历分享</button>
+    <view class="route-notice">最多可设置 5 个途经点；填写途经点后会优先展示完整途经路线，并保留直接路线用于比较。路线仅供行前规划参考。</view>
   </view>
 </view>

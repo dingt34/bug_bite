@@ -14,6 +14,11 @@ Page({
     overnights: ['当日往返', '户外过夜', '室内住宿'],
     monthIndex: -1,
     selectedRoute: null,
+    selectedRoutePath: '',
+    routeSuggestedRegions: [],
+    requiredCount: 3,
+    answeredCount: 0,
+    completionPercent: 0,
     form: {
       regionCodes: [],
       month: '',
@@ -26,11 +31,24 @@ Page({
   },
 
   onRegionTap(e) {
-    this.toggleArray('regionCodes', e.currentTarget.dataset.v);
+    this.toggleArray('regionCodes', e.currentTarget.dataset.v, '', () => this.updateCompletion());
   },
 
   onShow() {
-    this.setData({ selectedRoute: wx.getStorageSync('selectedRoutePlan') || null });
+    const selectedRoute = wx.getStorageSync('selectedRoutePlan') || null;
+    const suggested = selectedRoute && Array.isArray(selectedRoute.regions)
+      ? selectedRoute.regions.filter(region => this.data.regions.indexOf(region) > -1)
+      : [];
+    const routeNames = selectedRoute
+      ? [selectedRoute.startName].concat(selectedRoute.waypointNames || [], [selectedRoute.endName]).filter(Boolean)
+      : [];
+    const changes = { selectedRoute, selectedRoutePath: routeNames.join(' → '), routeSuggestedRegions: suggested };
+    if (!this.data.form.regionCodes.length && suggested.length) changes['form.regionCodes'] = suggested.slice();
+    this.setData(changes, () => this.updateCompletion());
+  },
+
+  applyRouteRegions() {
+    this.setData({ 'form.regionCodes': this.data.routeSuggestedRegions.slice() }, () => this.updateCompletion());
   },
 
   goRoutePlan() {
@@ -38,12 +56,14 @@ Page({
   },
 
   onMonthChange(e) {
-    this.setData({ monthIndex: Number(e.detail.value) });
-    this.setData({ 'form.month': this.data.months[e.detail.value] });
+    this.setData({
+      monthIndex: Number(e.detail.value),
+      'form.month': this.data.months[e.detail.value]
+    }, () => this.updateCompletion());
   },
 
   onActivityTap(e) {
-    this.setData({ 'form.activityType': e.currentTarget.dataset.v });
+    this.setData({ 'form.activityType': e.currentTarget.dataset.v }, () => this.updateCompletion());
   },
 
   onHabitatTap(e) {
@@ -62,11 +82,11 @@ Page({
     this.toggleArray('gearTags', e.currentTarget.dataset.v, '暂未准备');
   },
 
-  toggleArray(key, v, exclusiveValue) {
+  toggleArray(key, v, exclusiveValue, callback) {
     let arr = this.data.form[key].slice();
     if (exclusiveValue && v === exclusiveValue) {
       arr = arr.indexOf(v) > -1 ? [] : [v];
-      this.setData({ ['form.' + key]: arr });
+      this.setData({ ['form.' + key]: arr }, callback);
       return;
     }
     if (exclusiveValue) {
@@ -78,7 +98,17 @@ Page({
     } else {
       arr.push(v);
     }
-    this.setData({ ['form.' + key]: arr });
+    this.setData({ ['form.' + key]: arr }, callback);
+  },
+
+  updateCompletion() {
+    const form = this.data.form;
+    const answeredCount = [form.regionCodes.length > 0, !!form.month, !!form.activityType]
+      .filter(Boolean).length;
+    this.setData({
+      answeredCount,
+      completionPercent: Math.round(answeredCount / this.data.requiredCount * 100)
+    });
   },
 
   onShareAppMessage() {},
@@ -96,7 +126,10 @@ Page({
     const routeSummary = selectedRoute ? {
       id: selectedRoute.id,
       startName: selectedRoute.startName,
+      waypointName: selectedRoute.waypointName || '',
+      waypointNames: selectedRoute.waypointNames || [],
       endName: selectedRoute.endName,
+      regions: selectedRoute.regions || [],
       mode: selectedRoute.mode,
       modeName: selectedRoute.modeName,
       routeName: selectedRoute.routeName,

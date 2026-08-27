@@ -3,9 +3,9 @@ const routeUtils = require('../../utils/route-plan.js');
 Page({
   data: {
     modes: routeUtils.MODES,
-    form: { startName: '', waypointName: '', endName: '', mode: 'walking' },
-    waypointEnabled: false,
-    selectedPlaces: { startName: null, waypointName: null, endName: null },
+    form: { startName: '', endName: '', mode: 'walking' },
+    waypoints: [],
+    selectedPlaces: { startName: null, endName: null },
     activeSuggestKey: '',
     suggestions: [],
     suggestLoading: false,
@@ -26,11 +26,10 @@ Page({
     this.setData({
       form: {
         startName: saved.startName || '',
-        waypointName: saved.waypointName || '',
         endName: saved.endName || '',
         mode: saved.mode || 'walking'
       },
-      waypointEnabled: Boolean(saved.waypointName)
+      waypoints: routeUtils.normalizeWaypoints(saved.waypoints || saved.waypointNames, saved.waypointName)
     });
   },
 
@@ -48,7 +47,14 @@ Page({
   },
 
   onWaypointInput(e) {
-    this.updateInput('waypointName', e.detail.value);
+    const index = Number(e.currentTarget.dataset.index);
+    const waypoints = this.data.waypoints.slice();
+    if (!waypoints[index]) return;
+    waypoints[index] = Object.assign({}, waypoints[index], {
+      name: routeUtils.normalizeText(e.detail.value), place: null
+    });
+    this.setData({ waypoints, routes: [], polylines: [], message: '' });
+    this.scheduleSuggestions('waypoint_' + index, waypoints[index].name);
   },
 
   updateInput(key, value) {
@@ -63,7 +69,9 @@ Page({
 
   onPlaceFocus(e) {
     const key = e.currentTarget.dataset.key;
-    this.scheduleSuggestions(key, this.data.form[key]);
+    const index = Number(e.currentTarget.dataset.index);
+    const keyword = key === 'waypoint' ? ((this.data.waypoints[index] || {}).name || '') : this.data.form[key];
+    this.scheduleSuggestions(key === 'waypoint' ? 'waypoint_' + index : key, keyword);
   },
 
   onPlaceBlur() {
@@ -113,27 +121,44 @@ Page({
     const suggestion = this.data.suggestions[Number(e.currentTarget.dataset.index)];
     if (!suggestion) return;
     this.suggestSequence = (this.suggestSequence || 0) + 1;
-    this.setData({
-      ['form.' + key]: suggestion.title,
-      ['selectedPlaces.' + key]: suggestion,
+    const changes = {
       activeSuggestKey: '',
       suggestions: [],
       suggestLoading: false,
       suggestMessage: '',
       routes: [], polylines: [], message: ''
-    });
+    };
+    if (key.indexOf('waypoint_') === 0) {
+      const waypointIndex = Number(key.split('_')[1]);
+      const waypoints = this.data.waypoints.slice();
+      if (!waypoints[waypointIndex]) return;
+      waypoints[waypointIndex] = Object.assign({}, waypoints[waypointIndex], {
+        name: suggestion.title, place: suggestion
+      });
+      changes.waypoints = waypoints;
+    } else {
+      changes['form.' + key] = suggestion.title;
+      changes['selectedPlaces.' + key] = suggestion;
+    }
+    this.setData(changes);
   },
 
   addWaypoint() {
-    this.setData({ waypointEnabled: true });
+    if (this.data.waypoints.length >= 5) {
+      wx.showToast({ title: '最多可设置 5 个途经点', icon: 'none' });
+      return;
+    }
+    this.setData({
+      waypoints: this.data.waypoints.concat([{ id: 'waypoint_' + Date.now(), name: '', place: null }])
+    });
   },
 
-  clearWaypoint() {
+  clearWaypoint(e) {
     this.suggestSequence = (this.suggestSequence || 0) + 1;
+    const index = Number(e && e.currentTarget && e.currentTarget.dataset.index);
+    const waypoints = this.data.waypoints.filter((item, itemIndex) => itemIndex !== index);
     this.setData({
-      'form.waypointName': '',
-      'selectedPlaces.waypointName': null,
-      waypointEnabled: false,
+      waypoints,
       activeSuggestKey: '', suggestions: [], suggestMessage: '',
       routes: [], polylines: [], message: ''
     });
@@ -170,11 +195,11 @@ Page({
       name: 'routePlan',
       data: {
         start: form.startName,
-        waypoint: form.waypointName,
+        waypoints: this.data.waypoints.map(item => item.name).filter(Boolean),
         end: form.endName,
         mode: form.mode,
         startPlace: this.data.selectedPlaces.startName,
-        waypointPlace: this.data.selectedPlaces.waypointName,
+        waypointPlaces: this.data.waypoints.filter(item => item.name).map(item => item.place),
         endPlace: this.data.selectedPlaces.endName
       },
       success: result => {
@@ -217,11 +242,23 @@ Page({
     });
   },
 
-  confirmRoute() {
+  saveSelectedRoute() {
     const route = this.data.routes[this.data.selectedIndex];
-    if (!route) return;
-    const selected = routeUtils.buildSelectedRoute(route, this.data.form);
+    if (!route) return null;
+    const selected = routeUtils.buildSelectedRoute(route, Object.assign({}, this.data.form, {
+      waypoints: this.data.waypoints,
+      selectedPlaces: this.data.selectedPlaces,
+      regions: routeUtils.inferRouteRegions([
+        this.data.selectedPlaces.startName
+      ].concat(this.data.waypoints.map(item => item.place), [this.data.selectedPlaces.endName]))
+    }));
     wx.setStorageSync('selectedRoutePlan', selected);
+    return selected;
+  },
+
+  confirmRoute() {
+    const selected = this.saveSelectedRoute();
+    if (!selected) return;
     wx.showToast({ title: '路线已保存', icon: 'success' });
     setTimeout(() => {
       wx.navigateBack({
@@ -229,5 +266,11 @@ Page({
         fail: () => wx.navigateTo({ url: '/pages/precheck/precheck' })
       });
     }, 350);
+  },
+
+  shareRoute() {
+    const selected = this.saveSelectedRoute();
+    if (!selected) return;
+    wx.navigateTo({ url: '/pages/post-publish/post-publish?attachRoute=1' });
   }
 });

@@ -25,7 +25,7 @@ assert.ok(functionSource.includes("event.action === 'suggest'"));
 assert.ok(functionSource.includes('params.get_mp = 1'));
 assert.ok(functionSource.includes('params.waypoints ='));
 assert.ok(functionSource.includes('const start = await resolvePlace(startText, event.startPlace);'));
-assert.ok(functionSource.includes('await getRouteThroughWaypoint(start, waypoint, end, mode)'));
+assert.ok(functionSource.includes('await getRouteThroughWaypoints(start, waypoints, end, mode)'));
 assert.ok(!functionSource.includes('Promise.all([locate(startText), locate(endText)])'));
 
 console.log('route plan cloud error tests passed');

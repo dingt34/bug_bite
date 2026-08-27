@@ -27,25 +27,52 @@ function normalizeProfile(profile) {
   };
 }
 
+function normalizeRoutePlan(value) {
+  const source = value || {};
+  const startName = text(source.startName, 40);
+  const endName = text(source.endName, 40);
+  if (!startName || !endName) throw new Error('请先选择一条完整路线');
+  let waypointNames = (source.waypointNames || source.waypoints || [])
+    .map(item => text(typeof item === 'string' ? item : (item && (item.name || item.title)), 40))
+    .filter(Boolean).slice(0, 5);
+  if (!waypointNames.length && source.waypointName) waypointNames = [text(source.waypointName, 40)];
+  return {
+    id: text(source.id, 80),
+    startName,
+    waypointName: waypointNames[0] || text(source.waypointName, 40),
+    waypointNames,
+    endName,
+    mode: text(source.mode, 20),
+    modeName: text(source.modeName, 20),
+    routeName: text(source.routeName, 60),
+    distanceText: text(source.distanceText, 30),
+    durationText: text(source.durationText, 30),
+    regions: (source.regions || []).map(item => text(item, 20)).filter(Boolean).slice(0, 6)
+  };
+}
+
 function normalizePost(input) {
   const source = input || {};
   const content = text(source.text, 500);
   if (content.length < 5) throw new Error('请至少填写5个字，说明发生了什么');
   const contactType = text(source.contactType, 32);
   const stage = text(source.stage, 32);
+  const region = text(source.region, 32);
+  if (!region) throw new Error('请选择事件发生地点');
   if (!CONTACT_TYPE_NAMES[contactType] || ALLOWED_STAGES.indexOf(stage) < 0) {
     throw new Error('请完成有效的接触类型和当前阶段');
   }
-  const region = text(source.region, 32);
-  if (!region) throw new Error('请选择事件发生地点');
   const contactTypeName = CONTACT_TYPE_NAMES[contactType];
+  const routePlan = source.routePlan ? normalizeRoutePlan(source.routePlan) : null;
   return {
     text: content,
+    contentType: 'experience',
     region,
     contactType,
     contactTypeName,
     stage,
-    tags: [region, contactTypeName, stage].filter(Boolean),
+    routePlan,
+    tags: [region, contactTypeName, stage, routePlan ? '含路线' : ''].filter(Boolean),
     imageRefs: (source.imageRefs || []).filter(item =>
       typeof item === 'string' && item.indexOf('cloud://') === 0
     ).slice(0, 1)
@@ -105,7 +132,9 @@ function commentVoteTransition(reaction, requestedVote, comment) {
 function matchesQuery(post, query) {
   const keyword = text(query, 50).toLowerCase();
   if (!keyword) return true;
-  return [post.text, post.displayName, post.region].concat(post.tags || [])
+  const route = post.routePlan || {};
+  return [post.text, post.displayName, post.region, route.startName, route.endName]
+    .concat(route.waypointNames || [], post.tags || [])
     .some(value => String(value || '').toLowerCase().indexOf(keyword) > -1);
 }
 
@@ -118,6 +147,8 @@ function publicPost(post, reaction, openid) {
     avatarText: value.avatarText,
     avatarUrl: value.avatarUrl || '',
     text: value.text,
+    contentType: value.contentType || 'experience',
+    routePlan: value.routePlan || null,
     imageRefs: value.imageRefs || [],
     tags: value.tags || [],
     contactType: value.contactType || '',
@@ -166,6 +197,7 @@ function transactionValue(value) {
 module.exports = {
   text,
   normalizeProfile,
+  normalizeRoutePlan,
   normalizePost,
   normalizeComment,
   normalizeReportReason,

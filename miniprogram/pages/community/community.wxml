@@ -2,7 +2,7 @@
   <view class="community-hero">
     <view class="hero-eyebrow">虫咬互助社群</view>
     <view class="hero-title">分享真实经历，帮助彼此更安心</view>
-    <view class="hero-sub">浏览他人的处理经验，也可以记录自己的观察过程。</view>
+    <view class="hero-sub">浏览他人的处理经验，也可以在经历中附上本次出行路线。</view>
     <view class="hero-publish" bindtap="goPublish">
       <view class="publish-icon">＋</view>
       <view class="publish-copy">
@@ -20,6 +20,12 @@
       <input class="search-input" value="{{query}}" bindinput="onSearchInput" placeholder="搜索经历、地区或标签" confirm-type="search" />
       <text class="search-clear" wx:if="{{query}}" bindtap="clearSearch">清除</text>
     </view>
+
+    <scroll-view class="topic-scroll region-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="topic-row">
+        <view class="topic-chip {{(region === '' && item === '全部地区') || region === item ? 'topic-on' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="setRegion" data-region="{{item}}">{{item}}</view>
+      </view>
+    </scroll-view>
 
     <scroll-view class="topic-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="topic-row">
@@ -55,6 +61,17 @@
         <view class="post-name">{{item.displayName}}</view>
         <view class="post-time">{{item.time}}{{item.edited ? ' · 已编辑' : ''}}</view>
       </view>
+    </view>
+    <view class="route-share-card" wx:if="{{item.routePlan}}">
+      <view class="route-share-badge">本次路线 · {{item.region}}</view>
+      <view class="route-share-path">
+        <text>{{item.routePlan.startName}}</text>
+        <block wx:for="{{item.routePlan.waypointNames}}" wx:key="*this" wx:for-item="stop">
+          <text class="route-arrow">→</text><text>{{stop}}</text>
+        </block>
+        <text class="route-arrow">→</text><text>{{item.routePlan.endName}}</text>
+      </view>
+      <view class="route-share-meta">{{item.routePlan.modeName}} · {{item.routePlan.distanceText}} · {{item.routePlan.durationText}}</view>
     </view>
     <view class="post-text">{{item.text}}</view>
     <image

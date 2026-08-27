@@ -1,9 +1,23 @@
 <wxs src="./precheck.wxs" module="g" />
 <view class="page">
+  <view class="head">
+    <view class="head-title">完善本次行程信息</view>
+    <view class="head-sub">用于生成地区风险提示与个性化准备清单</view>
+  </view>
+
+  <view class="completion-card">
+    <view class="completion-row">
+      <view><text class="required">*</text> 行程地区、月份和活动类型为必填项</view>
+      <view class="completion-count">已完成 {{answeredCount}} / {{requiredCount}}</view>
+    </view>
+    <view class="completion-track"><view class="completion-value" style="width: {{completionPercent}}%;"></view></view>
+  </view>
+
   <view class="card route-entry" bindtap="goRoutePlan">
     <view class="route-entry-main">
-      <view class="card-title">🗺️ 路线规划 <text class="optional">选填</text></view>
-      <view class="route-entry-summary" wx:if="{{selectedRoute}}">{{selectedRoute.startName}} → {{selectedRoute.endName}}</view>
+      <view class="question-meta"><text class="question-index">＋</text><text class="question-group">路线信息</text></view>
+      <view class="card-title">路线规划 <text class="optional">选填</text></view>
+      <view class="route-entry-summary" wx:if="{{selectedRoute}}">{{selectedRoutePath}}</view>
       <view class="route-entry-detail" wx:if="{{selectedRoute}}">{{selectedRoute.modeName}} · {{selectedRoute.routeName}} · {{selectedRoute.distanceText}} · {{selectedRoute.durationText}}</view>
       <view class="route-entry-detail" wx:else>先查看多条出行路线，选定后再完成行前准备。</view>
     </view>
@@ -11,8 +25,13 @@
   </view>
 
   <!-- 必填：目的地（多选） -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index">1</text><text class="question-group">行程范围</text></view>
     <view class="card-title">目的地（可多选） <text class="required">*</text></view>
+    <view class="route-region-suggestion" wx:if="{{routeSuggestedRegions.length}}">
+      <view>已根据路线推荐行程地区（仍可修改）</view>
+      <text bindtap="applyRouteRegions">重新采用</text>
+    </view>
     <view class="chips">
       <text class="tag {{g.has(form.regionCodes, item) ? 'active' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="onRegionTap" data-v="{{item}}">{{item}}</text>
     </view>
@@ -20,7 +39,8 @@
   </view>
 
   <!-- 必填：月份 -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index">2</text><text class="question-group">出行时间</text></view>
     <view class="card-title">出行月份 <text class="required">*</text></view>
     <picker mode="selector" range="{{months}}" value="{{monthIndex}}" bindchange="onMonthChange">
       <view class="picker {{form.month ? '' : 'placeholder'}}">
@@ -30,15 +50,19 @@
   </view>
 
   <!-- 必填：活动类型 -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index">3</text><text class="question-group">活动安排</text></view>
     <view class="card-title">活动类型 <text class="required">*</text></view>
     <view class="chips">
       <text class="tag {{form.activityType === item ? 'active' : ''}}" wx:for="{{activities}}" wx:key="*this" bindtap="onActivityTap" data-v="{{item}}">{{item}}</text>
     </view>
   </view>
 
+  <view class="section-label">补充信息 <text>选填，用于细化建议</text></view>
+
   <!-- 选填：生境 -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index optional-index">4</text><text class="question-group">环境信息</text></view>
     <view class="card-title">可能经过的生境 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{g.has(form.habitatTags, item) ? 'active' : ''}}" wx:for="{{habitats}}" wx:key="*this" bindtap="onHabitatTap" data-v="{{item}}">{{item}}</text>
@@ -46,7 +70,8 @@
   </view>
 
   <!-- 选填：住宿方式 -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index optional-index">5</text><text class="question-group">行程安排</text></view>
     <view class="card-title">住宿方式 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{form.overnight === item ? 'active' : ''}}" wx:for="{{overnights}}" wx:key="*this" bindtap="onOvernightTap" data-v="{{item}}">{{item}}</text>
@@ -54,7 +79,8 @@
   </view>
 
   <!-- 选填：同行人群 -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index optional-index">6</text><text class="question-group">同行情况</text></view>
     <view class="card-title">同行人群 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{g.has(form.companionTags, item) ? 'active' : ''}}" wx:for="{{companions}}" wx:key="*this" bindtap="onCompanionTap" data-v="{{item}}">{{item}}</text>
@@ -62,7 +88,8 @@
   </view>
 
   <!-- 选填：已准备物品 -->
-  <view class="card">
+  <view class="card question-card">
+    <view class="question-meta"><text class="question-index optional-index">7</text><text class="question-group">装备准备</text></view>
     <view class="card-title">已准备的物品 <text class="optional">选填</text></view>
     <view class="chips">
       <text class="tag {{g.has(form.gearTags, item) ? 'active' : ''}}" wx:for="{{gears}}" wx:key="*this" bindtap="onGearTap" data-v="{{item}}">{{item}}</text>
@@ -73,5 +100,5 @@
   <view class="submit-wrap">
     <button class="btn-primary" disabled="{{!form.regionCodes.length || !form.month || !form.activityType}}" bindtap="submit">生成行前建议</button>
   </view>
-  <view class="tip" style="margin: 0 24rpx 40rpx;">带 <text class="required">*</text> 为必填项。提交后生成当地风险提示与准备清单。</view>
+  <view class="tip footer-tip">带 <text class="required">*</text> 为必填项。提交后生成当地风险提示与准备清单。</view>
 </view>
