@@ -17,8 +17,6 @@
     "pages/event-review/event-review",
     "pages/post-publish/post-publish",
     "pages/post-detail/post-detail",
-    "pages/friends/friends",
-    "pages/friend-chat/friend-chat",
     "pages/ai-chat/ai-chat",
     "pages/insect-guide/insect-guide",
     "pages/insect-detail/insect-detail",

@@ -4,13 +4,22 @@ let componentDefinition = null;
 let switchedUrl = '';
 let toastTitle = '';
 let emittedStep = null;
+let backDelta = 0;
+let redirectedUrl = '';
 const app = { globalData: { draftEvent: { id: 'draft_001' } } };
 
 global.Component = definition => { componentDefinition = definition; };
 global.getApp = () => app;
+global.getCurrentPages = () => [
+  { route: 'pages/post-detail/post-detail' },
+  { route: 'pages/contact/contact' },
+  { route: 'pages/guide/guide' }
+];
 global.wx = {
   getWindowInfo() { return { statusBarHeight: 24 }; },
   switchTab(options) { switchedUrl = options.url; },
+  navigateBack(options) { backDelta = options.delta; },
+  redirectTo(options) { redirectedUrl = options.url; },
   showToast(options) { toastTitle = options.title; }
 };
 
@@ -47,6 +56,17 @@ assert.strictEqual(toastTitle, '紧急结果不可返回修改');
 
 component.goHome();
 assert.strictEqual(switchedUrl, '/pages/index/index');
+assert.strictEqual(app.globalData.draftEvent, null);
+
+app.globalData.draftEvent = { id: 'draft_from_post' };
+app.globalData.safetyReturnPostId = 'cloud_post_1';
+const fromPost = createComponent(3, true);
+componentDefinition.lifetimes.attached.call(fromPost);
+assert.strictEqual(fromPost.data.returnLabel, '原帖子');
+fromPost.goHome();
+assert.strictEqual(backDelta, 2);
+assert.strictEqual(redirectedUrl, '');
+assert.strictEqual(app.globalData.safetyReturnPostId, '');
 assert.strictEqual(app.globalData.draftEvent, null);
 
 console.log('safety nav tests passed');

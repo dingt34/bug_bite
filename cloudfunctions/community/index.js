@@ -9,8 +9,6 @@ const POSTS = 'community_posts';
 const COMMENTS = 'community_comments';
 const REACTIONS = 'community_reactions';
 const REPORTS = 'community_reports';
-const FRIENDSHIPS = 'community_friendships';
-const MESSAGES = 'community_messages';
 const USERS = 'users';
 
 function requireOpenid() {
@@ -32,6 +30,26 @@ async function trustedProfile(openid) {
   const user = await readDocument(USERS, openid);
   if (!user) throw new Error('请先完成微信云登录');
   return domain.normalizeProfile(user);
+}
+
+async function attachCurrentAvatars(items) {
+  const values = items || [];
+  const authorIds = Array.from(new Set(values.map(item => item && item.authorOpenid).filter(Boolean)));
+  if (!authorIds.length) return values;
+  try {
+    const result = await db.collection(USERS).where({ _id: _.in(authorIds) }).limit(100).get();
+    const avatarByAuthor = {};
+    (result.data || []).forEach(user => {
+      if (user && user._id && typeof user.avatarUrl === 'string' && user.avatarUrl.indexOf('cloud://') === 0) {
+        avatarByAuthor[user._id] = user.avatarUrl;
+      }
+    });
+    return values.map(item => avatarByAuthor[item.authorOpenid]
+      ? Object.assign({}, item, { avatarUrl: avatarByAuthor[item.authorOpenid] })
+      : item);
+  } catch (error) {
+    return values;
+  }
 }
 
 async function checkTextSecurity(openid, content) {
@@ -58,11 +76,15 @@ async function userCommunityState(openid) {
     db.collection(REPORTS).where({ reporterOpenid: openid }).limit(100).get()
   ]);
   const reactions = {};
-  (reactionsResult.data || []).forEach(item => { reactions[item.postId] = item; });
+  (reactionsResult.data || []).forEach(item => {
+    if (item.targetType !== 'comment') reactions[item.postId] = item;
+  });
   const commented = {};
   (commentsResult.data || []).forEach(item => { commented[item.postId] = true; });
   const reported = {};
-  (reportsResult.data || []).forEach(item => { reported[item.postId] = true; });
+  (reportsResult.data || []).forEach(item => {
+    if (item.targetType !== 'comment') reported[item.postId] = true;
+  });
   return { reactions, commented, reported };
 }
 
@@ -94,7 +116,8 @@ async function listPosts(event, openid) {
     });
   }
   const total = posts.length;
-  const page = posts.slice(offset, offset + pageSize).map(post =>
+  const pagePosts = await attachCurrentAvatars(posts.slice(offset, offset + pageSize));
+  const page = pagePosts.map(post =>
     domain.publicPost(post, state.reactions[post._id], openid)
   );
   return { posts: page, total, hasMore: offset + page.length < total };
@@ -104,15 +127,28 @@ async function getPost(event, openid) {
   const post = await readDocument(POSTS, domain.text(event.postId, 80));
   if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
   const reactionId = domain.stableId('reaction', openid, post._id);
-  const [reaction, commentsResult, report] = await Promise.all([
+  const [reaction, commentsResult, commentReactionsResult, report] = await Promise.all([
     readDocument(REACTIONS, reactionId),
     db.collection(COMMENTS).where({ postId: post._id, status: 'active' })
       .orderBy('createdAtTimestamp', 'asc').limit(100).get(),
+    db.collection(REACTIONS).where({
+      authorOpenid: openid,
+      postId: post._id,
+      targetType: 'comment'
+    }).limit(100).get(),
     readDocument(REPORTS, domain.stableId('report', openid, post._id))
   ]);
+  const commentReactions = {};
+  (commentReactionsResult.data || []).forEach(item => { commentReactions[item.commentId] = item; });
+  const comments = commentsResult.data || [];
+  const profiled = await attachCurrentAvatars([post].concat(comments));
+  const profiledPost = profiled[0];
+  const profiledComments = profiled.slice(1);
   return {
-    post: domain.publicPost(post, reaction, openid),
-    comments: (commentsResult.data || []).map(comment => domain.publicComment(comment, openid)),
+    post: domain.publicPost(profiledPost, reaction, openid),
+    comments: profiledComments.map(comment =>
+      domain.publicComment(comment, openid, commentReactions[comment._id])
+    ),
     reported: !!report
   };
 }
@@ -129,7 +165,6 @@ async function publishPost(event, openid) {
       likeCount: 0,
       collectCount: 0,
       commentCount: 0,
-      shareCount: 0,
       reportCount: 0,
       createdAtTimestamp: timestamp,
       updatedAtTimestamp: timestamp
@@ -200,6 +235,7 @@ async function toggleReaction(event, openid) {
 
 async function createComment(event, openid) {
   const postId = domain.text(event.postId, 80);
+  const parentCommentId = domain.text(event.parentCommentId, 80);
   const profile = await trustedProfile(openid);
   const content = domain.normalizeComment(event.text);
   await checkTextSecurity(openid, content);
@@ -209,15 +245,33 @@ async function createComment(event, openid) {
     const postRef = transaction.collection(POSTS).doc(postId);
     const post = (await postRef.get()).data;
     if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
+    let parentComment = null;
+    let rootCommentId = '';
+    if (parentCommentId) {
+      parentComment = (await transaction.collection(COMMENTS).doc(parentCommentId).get()).data;
+      if (!parentComment || parentComment.status !== 'active' || parentComment.postId !== postId || parentComment.deletedByAuthor) {
+        throw new Error('要回复的评论不存在或已删除');
+      }
+      rootCommentId = parentComment.rootCommentId || parentCommentId;
+    }
     const comment = Object.assign({}, profile, {
       postId,
       authorOpenid: openid,
       text: content,
       status: 'active',
+      parentCommentId: parentCommentId || '',
+      rootCommentId,
+      replyToDisplayName: parentComment ? parentComment.displayName : '',
+      replyCount: 0,
+      likeCount: 0,
+      dislikeCount: 0,
       createdAtTimestamp: timestamp,
       updatedAtTimestamp: timestamp
     });
     await transaction.collection(COMMENTS).doc(commentId).set({ data: comment });
+    if (rootCommentId) {
+      await transaction.collection(COMMENTS).doc(rootCommentId).update({ data: { replyCount: _.inc(1) } });
+    }
     await postRef.update({ data: { commentCount: _.inc(1) } });
     return { comment: domain.publicComment(Object.assign({ _id: commentId }, comment), openid) };
   });
@@ -231,11 +285,76 @@ async function deleteComment(event, openid) {
     const comment = (await commentRef.get()).data;
     if (!comment || comment.status !== 'active') return { success: true };
     if (comment.authorOpenid !== openid) throw new Error('只能删除自己的评论');
-    await commentRef.update({ data: { status: 'deleted', updatedAtTimestamp: Date.now() } });
+    const timestamp = Date.now();
+    if (!comment.rootCommentId && (comment.replyCount || 0) > 0) {
+      await commentRef.update({ data: {
+        authorOpenid: '',
+        displayName: '',
+        avatarText: '',
+        avatarUrl: '',
+        text: '',
+        deletedByAuthor: true,
+        updatedAtTimestamp: timestamp
+      } });
+    } else {
+      await commentRef.update({ data: { status: 'deleted', updatedAtTimestamp: timestamp } });
+    }
+    if (comment.rootCommentId) {
+      const rootRef = transaction.collection(COMMENTS).doc(comment.rootCommentId);
+      const root = (await rootRef.get()).data;
+      if (root && root.deletedByAuthor && (root.replyCount || 0) <= 1) {
+        await rootRef.update({ data: { status: 'deleted', replyCount: 0, updatedAtTimestamp: timestamp } });
+      } else if (root) {
+        await rootRef.update({ data: { replyCount: _.inc(-1), updatedAtTimestamp: timestamp } });
+      }
+    }
     await transaction.collection(POSTS).doc(comment.postId).update({
       data: { commentCount: _.inc(-1) }
     });
     return { success: true };
+  });
+  await db.collection(REACTIONS).where({ targetType: 'comment', commentId }).remove();
+  return domain.transactionValue(result);
+}
+
+async function toggleCommentVote(event, openid) {
+  const commentId = domain.text(event.commentId, 80);
+  const reactionId = domain.stableId('comment_like', openid, commentId);
+  const requestedVote = event.vote === 'down' ? -1 : 1;
+  const result = await db.runTransaction(async transaction => {
+    const commentRef = transaction.collection(COMMENTS).doc(commentId);
+    const reactionRef = transaction.collection(REACTIONS).doc(reactionId);
+    const comment = (await commentRef.get()).data;
+    if (!comment || comment.status !== 'active' || comment.deletedByAuthor) throw new Error('评论不存在或已删除');
+    let reaction = null;
+    try {
+      reaction = (await reactionRef.get()).data;
+    } catch (error) {}
+    const transition = domain.commentVoteTransition(reaction, requestedVote, comment);
+    const timestamp = Date.now();
+    await reactionRef.set({ data: {
+      targetType: 'comment',
+      postId: comment.postId,
+      commentId,
+      authorOpenid: openid,
+      vote: transition.vote,
+      liked: transition.liked,
+      disliked: transition.disliked,
+      createdAtTimestamp: reaction && reaction.createdAtTimestamp || timestamp,
+      updatedAtTimestamp: timestamp
+    } });
+    await commentRef.update({ data: {
+      likeCount: _.inc(transition.likeDelta),
+      dislikeCount: _.inc(transition.dislikeDelta)
+    } });
+    return {
+      commentId,
+      liked: transition.liked,
+      disliked: transition.disliked,
+      vote: transition.vote,
+      likeCount: transition.likeCount,
+      dislikeCount: transition.dislikeCount
+    };
   });
   return domain.transactionValue(result);
 }
@@ -278,186 +397,28 @@ async function reportPost(event, openid) {
   return { success: true, reported: true };
 }
 
-function friendshipId(firstOpenid, secondOpenid) {
-  const pair = [String(firstOpenid), String(secondOpenid)].sort();
-  return domain.stableId('friend', pair[0], pair[1]);
-}
-
-async function publicUserCard(openid, extra) {
-  const user = await readDocument(USERS, openid);
-  return domain.publicUser(user, openid, extra);
-}
-
-function relationshipStatus(record, openid) {
-  if (!record) return 'none';
-  if (record.status === 'accepted') return 'accepted';
-  if (record.status === 'pending') {
-    return record.requesterOpenid === openid ? 'outgoing' : 'incoming';
+async function reportComment(event, openid) {
+  const commentId = domain.text(event.commentId, 80);
+  const comment = await readDocument(COMMENTS, commentId);
+  if (!comment || comment.status !== 'active' || comment.deletedByAuthor) {
+    throw new Error('评论不存在或已删除');
   }
-  return 'none';
-}
-
-async function getAuthorCard(event, openid) {
-  const post = await readDocument(POSTS, domain.text(event.postId, 80));
-  if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
-  if (post.authorOpenid === openid) {
-    return { user: await publicUserCard(openid), status: 'self', requestId: '' };
-  }
-  const id = friendshipId(openid, post.authorOpenid);
-  const relationship = await readDocument(FRIENDSHIPS, id);
-  return {
-    user: await publicUserCard(post.authorOpenid),
-    status: relationshipStatus(relationship, openid),
-    requestId: relationship && relationship.status === 'pending' ? id : ''
-  };
-}
-
-async function sendFriendRequest(event, openid) {
-  await trustedProfile(openid);
-  const post = await readDocument(POSTS, domain.text(event.postId, 80));
-  if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
-  const targetOpenid = post.authorOpenid;
-  if (!targetOpenid || targetOpenid === openid) throw new Error('不能添加自己为好友');
-  const id = friendshipId(openid, targetOpenid);
-  const existing = await readDocument(FRIENDSHIPS, id);
-  const timestamp = Date.now();
-  if (existing && existing.status === 'accepted') return { status: 'accepted', requestId: id };
-  if (existing && existing.status === 'pending' && existing.recipientOpenid === openid) {
-    await db.collection(FRIENDSHIPS).doc(id).update({
-      data: { status: 'accepted', acceptedAtTimestamp: timestamp, updatedAtTimestamp: timestamp }
-    });
-    return { status: 'accepted', requestId: id };
-  }
-  if (existing && existing.status === 'pending') return { status: 'outgoing', requestId: id };
-  await db.collection(FRIENDSHIPS).doc(id).set({ data: {
-    requesterOpenid: openid,
-    recipientOpenid: targetOpenid,
+  if (comment.authorOpenid === openid) throw new Error('不能举报自己的评论');
+  const reportId = domain.stableId('comment_report', openid, commentId);
+  const existing = await readDocument(REPORTS, reportId);
+  if (existing) return { success: true, reported: true };
+  const reason = domain.normalizeReportReason(event.reason);
+  await db.collection(REPORTS).doc(reportId).set({ data: {
+    targetType: 'comment',
+    postId: comment.postId,
+    commentId,
+    reporterOpenid: openid,
+    reason,
     status: 'pending',
-    createdAtTimestamp: existing && existing.createdAtTimestamp || timestamp,
-    updatedAtTimestamp: timestamp
+    createdAtTimestamp: Date.now()
   } });
-  return { status: 'outgoing', requestId: id };
-}
-
-async function respondFriendRequest(event, openid) {
-  const requestId = domain.text(event.requestId, 80);
-  const request = await readDocument(FRIENDSHIPS, requestId);
-  if (!request || request.status !== 'pending' || request.recipientOpenid !== openid) {
-    throw new Error('好友申请不存在或已处理');
-  }
-  const accepted = event.accept === true;
-  const timestamp = Date.now();
-  await db.collection(FRIENDSHIPS).doc(requestId).update({ data: {
-    status: accepted ? 'accepted' : 'rejected',
-    acceptedAtTimestamp: accepted ? timestamp : 0,
-    updatedAtTimestamp: timestamp
-  } });
-  return { status: accepted ? 'accepted' : 'rejected' };
-}
-
-async function listFriends(openid) {
-  await trustedProfile(openid);
-  const [sentResult, receivedResult, requestResult, unreadResult] = await Promise.all([
-    db.collection(FRIENDSHIPS).where({ requesterOpenid: openid, status: 'accepted' }).limit(100).get(),
-    db.collection(FRIENDSHIPS).where({ recipientOpenid: openid, status: 'accepted' }).limit(100).get(),
-    db.collection(FRIENDSHIPS).where({ recipientOpenid: openid, status: 'pending' }).limit(100).get(),
-    db.collection(MESSAGES).where({ recipientOpenid: openid, readAtTimestamp: 0 }).limit(100).get()
-  ]);
-  const unreadByOpenid = {};
-  (unreadResult.data || []).forEach(message => {
-    unreadByOpenid[message.senderOpenid] = (unreadByOpenid[message.senderOpenid] || 0) + 1;
-  });
-  const relationships = (sentResult.data || []).concat(receivedResult.data || []);
-  const friends = await Promise.all(relationships.map(record => {
-    const friendOpenid = record.requesterOpenid === openid ? record.recipientOpenid : record.requesterOpenid;
-    return publicUserCard(friendOpenid, { unreadCount: unreadByOpenid[friendOpenid] || 0 });
-  }));
-  const requests = await Promise.all((requestResult.data || []).map(record =>
-    publicUserCard(record.requesterOpenid, { requestId: record._id })
-  ));
-  return { friends, requests, unreadCount: Object.values(unreadByOpenid).reduce((sum, value) => sum + value, 0) };
-}
-
-async function resolveFriend(openid, friendId) {
-  const [sentResult, receivedResult] = await Promise.all([
-    db.collection(FRIENDSHIPS).where({ requesterOpenid: openid, status: 'accepted' }).limit(100).get(),
-    db.collection(FRIENDSHIPS).where({ recipientOpenid: openid, status: 'accepted' }).limit(100).get()
-  ]);
-  const records = (sentResult.data || []).concat(receivedResult.data || []);
-  for (const record of records) {
-    const otherOpenid = record.requesterOpenid === openid ? record.recipientOpenid : record.requesterOpenid;
-    if (domain.publicUserId(otherOpenid) === friendId) return otherOpenid;
-  }
-  throw new Error('对方不是你的好友');
-}
-
-async function listMessages(event, openid) {
-  const friendId = domain.text(event.friendId, 80);
-  const friendOpenid = await resolveFriend(openid, friendId);
-  const conversation = domain.conversationId(openid, friendOpenid);
-  const result = await db.collection(MESSAGES).where({ conversationId: conversation })
-    .orderBy('createdAtTimestamp', 'desc').limit(50).get();
-  const timestamp = Date.now();
-  await db.collection(MESSAGES).where({
-    conversationId: conversation,
-    recipientOpenid: openid,
-    readAtTimestamp: 0
-  }).update({ data: { readAtTimestamp: timestamp } });
-  return {
-    friend: await publicUserCard(friendOpenid),
-    messages: (result.data || []).slice().reverse().map(message => domain.publicMessage(message, openid))
-  };
-}
-
-async function createPrivateMessage(event, openid) {
-  await trustedProfile(openid);
-  const friendId = domain.text(event.friendId, 80);
-  const friendOpenid = await resolveFriend(openid, friendId);
-  const content = domain.normalizeMessage(event.text);
-  await checkTextSecurity(openid, content);
-  const timestamp = Date.now();
-  const message = {
-    conversationId: domain.conversationId(openid, friendOpenid),
-    senderOpenid: openid,
-    recipientOpenid: friendOpenid,
-    kind: 'text',
-    text: content,
-    postId: '',
-    postPreview: null,
-    readAtTimestamp: 0,
-    createdAtTimestamp: timestamp
-  };
-  const result = await db.collection(MESSAGES).add({ data: message });
-  return { message: domain.publicMessage(Object.assign({ _id: result._id }, message), openid) };
-}
-
-async function forwardPost(event, openid) {
-  await trustedProfile(openid);
-  const friendId = domain.text(event.friendId, 80);
-  const friendOpenid = await resolveFriend(openid, friendId);
-  const postId = domain.text(event.postId, 80);
-  const post = await readDocument(POSTS, postId);
-  if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
-  const timestamp = Date.now();
-  const message = {
-    conversationId: domain.conversationId(openid, friendOpenid),
-    senderOpenid: openid,
-    recipientOpenid: friendOpenid,
-    kind: 'post',
-    text: '向你转发了一篇社群帖子',
-    postId,
-    postPreview: {
-      id: postId,
-      displayName: post.displayName || '微信用户',
-      text: domain.text(post.text, 100),
-      imageRef: (post.imageRefs || [])[0] || ''
-    },
-    readAtTimestamp: 0,
-    createdAtTimestamp: timestamp
-  };
-  const result = await db.collection(MESSAGES).add({ data: message });
-  await db.collection(POSTS).doc(postId).update({ data: { shareCount: _.inc(1) } });
-  return { message: domain.publicMessage(Object.assign({ _id: result._id }, message), openid) };
+  await db.collection(COMMENTS).doc(commentId).update({ data: { reportCount: _.inc(1) } });
+  return { success: true, reported: true };
 }
 
 async function getStats(openid) {
@@ -482,17 +443,24 @@ async function deleteAccount(openid) {
   }
   for (const comment of commentsResult.data || []) await deleteComment({ commentId: comment._id }, openid);
   for (const reaction of reactionsResult.data || []) {
+    if (reaction.targetType === 'comment') {
+      if (reaction.vote || reaction.liked || reaction.disliked) {
+        try {
+          await toggleCommentVote({
+            commentId: reaction.commentId,
+            vote: reaction.vote === -1 || reaction.disliked ? 'down' : 'up'
+          }, openid);
+        } catch (error) {}
+      }
+      continue;
+    }
     if (ownPostIds[reaction.postId]) continue;
     if (reaction.liked) await toggleReaction({ postId: reaction.postId, key: 'liked' }, openid);
     if (reaction.collected) await toggleReaction({ postId: reaction.postId, key: 'collected' }, openid);
   }
   await Promise.all([
     db.collection(REACTIONS).where({ authorOpenid: openid }).remove(),
-    db.collection(REPORTS).where({ reporterOpenid: openid }).remove(),
-    db.collection(FRIENDSHIPS).where({ requesterOpenid: openid }).remove(),
-    db.collection(FRIENDSHIPS).where({ recipientOpenid: openid }).remove(),
-    db.collection(MESSAGES).where({ senderOpenid: openid }).remove(),
-    db.collection(MESSAGES).where({ recipientOpenid: openid }).remove()
+    db.collection(REPORTS).where({ reporterOpenid: openid }).remove()
   ]);
   return { success: true };
 }
@@ -506,16 +474,12 @@ exports.main = async event => {
   if (action === 'updatePost') return updatePost(event, openid);
   if (action === 'toggleReaction') return toggleReaction(event, openid);
   if (action === 'comment') return createComment(event, openid);
+  if (action === 'toggleCommentLike') return toggleCommentVote(Object.assign({}, event, { vote: 'up' }), openid);
+  if (action === 'toggleCommentVote') return toggleCommentVote(event, openid);
   if (action === 'deleteComment') return deleteComment(event, openid);
   if (action === 'deletePost') return deletePost(event, openid);
   if (action === 'report') return reportPost(event, openid);
-  if (action === 'authorCard') return getAuthorCard(event, openid);
-  if (action === 'sendFriendRequest') return sendFriendRequest(event, openid);
-  if (action === 'respondFriendRequest') return respondFriendRequest(event, openid);
-  if (action === 'friends') return listFriends(openid);
-  if (action === 'messages') return listMessages(event, openid);
-  if (action === 'sendMessage') return createPrivateMessage(event, openid);
-  if (action === 'forwardPost') return forwardPost(event, openid);
+  if (action === 'reportComment') return reportComment(event, openid);
   if (action === 'stats') return getStats(openid);
   if (action === 'deleteAccount') return deleteAccount(openid);
   throw new Error('不支持的社区操作');

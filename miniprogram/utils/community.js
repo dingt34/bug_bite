@@ -103,6 +103,7 @@ function validatePost(input) {
   if (!text) return { valid: false, message: '请填写经历内容。' };
   if (text.length < 5) return { valid: false, message: '请至少填写 5 个字，说明发生了什么。' };
   if (text.length > 500) return { valid: false, message: '经历内容不能超过 500 个字。' };
+  if (!input.region) return { valid: false, message: '请选择事件发生地点。' };
   if (!input.contactType) return { valid: false, message: '请选择接触类型。' };
   if (!input.stage) return { valid: false, message: '请选择当前阶段。' };
   return { valid: true, text };

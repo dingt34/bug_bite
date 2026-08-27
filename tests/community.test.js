@@ -44,9 +44,10 @@ assert.strictEqual(toggled.post_1.liked, false);
 assert.strictEqual(reactions.post_1.liked, true);
 
 assert.strictEqual(community.findPost(local, demos, reactions, 'missing'), null);
-assert.strictEqual(community.validatePost({ text: '太短', contactType: 'bite', stage: '观察中' }).valid, false);
-assert.strictEqual(community.validatePost({ text: '这是一段完整经历', contactType: '', stage: '观察中' }).valid, false);
-assert.strictEqual(community.validatePost({ text: '这是一段完整经历', contactType: 'bite', stage: '观察中' }).valid, true);
+assert.strictEqual(community.validatePost({ text: '太短', region: '丽水', contactType: 'bite', stage: '观察中' }).valid, false);
+assert.strictEqual(community.validatePost({ text: '这是一段完整经历', region: '', contactType: 'bite', stage: '观察中' }).message, '请选择事件发生地点。');
+assert.strictEqual(community.validatePost({ text: '这是一段完整经历', region: '丽水', contactType: '', stage: '观察中' }).valid, false);
+assert.strictEqual(community.validatePost({ text: '这是一段完整经历', region: '丽水', contactType: 'bite', stage: '观察中' }).valid, true);
 
 const post = community.buildPost({
   text: '  记录一次户外叮咬经历  ',

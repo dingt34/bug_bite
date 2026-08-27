@@ -17,9 +17,13 @@ function text(value, maxLength) {
 function normalizeProfile(profile) {
   const source = profile || {};
   const displayName = text(source.displayName, 24) || '微信用户';
+  const avatarUrl = typeof source.avatarUrl === 'string' && source.avatarUrl.indexOf('cloud://') === 0
+    ? source.avatarUrl
+    : '';
   return {
     displayName,
-    avatarText: text(source.avatarText, 2) || displayName.slice(0, 1)
+    avatarText: text(source.avatarText, 2) || displayName.slice(0, 1),
+    avatarUrl
   };
 }
 
@@ -33,6 +37,7 @@ function normalizePost(input) {
     throw new Error('请完成有效的接触类型和当前阶段');
   }
   const region = text(source.region, 32);
+  if (!region) throw new Error('请选择事件发生地点');
   const contactTypeName = CONTACT_TYPE_NAMES[contactType];
   return {
     text: content,
@@ -60,12 +65,6 @@ function normalizeReportReason(value) {
   return reason;
 }
 
-function normalizeMessage(value) {
-  const content = text(value, 500);
-  if (!content) throw new Error('请输入私信内容');
-  return content;
-}
-
 function hotScore(post, now) {
   const value = post || {};
   const engagement = (value.likeCount || 0) * 2 +
@@ -81,36 +80,25 @@ function stableId(prefix, openid, targetId) {
     .digest('hex');
 }
 
-function publicUserId(openid) {
-  return stableId('user', 'community', openid);
-}
-
-function conversationId(firstOpenid, secondOpenid) {
-  const pair = [String(firstOpenid), String(secondOpenid)].sort();
-  return stableId('conversation', pair[0], pair[1]);
-}
-
-function publicUser(user, openid, extra) {
-  const value = user || {};
-  const displayName = text(value.displayName, 24) || '微信用户';
-  return Object.assign({
-    id: publicUserId(openid),
-    displayName,
-    avatarText: text(value.avatarText, 2) || displayName.slice(0, 1)
-  }, extra || {});
-}
-
-function publicMessage(message, viewerOpenid) {
-  const value = message || {};
+function commentVoteTransition(reaction, requestedVote, comment) {
+  const state = reaction || {};
+  const value = comment || {};
+  const requested = requestedVote === -1 ? -1 : 1;
+  const previous = typeof state.vote === 'number'
+    ? state.vote
+    : (state.disliked ? -1 : (state.liked ? 1 : 0));
+  const next = previous === requested ? 0 : requested;
+  const likeDelta = (next === 1 ? 1 : 0) - (previous === 1 ? 1 : 0);
+  const dislikeDelta = (next === -1 ? 1 : 0) - (previous === -1 ? 1 : 0);
   return {
-    id: value._id,
-    kind: value.kind === 'post' ? 'post' : 'text',
-    text: value.text || '',
-    postId: value.postId || '',
-    postPreview: value.postPreview || null,
-    mine: value.senderOpenid === viewerOpenid,
-    createdAtTimestamp: value.createdAtTimestamp || 0,
-    read: !!value.readAtTimestamp
+    previousVote: previous,
+    vote: next,
+    liked: next === 1,
+    disliked: next === -1,
+    likeDelta,
+    dislikeDelta,
+    likeCount: Math.max(0, (value.likeCount || 0) + likeDelta),
+    dislikeCount: Math.max(0, (value.dislikeCount || 0) + dislikeDelta)
   };
 }
 
@@ -128,6 +116,7 @@ function publicPost(post, reaction, openid) {
     id: value._id,
     displayName: value.displayName,
     avatarText: value.avatarText,
+    avatarUrl: value.avatarUrl || '',
     text: value.text,
     imageRefs: value.imageRefs || [],
     tags: value.tags || [],
@@ -138,26 +127,35 @@ function publicPost(post, reaction, openid) {
     likeCount: Math.max(0, value.likeCount || 0),
     collectCount: Math.max(0, value.collectCount || 0),
     commentCount: Math.max(0, value.commentCount || 0),
-    shareCount: Math.max(0, value.shareCount || 0),
     liked: !!state.liked,
     collected: !!state.collected,
     createdAtTimestamp: value.createdAtTimestamp || 0,
     updatedAtTimestamp: value.updatedAtTimestamp || 0,
-    canDelete: !!openid && value.authorOpenid === openid,
-    authorId: value.authorOpenid ? publicUserId(value.authorOpenid) : ''
+    canDelete: !!openid && value.authorOpenid === openid
   };
 }
 
-function publicComment(comment, openid) {
+function publicComment(comment, openid, reaction) {
   const value = comment || {};
+  const state = reaction || {};
+  const deleted = !!value.deletedByAuthor;
   return {
     id: value._id,
     postId: value.postId,
-    displayName: value.displayName,
-    avatarText: value.avatarText,
-    text: value.text,
+    parentCommentId: value.parentCommentId || '',
+    rootCommentId: value.rootCommentId || '',
+    replyToDisplayName: value.replyToDisplayName || '',
+    displayName: deleted ? '已删除评论' : value.displayName,
+    avatarText: deleted ? '—' : value.avatarText,
+    avatarUrl: deleted ? '' : (value.avatarUrl || ''),
+    text: deleted ? '该评论已删除' : value.text,
+    likeCount: Math.max(0, value.likeCount || 0),
+    dislikeCount: Math.max(0, value.dislikeCount || 0),
+    liked: state.vote === 1 || !!state.liked,
+    disliked: state.vote === -1 || !!state.disliked,
+    deleted,
     createdAtTimestamp: value.createdAtTimestamp || 0,
-    canDelete: !!openid && value.authorOpenid === openid
+    canDelete: !deleted && !!openid && value.authorOpenid === openid
   };
 }
 
@@ -171,13 +169,9 @@ module.exports = {
   normalizePost,
   normalizeComment,
   normalizeReportReason,
-  normalizeMessage,
   hotScore,
   stableId,
-  publicUserId,
-  conversationId,
-  publicUser,
-  publicMessage,
+  commentVoteTransition,
   matchesQuery,
   publicPost,
   publicComment,

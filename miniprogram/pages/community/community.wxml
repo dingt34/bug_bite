@@ -1,51 +1,47 @@
 <view class="page">
-  <!-- 免责声明 -->
-  <view class="disclaimer">💡 社群内容为个人经验分享，不构成医疗诊断，也不参与风险评分。</view>
-
-  <view class="social-entry" bindtap="goFriends">
-    <view class="social-icon">👥</view>
-    <view class="social-copy">
-      <view class="social-title">好友与私信</view>
-      <view class="social-sub">处理好友申请、查看私信和转发帖子</view>
+  <view class="community-hero">
+    <view class="hero-eyebrow">虫咬互助社群</view>
+    <view class="hero-title">分享真实经历，帮助彼此更安心</view>
+    <view class="hero-sub">浏览他人的处理经验，也可以记录自己的观察过程。</view>
+    <view class="hero-publish" bindtap="goPublish">
+      <view class="publish-icon">＋</view>
+      <view class="publish-copy">
+        <view class="publish-title">发布我的经历</view>
+        <view class="publish-sub">描述经过、症状与处理方式</view>
+      </view>
+      <view class="publish-arrow">›</view>
     </view>
-    <view class="social-arrow">›</view>
+    <view class="hero-notice">仅供经验交流，不替代医疗诊断与紧急处置</view>
   </view>
 
-  <view class="search-box">
-    <text class="search-icon">⌕</text>
-    <input class="search-input" value="{{query}}" bindinput="onSearchInput" placeholder="搜索经历、地区、标签或发布者" confirm-type="search" />
-    <text class="search-clear" wx:if="{{query}}" bindtap="clearSearch">清除</text>
-  </view>
-
-  <view class="filters">
-    <view class="filter {{filterMode === 'all' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="all">全部分享</view>
-    <view class="filter {{filterMode === 'collected' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="collected">我的收藏</view>
-    <view class="filter {{filterMode === 'mine' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="mine">我的发布</view>
-    <view class="filter {{filterMode === 'commented' ? 'filter-on' : ''}}" bindtap="setFilter" data-mode="commented">我的评论</view>
-  </view>
-
-  <scroll-view class="topic-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-    <view class="topic-row">
-      <view class="topic-chip {{topic === item.key ? 'topic-on' : ''}}" wx:for="{{topics}}" wx:key="key" bindtap="setTopic" data-topic="{{item.key}}">{{item.name}}</view>
+  <view class="discover-panel">
+    <view class="search-box">
+      <text class="search-icon">⌕</text>
+      <input class="search-input" value="{{query}}" bindinput="onSearchInput" placeholder="搜索经历、地区或标签" confirm-type="search" />
+      <text class="search-clear" wx:if="{{query}}" bindtap="clearSearch">清除</text>
     </view>
-  </scroll-view>
+
+    <scroll-view class="topic-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="topic-row">
+        <view class="topic-chip {{topic === item.key ? 'topic-on' : ''}}" wx:for="{{topics}}" wx:key="key" bindtap="setTopic" data-topic="{{item.key}}">{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
 
   <view class="feed-tools">
-    <view class="result-count">{{resultCount}} 条云端分享</view>
+    <view>
+      <view class="feed-title">社群动态</view>
+      <view class="result-count">共 {{resultCount}} 条经验分享</view>
+    </view>
     <view class="sorts">
       <text class="sort {{sortMode === 'latest' ? 'sort-on' : ''}}" bindtap="setSort" data-mode="latest">最新</text>
       <text class="sort {{sortMode === 'hot' ? 'sort-on' : ''}}" bindtap="setSort" data-mode="hot">热门</text>
     </view>
   </view>
 
-  <view class="cloud-state" wx:if="{{loading && !posts.length}}">
-    <view class="state-spinner"></view>
-    <view>正在连接云端社区…</view>
-  </view>
-
-  <view class="cloud-state state-error" wx:elif="{{loadError && !posts.length}}">
+  <view class="cloud-state state-error" wx:if="{{!initialLoading && loadError && !posts.length}}">
     <view class="state-icon">☁️</view>
-    <view class="state-title">云端社区暂时无法加载</view>
+    <view class="state-title">云端社群暂时无法加载</view>
     <view class="state-sub">{{loadError}}</view>
     <button class="retry-button" bindtap="retryLoad">重新加载</button>
   </view>
@@ -53,7 +49,8 @@
   <!-- 帖子列表 -->
   <view class="post-card" wx:for="{{posts}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
     <view class="post-head">
-      <view class="post-avatar">{{item.avatarText}}</view>
+      <image wx:if="{{item.avatarUrl}}" class="post-avatar post-avatar-image" src="{{item.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="post-avatar">{{item.avatarText}}</view>
       <view class="post-meta">
         <view class="post-name">{{item.displayName}}</view>
         <view class="post-time">{{item.time}}{{item.edited ? ' · 已编辑' : ''}}</view>
@@ -73,26 +70,25 @@
       <text class="tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
     </view>
     <view class="post-actions">
-      <view class="action" catchtap="toggleLike" data-id="{{item.id}}">
-        <text class="action-icon">{{item.liked ? '❤️' : '🤍'}}</text>
-        <text class="action-num">{{item.likeCount}}</text>
+      <view class="action {{item.liked ? 'action-on' : ''}}" catchtap="toggleLike" data-id="{{item.id}}">
+        <text class="action-icon action-glyph">{{item.liked ? '♥' : '♡'}}</text>
+        <text class="action-label">点赞</text>
+        <text class="action-num" wx:if="{{item.likeCount}}">{{item.likeCount}}</text>
       </view>
-      <view class="action" catchtap="toggleCollect" data-id="{{item.id}}">
-        <text class="action-icon">{{item.collected ? '⭐' : '☆'}}</text>
-        <text class="action-num">{{item.collectCount}}</text>
-      </view>
-      <view class="action" catchtap="goDetail" data-id="{{item.id}}">
-        <text class="action-icon comment-icon">💬</text>
-        <text class="action-num">{{item.commentCount}}</text>
+      <view class="action {{item.collected ? 'action-collected' : ''}}" catchtap="toggleCollect" data-id="{{item.id}}">
+        <text class="action-icon action-glyph">{{item.collected ? '★' : '☆'}}</text>
+        <text class="action-label">收藏</text>
+        <text class="action-num" wx:if="{{item.collectCount}}">{{item.collectCount}}</text>
       </view>
       <view class="action" catchtap="goDetail" data-id="{{item.id}}">
-        <text class="action-icon comment-icon">↗</text>
-        <text class="action-num">{{item.shareCount || 0}}</text>
+        <view class="action-icon comment-bubble"></view>
+        <text class="action-label">评论</text>
+        <text class="action-num" wx:if="{{item.commentCount}}">{{item.commentCount}}</text>
       </view>
     </view>
   </view>
 
-  <view wx:if="{{!loading && !loadError && !posts.length}}" class="empty">
+  <view wx:if="{{!initialLoading && !loadError && !posts.length}}" class="empty">
     <view class="empty-icon">💬</view>
     <view class="empty-text">{{query ? '没有找到匹配的分享' : (filterMode === 'collected' ? '还没有收藏的分享' : (filterMode === 'mine' ? '你还没有发布内容' : (filterMode === 'commented' ? '你还没有参与讨论' : '还没有帖子')))}}</view>
     <view class="empty-sub">{{query ? '尝试缩短关键词或切换主题' : (filterMode === 'collected' ? '收藏后可以在这里快速找到' : (filterMode === 'mine' ? '点击右下角发布第一条经历' : (filterMode === 'commented' ? '评论后可在这里找到参与过的帖子' : '成为第一个分享经历的人')))}}</view>

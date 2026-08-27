@@ -6,6 +6,7 @@ Component({
 
   data: {
     statusBarHeight: 20,
+    returnLabel: '首页',
     steps: [
       { step: 1, name: '危险筛查' },
       { step: 2, name: '接触类型' },
@@ -21,13 +22,47 @@ Component({
         info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
       } catch (e) {}
       this.setData({ statusBarHeight: info.statusBarHeight || 20 });
+      this.syncReturnTarget();
+    }
+  },
+
+  pageLifetimes: {
+    show() {
+      this.syncReturnTarget();
     }
   },
 
   methods: {
+    syncReturnTarget() {
+      const app = typeof getApp === 'function' ? getApp() : null;
+      const postId = app && app.globalData && app.globalData.safetyReturnPostId;
+      this.setData({ returnLabel: postId ? '原帖子' : '首页' });
+    },
+
     goHome() {
       const app = typeof getApp === 'function' ? getApp() : null;
-      if (app && app.globalData) app.globalData.draftEvent = null;
+      const postId = app && app.globalData && app.globalData.safetyReturnPostId;
+      if (app && app.globalData) {
+        app.globalData.draftEvent = null;
+        app.globalData.safetyReturnPostId = '';
+      }
+      if (postId) {
+        const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+        let postPageIndex = -1;
+        for (let index = pages.length - 1; index >= 0; index -= 1) {
+          if (pages[index] && pages[index].route === 'pages/post-detail/post-detail') {
+            postPageIndex = index;
+            break;
+          }
+        }
+        const delta = postPageIndex > -1 ? pages.length - 1 - postPageIndex : 0;
+        if (delta > 0) {
+          wx.navigateBack({ delta });
+          return;
+        }
+        wx.redirectTo({ url: '/pages/post-detail/post-detail?id=' + encodeURIComponent(postId) });
+        return;
+      }
       wx.switchTab({ url: '/pages/index/index' });
     },
 

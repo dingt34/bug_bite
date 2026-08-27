@@ -3,14 +3,16 @@
   <view class="head">
     <view class="head-title">发生了哪类接触？</view>
     <view class="head-sub">选择最接近的一项，不确定也可以继续</view>
+    <view class="recommend-tip" wx:if="{{recommendedKey}}">根据这条社群经历，建议先查看“{{recommendedName}}”；你仍可选择其他类型。</view>
   </view>
 
-  <view class="type-card" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
+  <view class="type-card {{recommendedKey === item.key ? 'type-recommended' : ''}}" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
     <view class="type-icon">{{item.icon}}</view>
     <view class="type-body">
       <view class="type-name">{{item.name}}</view>
       <view class="type-desc">{{item.desc}}</view>
     </view>
+    <view class="recommend-badge" wx:if="{{recommendedKey === item.key}}">建议</view>
     <view class="type-arrow">→</view>
   </view>
 

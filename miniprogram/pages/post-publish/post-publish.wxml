@@ -6,6 +6,17 @@
     <text class="draft-clear" bindtap="discardDraft">清空草稿</text>
   </view>
 
+  <view class="event-import" wx:if="{{!editing}}" bindtap="choosePreviousEvent">
+    <view class="event-import-icon">↓</view>
+    <view class="event-import-copy">
+      <view class="event-import-title">从以前的事件快速填写</view>
+      <view class="event-import-sub" wx:if="{{selectedEventLabel}}">已选择：{{selectedEventLabel}}</view>
+      <view class="event-import-sub" wx:elif="{{hasPreviousEvents}}">选择一条记录，自动填写文字和标签</view>
+      <view class="event-import-sub" wx:else>暂无记录，可先完成一次安全判断</view>
+    </view>
+    <view class="event-import-arrow">›</view>
+  </view>
+
   <view class="card">
     <view class="card-title">{{editing ? '编辑你的分享' : '分享你的经历'}}</view>
     <textarea class="editor" placeholder="描述你的户外经历、接触情况或处理经验…" maxlength="500" bindinput="onInput" value="{{text}}" />
@@ -27,7 +38,8 @@
   </view>
 
   <view class="card">
-    <view class="card-title">地区标签 <text class="optional">选填</text></view>
+    <view class="card-title">事件发生地点 <text class="required">*</text></view>
+    <view class="field-help">请选择最接近的浙江省内城市</view>
     <view class="chips">
       <text class="tag {{region === item ? 'active' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="onRegionTap" data-v="{{item}}">{{item}}</text>
     </view>

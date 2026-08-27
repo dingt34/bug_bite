@@ -16,10 +16,10 @@
 - `user_data`：保存每个微信用户的计划、事件和个人图片映射同步快照。
 - `community_posts`：保存所有用户可见的公共帖子和互动计数。
 - `community_comments`：保存公共评论。
-- `community_reactions`：保存用户对帖子的点赞和收藏状态。
+- `community_reactions`：保存用户对帖子的点赞、收藏，以及对评论的赞踩状态。
 - `community_reports`：保存社区内容举报记录。
 
-两个集合都应设置为“不允许小程序客户端直接读写”或等价的管理员/云函数专用权限。所有身份确认与数据库操作均通过云函数完成。
+以上集合都应设置为“不允许小程序客户端直接读写”或等价的管理员/云函数专用权限。所有身份确认与数据库操作均通过云函数完成。
 
 ## 3. 部署云函数
 
@@ -38,7 +38,7 @@
 2. 页面应显示“微信云开发已连接”。
 3. 选择头像、填写昵称，点击“微信云登录”。
 4. 创建计划或事件后进入“我的”，点击“立即同步”。
-5. 发布一条社区内容并添加评论、点赞或收藏。
+5. 发布一条社区内容，并分别验证评论、回复、赞踩、收藏和微信分享。
 6. 在云开发控制台检查 `users`、`user_data`、四个 `community_*` 集合，以及云存储的 `avatars/`、`user-content/`、`community/` 目录。
 
 ## 社区数据库索引
@@ -47,10 +47,14 @@
 
 - `community_posts`：`status + createdAtTimestamp`，`authorOpenid + status`。
 - `community_comments`：`postId + status + createdAtTimestamp`，`authorOpenid + status`。
-- `community_reactions`：`authorOpenid`，`postId`。
+- `community_reactions`：`authorOpenid`，`postId`，以及评论赞踩使用的 `authorOpenid + postId + targetType`、`commentId + targetType`。
 - `community_reports`：`reporterOpenid`，`postId`。
 
 四个社区集合均应设置为“不允许小程序客户端直接读写”。列表、发布、评论、互动、删除、举报和统计全部通过 `community` 云函数完成。
+
+## 社群功能范围
+
+社群仅保留公共经历分享：浏览与搜索动态、发布和编辑、评论与二层回复、评论赞踩、帖子点赞收藏、举报，以及微信原生分享。好友申请、好友列表和站内私信已移除，因此无需创建 `community_friendships` 或 `community_messages` 集合。
 
 ## 数据策略
 

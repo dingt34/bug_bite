@@ -22,7 +22,9 @@ Page({
     editing: false,
     editPostId: '',
     loadingPost: false,
-    draftRestored: false
+    draftRestored: false,
+    hasPreviousEvents: false,
+    selectedEventLabel: ''
   },
 
   onLoad(options) {
@@ -43,7 +45,102 @@ Page({
       this.loadPostForEdit(editPostId);
     } else {
       this.restoreDraft();
+      this.loadPreviousEvents();
     }
+  },
+
+  loadPreviousEvents() {
+    const storedEvents = wx.getStorageSync('events');
+    const events = Array.isArray(storedEvents) ? storedEvents : [];
+    this.previousEvents = events.filter(event => event && event.id && event.contactType)
+      .sort((a, b) => (b.updatedAtTimestamp || b.createdAtTimestamp || 0) -
+        (a.updatedAtTimestamp || a.createdAtTimestamp || 0))
+      .slice(0, 6);
+    this.setData({ hasPreviousEvents: this.previousEvents.length > 0 });
+  },
+
+  previousEventLabel(event) {
+    const typeName = event.contactTypeName || '接触事件';
+    const time = event.occurredAt || event.createdAt || '时间未记录';
+    return (typeName + ' · ' + time).slice(0, 30);
+  },
+
+  choosePreviousEvent() {
+    if (this.data.editing) return;
+    const events = this.previousEvents || [];
+    if (!events.length) {
+      wx.showModal({
+        title: '还没有事件记录',
+        content: '完成一次安全判断后，事件会保存在这里供快速填写。',
+        confirmText: '去安全判断',
+        success: result => {
+          if (result.confirm) wx.navigateTo({ url: '/pages/contact/contact' });
+        }
+      });
+      return;
+    }
+    wx.showActionSheet({
+      itemList: events.map(event => this.previousEventLabel(event)),
+      success: result => this.confirmPreviousEvent(events[result.tapIndex])
+    });
+  },
+
+  confirmPreviousEvent(event) {
+    if (!event) return;
+    const hasCurrentContent = this.data.text.trim() || this.data.region ||
+      this.data.contactType || this.data.stage;
+    if (!hasCurrentContent) {
+      this.applyPreviousEvent(event);
+      return;
+    }
+    wx.showModal({
+      title: '使用这条事件记录？',
+      content: '将替换当前文字和标签，已经选择的分享图片会保留。',
+      confirmText: '替换填写',
+      success: result => {
+        if (result.confirm) this.applyPreviousEvent(event);
+      }
+    });
+  },
+
+  buildEventShareText(event) {
+    const typeName = event.contactTypeName || '虫咬接触';
+    const parts = ['我想分享一次' + typeName + '的经历。'];
+    if (event.occurredAt) parts.push('发生时间：' + event.occurredAt + '。');
+    if (event.summary) parts.push(String(event.summary));
+    if (event.latestReviewSummary && event.latestReviewSummary !== event.summary) {
+      parts.push('最新复查：' + event.latestReviewSummary);
+    }
+    return parts.join('\n').slice(0, 500);
+  },
+
+  resolveEventStage(event) {
+    const status = String(event.status || '').toLowerCase();
+    if (status === 'recovered' || status === 'resolved') return '已恢复';
+    const reviews = Array.isArray(event.reviews) ? event.reviews : [];
+    const latest = reviews.length ? reviews[reviews.length - 1] : null;
+    const trend = String(latest && latest.answers && latest.answers.trend || '');
+    if (event.riskLevel === 'observe' && trend.indexOf('明显好转') > -1) return '已处理';
+    return '观察中';
+  },
+
+  applyPreviousEvent(event) {
+    const matchedType = this.data.types.find(item => item.key === event.contactType);
+    const text = this.buildEventShareText(event);
+    const region = this.data.regions.indexOf(event.region) > -1 ? event.region : '';
+    this.setData({
+      text,
+      charCount: text.length,
+      region,
+      contactType: matchedType ? matchedType.key : 'unknown',
+      contactTypeName: matchedType ? matchedType.name : '暂时不能确定',
+      stage: this.resolveEventStage(event),
+      validationMessage: '',
+      draftRestored: false,
+      selectedEventLabel: this.previousEventLabel(event)
+    });
+    this.persistDraft();
+    wx.showToast({ title: '已填入事件，图片未自动添加', icon: 'none' });
   },
 
   loadPostForEdit(postId) {

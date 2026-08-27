@@ -2,7 +2,20 @@ const mock = require('../../utils/mock.js');
 
 Page({
   data: {
-    types: mock.CONTACT_TYPES
+    types: mock.CONTACT_TYPES,
+    recommendedKey: '',
+    recommendedName: ''
+  },
+
+  onLoad(options) {
+    const app = getApp();
+    const sourcePostId = options && options.fromPost || '';
+    if (app && app.globalData) app.globalData.safetyReturnPostId = sourcePostId;
+    const recommendedKey = options && options.recommended || '';
+    const recommended = mock.CONTACT_TYPES.find(item => item.key === recommendedKey);
+    if (recommended) {
+      this.setData({ recommendedKey: recommended.key, recommendedName: recommended.name });
+    }
   },
 
   select(e) {

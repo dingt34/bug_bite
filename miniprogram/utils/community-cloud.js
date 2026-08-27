@@ -85,8 +85,19 @@ function toggleReaction(wxApi, postId, key) {
   return call(wxApi, 'toggleReaction', { postId, key });
 }
 
-function comment(wxApi, postId, text, profile) {
-  return call(wxApi, 'comment', { postId, text, profile });
+function comment(wxApi, postId, text, profile, parentCommentId) {
+  return call(wxApi, 'comment', { postId, text, profile, parentCommentId: parentCommentId || '' });
+}
+
+function toggleCommentLike(wxApi, commentId) {
+  return call(wxApi, 'toggleCommentLike', { commentId });
+}
+
+function toggleCommentVote(wxApi, commentId, vote) {
+  return call(wxApi, 'toggleCommentVote', {
+    commentId,
+    vote: vote === 'down' ? 'down' : 'up'
+  });
 }
 
 function deleteComment(wxApi, commentId) {
@@ -99,6 +110,10 @@ function deletePost(wxApi, postId) {
 
 function report(wxApi, postId, reason) {
   return call(wxApi, 'report', { postId, reason });
+}
+
+function reportComment(wxApi, commentId, reason) {
+  return call(wxApi, 'reportComment', { commentId, reason });
 }
 
 function deleteAccount(wxApi) {
@@ -214,9 +229,12 @@ module.exports = {
   update,
   toggleReaction,
   comment,
+  toggleCommentLike,
+  toggleCommentVote,
   deleteComment,
   deletePost,
   report,
+  reportComment,
   deleteAccount,
   getStats,
   readCachedStats,
