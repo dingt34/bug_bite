@@ -17,25 +17,12 @@ global.wx = {
   cloud: {
     init() {},
     deleteFile() { return Promise.resolve({ fileList: [] }); },
-    extend: {
-      AI: {
-        createModel() {
-          return {
-            async streamText() {
-              return {
-                textStream: {
-                  async *[Symbol.asyncIterator]() { yield '建议先观察危险信号。'; }
-                }
-              };
-            }
-          };
-        }
-      }
+    callFunction() {
+      return Promise.resolve({ result: { ok: true, text: '建议先观察危险信号。' } });
     }
   }
 };
 
-config.AI_BOT_ID = '';
 cloudService.resetForTests();
 require('../miniprogram/pages/ai-chat/ai-chat.js');
 
