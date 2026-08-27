@@ -21,5 +21,8 @@ assert.ok(readableError(new Error('FUNCTIONS_EXECUTE_FAIL')).includes('FUNCTIONS
 
 const functionSource = fs.readFileSync(path.join(__dirname, '../cloudfunctions/routePlan/index.js'), 'utf8');
 assert.ok(functionSource.includes('if (failedRequest) throw failedRequest.reason;'));
+assert.ok(functionSource.includes('const start = await locate(startText);'));
+assert.ok(functionSource.includes('value: await getRoutes(start, end, mode, policy)'));
+assert.ok(!functionSource.includes('Promise.all([locate(startText), locate(endText)])'));
 
 console.log('route plan cloud error tests passed');

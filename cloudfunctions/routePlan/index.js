@@ -102,9 +102,19 @@ async function planRoute(event) {
   const endText = String(event.end || '').trim();
   const mode = MODE_CONFIG[event.mode] ? event.mode : 'walking';
   if (!startText || !endText) throw new Error('请填写起点和终点');
-  const [start, end] = await Promise.all([locate(startText), locate(endText)]);
+  // Keep requests sequential so a personal developer account only needs
+  // one concurrent request quota for each WebService API.
+  const start = await locate(startText);
+  const end = await locate(endText);
   const config = MODE_CONFIG[mode];
-  const results = await Promise.allSettled(config.policies.map(policy => getRoutes(start, end, mode, policy)));
+  const results = [];
+  for (const policy of config.policies) {
+    try {
+      results.push({ status: 'fulfilled', value: await getRoutes(start, end, mode, policy) });
+    } catch (reason) {
+      results.push({ status: 'rejected', reason });
+    }
+  }
   const routes = uniqueRoutes(results
     .filter(item => item.status === 'fulfilled')
     .reduce((list, item) => list.concat(item.value), []))
