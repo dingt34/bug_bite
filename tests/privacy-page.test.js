@@ -12,6 +12,7 @@ const storage = {
   posts: [{ id: 'post1', imageRefs: ['wxfile://usr/post.jpg'] }],
   postReactions: { post1: { collected: true } },
   reportedPosts: { post1: true },
+  insectGuideCompare: ['mosquito', 'tick'],
   unrelatedPreference: 'keep'
 };
 const app = { globalData: { userInfo: {}, latestPlan: {}, draftEvent: {} } };
@@ -46,6 +47,7 @@ page.clearAllData();
 assert.strictEqual(storage.unrelatedPreference, 'keep');
 assert.strictEqual(storage.events, undefined);
 assert.strictEqual(storage.plan_p1, undefined);
+assert.strictEqual(storage.insectGuideCompare, undefined);
 assert.deepStrictEqual(removedFiles, ['wxfile://usr/event.jpg', 'wxfile://usr/post.jpg']);
 assert.strictEqual(app.globalData.userInfo, null);
 assert.strictEqual(app.globalData.latestPlan, null);

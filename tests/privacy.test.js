@@ -40,8 +40,8 @@ assert.deepStrictEqual(privacy.buildDataSummary(snapshot), {
   hasOfflineCard: true
 });
 assert.deepStrictEqual(
-  privacy.resolveDataKeys(['userInfo', 'plans', 'plan_p1', 'postComments', 'unrelatedPreference', 'events']),
-  ['userInfo', 'plans', 'plan_p1', 'postComments', 'events']
+  privacy.resolveDataKeys(['userInfo', 'plans', 'plan_p1', 'postComments', 'insectGuideCompare', 'unrelatedPreference', 'events']),
+  ['userInfo', 'plans', 'plan_p1', 'postComments', 'insectGuideCompare', 'events']
 );
 
 console.log('privacy tests passed');

@@ -1,7 +1,7 @@
 const FIXED_STORAGE_KEYS = [
   'userInfo', 'plans', 'latestPlan', 'offlineCard', 'events',
   'posts', 'postReactions', 'postComments', 'reportedPosts', 'cloudFileMap', 'cloudTombstones',
-  'communityCloudStats', 'communityMigrationV1'
+  'communityCloudStats', 'communityMigrationV1', 'insectGuideCompare'
 ];
 
 function unique(values) {
