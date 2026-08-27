@@ -17,16 +17,24 @@
 .home-action {
   display: flex;
   align-items: center;
+  box-sizing: border-box;
   min-height: 44px;
 }
 .home-arrow {
-  margin-right: 3px;
-  font-size: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 44px;
+  margin-right: 4px;
+  font-size: 32px;
   font-weight: 300;
   line-height: 1;
 }
 .home-label {
+  display: block;
   font-size: 15px;
+  line-height: 22px;
 }
 .nav-title {
   position: absolute;

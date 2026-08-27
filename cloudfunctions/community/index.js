@@ -32,6 +32,26 @@ async function trustedProfile(openid) {
   return domain.normalizeProfile(user);
 }
 
+async function attachCurrentAvatars(items) {
+  const values = items || [];
+  const authorIds = Array.from(new Set(values.map(item => item && item.authorOpenid).filter(Boolean)));
+  if (!authorIds.length) return values;
+  try {
+    const result = await db.collection(USERS).where({ _id: _.in(authorIds) }).limit(100).get();
+    const avatarByAuthor = {};
+    (result.data || []).forEach(user => {
+      if (user && user._id && typeof user.avatarUrl === 'string' && user.avatarUrl.indexOf('cloud://') === 0) {
+        avatarByAuthor[user._id] = user.avatarUrl;
+      }
+    });
+    return values.map(item => avatarByAuthor[item.authorOpenid]
+      ? Object.assign({}, item, { avatarUrl: avatarByAuthor[item.authorOpenid] })
+      : item);
+  } catch (error) {
+    return values;
+  }
+}
+
 async function checkTextSecurity(openid, content) {
   if (!cloud.openapi || !cloud.openapi.security || !cloud.openapi.security.msgSecCheck) return;
   try {
@@ -56,11 +76,15 @@ async function userCommunityState(openid) {
     db.collection(REPORTS).where({ reporterOpenid: openid }).limit(100).get()
   ]);
   const reactions = {};
-  (reactionsResult.data || []).forEach(item => { reactions[item.postId] = item; });
+  (reactionsResult.data || []).forEach(item => {
+    if (item.targetType !== 'comment') reactions[item.postId] = item;
+  });
   const commented = {};
   (commentsResult.data || []).forEach(item => { commented[item.postId] = true; });
   const reported = {};
-  (reportsResult.data || []).forEach(item => { reported[item.postId] = true; });
+  (reportsResult.data || []).forEach(item => {
+    if (item.targetType !== 'comment') reported[item.postId] = true;
+  });
   return { reactions, commented, reported };
 }
 
@@ -84,14 +108,16 @@ async function listPosts(event, openid) {
   if (filterMode === 'commented') posts = posts.filter(post => state.commented[post._id]);
   posts = posts.filter(post => domain.matchesQuery(post, event.query));
   if (sortMode === 'hot') {
+    const now = Date.now();
     posts.sort((a, b) => {
-      const heatA = (a.likeCount || 0) * 2 + (a.collectCount || 0) * 3 + (a.commentCount || 0) * 2;
-      const heatB = (b.likeCount || 0) * 2 + (b.collectCount || 0) * 3 + (b.commentCount || 0) * 2;
+      const heatA = domain.hotScore(a, now);
+      const heatB = domain.hotScore(b, now);
       return heatB - heatA || (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0);
     });
   }
   const total = posts.length;
-  const page = posts.slice(offset, offset + pageSize).map(post =>
+  const pagePosts = await attachCurrentAvatars(posts.slice(offset, offset + pageSize));
+  const page = pagePosts.map(post =>
     domain.publicPost(post, state.reactions[post._id], openid)
   );
   return { posts: page, total, hasMore: offset + page.length < total };
@@ -101,15 +127,28 @@ async function getPost(event, openid) {
   const post = await readDocument(POSTS, domain.text(event.postId, 80));
   if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
   const reactionId = domain.stableId('reaction', openid, post._id);
-  const [reaction, commentsResult, report] = await Promise.all([
+  const [reaction, commentsResult, commentReactionsResult, report] = await Promise.all([
     readDocument(REACTIONS, reactionId),
     db.collection(COMMENTS).where({ postId: post._id, status: 'active' })
       .orderBy('createdAtTimestamp', 'asc').limit(100).get(),
+    db.collection(REACTIONS).where({
+      authorOpenid: openid,
+      postId: post._id,
+      targetType: 'comment'
+    }).limit(100).get(),
     readDocument(REPORTS, domain.stableId('report', openid, post._id))
   ]);
+  const commentReactions = {};
+  (commentReactionsResult.data || []).forEach(item => { commentReactions[item.commentId] = item; });
+  const comments = commentsResult.data || [];
+  const profiled = await attachCurrentAvatars([post].concat(comments));
+  const profiledPost = profiled[0];
+  const profiledComments = profiled.slice(1);
   return {
-    post: domain.publicPost(post, reaction, openid),
-    comments: (commentsResult.data || []).map(comment => domain.publicComment(comment, openid)),
+    post: domain.publicPost(profiledPost, reaction, openid),
+    comments: profiledComments.map(comment =>
+      domain.publicComment(comment, openid, commentReactions[comment._id])
+    ),
     reported: !!report
   };
 }
@@ -132,6 +171,27 @@ async function publishPost(event, openid) {
     })
   });
   const saved = await readDocument(POSTS, result._id);
+  return { post: domain.publicPost(saved, null, openid) };
+}
+
+async function updatePost(event, openid) {
+  const postId = domain.text(event.postId, 80);
+  const current = await readDocument(POSTS, postId);
+  if (!current || current.status !== 'active') throw new Error('帖子不存在或已删除');
+  if (current.authorOpenid !== openid) throw new Error('只能编辑自己的分享');
+  const input = domain.normalizePost(event.post);
+  await checkTextSecurity(openid, input.text);
+  const timestamp = Date.now();
+  await db.collection(POSTS).doc(postId).update({
+    data: Object.assign({}, input, { updatedAtTimestamp: timestamp })
+  });
+  const removedFiles = (current.imageRefs || []).filter(item =>
+    typeof item === 'string' && item.indexOf('cloud://') === 0 && input.imageRefs.indexOf(item) < 0
+  );
+  if (removedFiles.length) {
+    try { await cloud.deleteFile({ fileList: removedFiles }); } catch (error) {}
+  }
+  const saved = await readDocument(POSTS, postId);
   return { post: domain.publicPost(saved, null, openid) };
 }
 
@@ -162,8 +222,7 @@ async function toggleReaction(event, openid) {
     };
     await reactionRef.set({ data: nextReaction });
     await postRef.update({ data: {
-      [countKey]: _.inc(nextValue ? 1 : -1),
-      updatedAtTimestamp: Date.now()
+      [countKey]: _.inc(nextValue ? 1 : -1)
     } });
     return {
       reaction: { liked: !!nextReaction.liked, collected: !!nextReaction.collected },
@@ -176,6 +235,7 @@ async function toggleReaction(event, openid) {
 
 async function createComment(event, openid) {
   const postId = domain.text(event.postId, 80);
+  const parentCommentId = domain.text(event.parentCommentId, 80);
   const profile = await trustedProfile(openid);
   const content = domain.normalizeComment(event.text);
   await checkTextSecurity(openid, content);
@@ -185,16 +245,34 @@ async function createComment(event, openid) {
     const postRef = transaction.collection(POSTS).doc(postId);
     const post = (await postRef.get()).data;
     if (!post || post.status !== 'active') throw new Error('帖子不存在或已删除');
+    let parentComment = null;
+    let rootCommentId = '';
+    if (parentCommentId) {
+      parentComment = (await transaction.collection(COMMENTS).doc(parentCommentId).get()).data;
+      if (!parentComment || parentComment.status !== 'active' || parentComment.postId !== postId || parentComment.deletedByAuthor) {
+        throw new Error('要回复的评论不存在或已删除');
+      }
+      rootCommentId = parentComment.rootCommentId || parentCommentId;
+    }
     const comment = Object.assign({}, profile, {
       postId,
       authorOpenid: openid,
       text: content,
       status: 'active',
+      parentCommentId: parentCommentId || '',
+      rootCommentId,
+      replyToDisplayName: parentComment ? parentComment.displayName : '',
+      replyCount: 0,
+      likeCount: 0,
+      dislikeCount: 0,
       createdAtTimestamp: timestamp,
       updatedAtTimestamp: timestamp
     });
     await transaction.collection(COMMENTS).doc(commentId).set({ data: comment });
-    await postRef.update({ data: { commentCount: _.inc(1), updatedAtTimestamp: timestamp } });
+    if (rootCommentId) {
+      await transaction.collection(COMMENTS).doc(rootCommentId).update({ data: { replyCount: _.inc(1) } });
+    }
+    await postRef.update({ data: { commentCount: _.inc(1) } });
     return { comment: domain.publicComment(Object.assign({ _id: commentId }, comment), openid) };
   });
   return domain.transactionValue(result);
@@ -207,11 +285,76 @@ async function deleteComment(event, openid) {
     const comment = (await commentRef.get()).data;
     if (!comment || comment.status !== 'active') return { success: true };
     if (comment.authorOpenid !== openid) throw new Error('只能删除自己的评论');
-    await commentRef.update({ data: { status: 'deleted', updatedAtTimestamp: Date.now() } });
+    const timestamp = Date.now();
+    if (!comment.rootCommentId && (comment.replyCount || 0) > 0) {
+      await commentRef.update({ data: {
+        authorOpenid: '',
+        displayName: '',
+        avatarText: '',
+        avatarUrl: '',
+        text: '',
+        deletedByAuthor: true,
+        updatedAtTimestamp: timestamp
+      } });
+    } else {
+      await commentRef.update({ data: { status: 'deleted', updatedAtTimestamp: timestamp } });
+    }
+    if (comment.rootCommentId) {
+      const rootRef = transaction.collection(COMMENTS).doc(comment.rootCommentId);
+      const root = (await rootRef.get()).data;
+      if (root && root.deletedByAuthor && (root.replyCount || 0) <= 1) {
+        await rootRef.update({ data: { status: 'deleted', replyCount: 0, updatedAtTimestamp: timestamp } });
+      } else if (root) {
+        await rootRef.update({ data: { replyCount: _.inc(-1), updatedAtTimestamp: timestamp } });
+      }
+    }
     await transaction.collection(POSTS).doc(comment.postId).update({
-      data: { commentCount: _.inc(-1), updatedAtTimestamp: Date.now() }
+      data: { commentCount: _.inc(-1) }
     });
     return { success: true };
+  });
+  await db.collection(REACTIONS).where({ targetType: 'comment', commentId }).remove();
+  return domain.transactionValue(result);
+}
+
+async function toggleCommentVote(event, openid) {
+  const commentId = domain.text(event.commentId, 80);
+  const reactionId = domain.stableId('comment_like', openid, commentId);
+  const requestedVote = event.vote === 'down' ? -1 : 1;
+  const result = await db.runTransaction(async transaction => {
+    const commentRef = transaction.collection(COMMENTS).doc(commentId);
+    const reactionRef = transaction.collection(REACTIONS).doc(reactionId);
+    const comment = (await commentRef.get()).data;
+    if (!comment || comment.status !== 'active' || comment.deletedByAuthor) throw new Error('评论不存在或已删除');
+    let reaction = null;
+    try {
+      reaction = (await reactionRef.get()).data;
+    } catch (error) {}
+    const transition = domain.commentVoteTransition(reaction, requestedVote, comment);
+    const timestamp = Date.now();
+    await reactionRef.set({ data: {
+      targetType: 'comment',
+      postId: comment.postId,
+      commentId,
+      authorOpenid: openid,
+      vote: transition.vote,
+      liked: transition.liked,
+      disliked: transition.disliked,
+      createdAtTimestamp: reaction && reaction.createdAtTimestamp || timestamp,
+      updatedAtTimestamp: timestamp
+    } });
+    await commentRef.update({ data: {
+      likeCount: _.inc(transition.likeDelta),
+      dislikeCount: _.inc(transition.dislikeDelta)
+    } });
+    return {
+      commentId,
+      liked: transition.liked,
+      disliked: transition.disliked,
+      vote: transition.vote,
+      likeCount: transition.likeCount,
+      dislikeCount: transition.dislikeCount
+    };
   });
   return domain.transactionValue(result);
 }
@@ -242,14 +385,39 @@ async function reportPost(event, openid) {
   const reportId = domain.stableId('report', openid, postId);
   const existing = await readDocument(REPORTS, reportId);
   if (existing) return { success: true, reported: true };
+  const reason = domain.normalizeReportReason(event.reason);
   await db.collection(REPORTS).doc(reportId).set({ data: {
     postId,
     reporterOpenid: openid,
-    reason: domain.text(event.reason, 100) || '用户标记不当内容',
+    reason,
     status: 'pending',
     createdAtTimestamp: Date.now()
   } });
   await db.collection(POSTS).doc(postId).update({ data: { reportCount: _.inc(1) } });
+  return { success: true, reported: true };
+}
+
+async function reportComment(event, openid) {
+  const commentId = domain.text(event.commentId, 80);
+  const comment = await readDocument(COMMENTS, commentId);
+  if (!comment || comment.status !== 'active' || comment.deletedByAuthor) {
+    throw new Error('评论不存在或已删除');
+  }
+  if (comment.authorOpenid === openid) throw new Error('不能举报自己的评论');
+  const reportId = domain.stableId('comment_report', openid, commentId);
+  const existing = await readDocument(REPORTS, reportId);
+  if (existing) return { success: true, reported: true };
+  const reason = domain.normalizeReportReason(event.reason);
+  await db.collection(REPORTS).doc(reportId).set({ data: {
+    targetType: 'comment',
+    postId: comment.postId,
+    commentId,
+    reporterOpenid: openid,
+    reason,
+    status: 'pending',
+    createdAtTimestamp: Date.now()
+  } });
+  await db.collection(COMMENTS).doc(commentId).update({ data: { reportCount: _.inc(1) } });
   return { success: true, reported: true };
 }
 
@@ -275,6 +443,17 @@ async function deleteAccount(openid) {
   }
   for (const comment of commentsResult.data || []) await deleteComment({ commentId: comment._id }, openid);
   for (const reaction of reactionsResult.data || []) {
+    if (reaction.targetType === 'comment') {
+      if (reaction.vote || reaction.liked || reaction.disliked) {
+        try {
+          await toggleCommentVote({
+            commentId: reaction.commentId,
+            vote: reaction.vote === -1 || reaction.disliked ? 'down' : 'up'
+          }, openid);
+        } catch (error) {}
+      }
+      continue;
+    }
     if (ownPostIds[reaction.postId]) continue;
     if (reaction.liked) await toggleReaction({ postId: reaction.postId, key: 'liked' }, openid);
     if (reaction.collected) await toggleReaction({ postId: reaction.postId, key: 'collected' }, openid);
@@ -292,11 +471,15 @@ exports.main = async event => {
   if (action === 'list') return listPosts(event, openid);
   if (action === 'get') return getPost(event, openid);
   if (action === 'publish') return publishPost(event, openid);
+  if (action === 'updatePost') return updatePost(event, openid);
   if (action === 'toggleReaction') return toggleReaction(event, openid);
   if (action === 'comment') return createComment(event, openid);
+  if (action === 'toggleCommentLike') return toggleCommentVote(Object.assign({}, event, { vote: 'up' }), openid);
+  if (action === 'toggleCommentVote') return toggleCommentVote(event, openid);
   if (action === 'deleteComment') return deleteComment(event, openid);
   if (action === 'deletePost') return deletePost(event, openid);
   if (action === 'report') return reportPost(event, openid);
+  if (action === 'reportComment') return reportComment(event, openid);
   if (action === 'stats') return getStats(openid);
   if (action === 'deleteAccount') return deleteAccount(openid);
   throw new Error('不支持的社区操作');

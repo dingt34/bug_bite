@@ -1,8 +1,8 @@
 <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
   <view class="nav-row">
-    <view class="home-action" bindtap="goHome" role="button" aria-label="返回首页">
+    <view class="home-action" bindtap="goHome" role="button" aria-label="返回{{returnLabel}}">
       <text class="home-arrow">‹</text>
-      <text class="home-label">首页</text>
+      <text class="home-label">{{returnLabel}}</text>
     </view>
     <view class="nav-title">接触后安全判断</view>
     <view class="nav-placeholder"></view>

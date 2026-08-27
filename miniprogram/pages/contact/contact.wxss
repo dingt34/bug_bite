@@ -14,6 +14,15 @@
   color: #737D85;
   font-size: 24rpx;
 }
+.recommend-tip {
+  margin-top: 16rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 14rpx;
+  background: var(--primary-light);
+  color: #456D5B;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
 
 .type-card {
   display: flex;
@@ -28,6 +37,19 @@
 .type-card:active {
   border-color: var(--primary);
   background: var(--primary-light);
+}
+.type-recommended {
+  border-color: var(--primary);
+  background: #F4FAF7;
+}
+.recommend-badge {
+  margin-right: 14rpx;
+  padding: 5rpx 12rpx;
+  border-radius: 16rpx;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 20rpx;
+  font-weight: 600;
 }
 .type-icon {
   font-size: 52rpx;

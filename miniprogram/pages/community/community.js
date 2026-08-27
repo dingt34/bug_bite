@@ -15,6 +15,7 @@ Page({
       name: item.name
     }))),
     resultCount: 0,
+    initialLoading: true,
     loading: false,
     loadingMore: false,
     loadError: '',
@@ -69,7 +70,7 @@ Page({
     this.loadToken = token;
     this.setData(append
       ? { loadingMore: true, loadError: '' }
-      : { loading: true, loadError: '', posts: settings.reset ? [] : this.data.posts });
+      : { loading: true, loadError: '' });
     return communityCloud.getFeed(wx, {
       filterMode: this.data.filterMode,
       query: this.data.query,
@@ -84,6 +85,7 @@ Page({
         posts,
         resultCount: result.total,
         hasMore: result.hasMore,
+        initialLoading: false,
         loading: false,
         loadingMore: false,
         loadError: ''
@@ -91,6 +93,7 @@ Page({
     }).catch(error => {
       if (this.loadToken !== token) return;
       this.setData({
+        initialLoading: false,
         loading: false,
         loadingMore: false,
         loadError: error && error.message ? error.message : '云端社区加载失败'
@@ -98,11 +101,6 @@ Page({
     }).then(() => {
       if (settings.pullDown && wx.stopPullDownRefresh) wx.stopPullDownRefresh();
     });
-  },
-
-  setFilter(e) {
-    this.setData({ filterMode: e.currentTarget.dataset.mode });
-    this.loadPosts({ reset: true });
   },
 
   onSearchInput(e) {
@@ -136,11 +134,44 @@ Page({
 
   toggleReaction(id, key) {
     if (this.data.actionPostId) return;
-    this.setData({ actionPostId: id });
-    communityCloud.toggleReaction(wx, id, key)
-      .then(() => key === 'collected' ? communityCloud.getStats(wx).catch(() => null) : null)
-      .then(() => this.loadPosts({ reset: true }))
-      .catch(error => wx.showToast({ title: error.message || '操作失败', icon: 'none' }))
+    const originalPosts = this.data.posts;
+    const originalResultCount = this.data.resultCount;
+    const originalPost = originalPosts.find(post => post.id === id);
+    if (!originalPost) return;
+    const countKey = key === 'liked' ? 'likeCount' : 'collectCount';
+    const optimisticValue = !originalPost[key];
+    const optimisticPost = Object.assign({}, originalPost, {
+      [key]: optimisticValue,
+      [countKey]: Math.max(0, (originalPost[countKey] || 0) + (optimisticValue ? 1 : -1))
+    });
+    const removeOptimistically = key === 'collected' && this.data.filterMode === 'collected' && !optimisticValue;
+    this.setData({
+      actionPostId: id,
+      posts: removeOptimistically
+        ? originalPosts.filter(post => post.id !== id)
+        : originalPosts.map(post => post.id === id ? optimisticPost : post),
+      resultCount: removeOptimistically ? Math.max(0, originalResultCount - 1) : originalResultCount
+    });
+    return communityCloud.toggleReaction(wx, id, key)
+      .then(result => {
+        const reaction = result.reaction || {};
+        const reconciledPost = Object.assign({}, originalPost, reaction, {
+          [countKey]: typeof result[countKey] === 'number' ? result[countKey] : optimisticPost[countKey]
+        });
+        const removedFromCollected = key === 'collected' && this.data.filterMode === 'collected' && !reaction.collected;
+        const posts = removedFromCollected
+          ? originalPosts.filter(post => post.id !== id)
+          : originalPosts.map(post => post.id === id ? reconciledPost : post);
+        this.setData({
+          posts,
+          resultCount: removedFromCollected ? Math.max(0, originalResultCount - 1) : originalResultCount
+        });
+        if (key === 'collected') communityCloud.getStats(wx).catch(() => null);
+      })
+      .catch(error => {
+        this.setData({ posts: originalPosts, resultCount: originalResultCount });
+        wx.showToast({ title: error.message || '操作失败', icon: 'none' });
+      })
       .then(() => this.setData({ actionPostId: '' }));
   },
 

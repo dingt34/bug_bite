@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const cloudService = require('../miniprogram/utils/cloud-service.js');
 
 let pageDefinition = null;
@@ -46,7 +48,11 @@ require('../miniprogram/pages/community/community.js');
 
 const page = Object.assign({}, pageDefinition, {
   data: Object.assign({}, pageDefinition.data),
-  setData(update) { this.data = Object.assign({}, this.data, update); }
+  dataUpdates: [],
+  setData(update) {
+    this.dataUpdates.push(update);
+    this.data = Object.assign({}, this.data, update);
+  }
 });
 
 (async () => {
@@ -58,6 +64,11 @@ const page = Object.assign({}, pageDefinition, {
   assert.strictEqual(app.globalData.communityFilter, null);
   assert.strictEqual(lastListRequest.filterMode, 'collected');
 
+  const refreshPromise = page.loadPosts({ reset: true });
+  assert.strictEqual(page.data.posts.length, 1, '后台刷新不应清空当前社群动态');
+  assert.strictEqual(page.data.initialLoading, false, '首次加载完成后不应恢复整页加载');
+  await refreshPromise;
+
   page.onSearchInput({ detail: { value: '不存在的关键词' } });
   await new Promise(resolve => setTimeout(resolve, 330));
   assert.strictEqual(page.data.posts.length, 0);
@@ -65,14 +76,21 @@ const page = Object.assign({}, pageDefinition, {
   await new Promise(resolve => setTimeout(resolve, 10));
   assert.strictEqual(page.data.posts.length, 1);
 
+  page.dataUpdates = [];
   page.toggleLike({ currentTarget: { dataset: { id: 'cloud_post_1' } } });
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.strictEqual(reactionCalls, 1);
+  assert.strictEqual(page.dataUpdates.some(update => update.loading === true), false,
+    '点赞不应触发页面级加载状态');
+  assert.strictEqual(page.dataUpdates.some(update => Array.isArray(update.posts) && update.posts.length === 0), false,
+    '点赞不应清空当前帖子列表');
   page.setSort({ currentTarget: { dataset: { mode: 'hot' } } });
   await new Promise(resolve => setTimeout(resolve, 10));
   assert.strictEqual(page.data.sortMode, 'hot');
   page.onHide();
   assert.strictEqual(page.data.filterMode, 'all');
+  const template = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/community/community.wxml'), 'utf8');
+  assert.ok(template.includes('wx:if="{{item.avatarUrl}}"'), '社群列表应优先显示云头像图片');
   cloudService.resetForTests();
   console.log('community page tests passed');
 })().catch(error => {

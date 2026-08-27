@@ -59,12 +59,45 @@ function publish(wxApi, draft, profile) {
   });
 }
 
+function update(wxApi, postId, draft) {
+  let uploadedFileId = '';
+  const isNewUpload = draft.previewImage && draft.previewImage.indexOf('cloud://') !== 0;
+  return uploadImage(wxApi, draft.previewImage).then(fileId => {
+    if (isNewUpload) uploadedFileId = fileId;
+    return call(wxApi, 'updatePost', {
+      postId,
+      post: {
+        text: draft.text,
+        region: draft.region,
+        contactType: draft.contactType,
+        contactTypeName: draft.contactTypeName,
+        stage: draft.stage,
+        imageRefs: fileId ? [fileId] : []
+      }
+    });
+  }).catch(error => {
+    if (uploadedFileId) cloudService.deleteFiles(wxApi, [uploadedFileId]).catch(() => {});
+    throw error;
+  });
+}
+
 function toggleReaction(wxApi, postId, key) {
   return call(wxApi, 'toggleReaction', { postId, key });
 }
 
-function comment(wxApi, postId, text, profile) {
-  return call(wxApi, 'comment', { postId, text, profile });
+function comment(wxApi, postId, text, profile, parentCommentId) {
+  return call(wxApi, 'comment', { postId, text, profile, parentCommentId: parentCommentId || '' });
+}
+
+function toggleCommentLike(wxApi, commentId) {
+  return call(wxApi, 'toggleCommentLike', { commentId });
+}
+
+function toggleCommentVote(wxApi, commentId, vote) {
+  return call(wxApi, 'toggleCommentVote', {
+    commentId,
+    vote: vote === 'down' ? 'down' : 'up'
+  });
 }
 
 function deleteComment(wxApi, commentId) {
@@ -77,6 +110,10 @@ function deletePost(wxApi, postId) {
 
 function report(wxApi, postId, reason) {
   return call(wxApi, 'report', { postId, reason });
+}
+
+function reportComment(wxApi, commentId, reason) {
+  return call(wxApi, 'reportComment', { commentId, reason });
 }
 
 function deleteAccount(wxApi) {
@@ -189,11 +226,15 @@ module.exports = {
   getFeed,
   getThread,
   publish,
+  update,
   toggleReaction,
   comment,
+  toggleCommentLike,
+  toggleCommentVote,
   deleteComment,
   deletePost,
   report,
+  reportComment,
   deleteAccount,
   getStats,
   readCachedStats,
