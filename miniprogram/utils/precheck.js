@@ -37,63 +37,10 @@ const HABITAT_RULES = {
   室内住宿: { tag: '室内住宿', tip: '入住后检查纱窗、床铺和墙角，并避免房间内长时间积水。' }
 };
 
-const ROUTE_INSECT_PROFILES = {
-  蚊虫: { name: '蚊虫', reason: '暖季、潮湿草地或水边活动时更常见。' },
-  蠓虫: { name: '蠓虫', reason: '水边、林缘和潮湿植被附近较易出现。' },
-  蜱虫: { name: '蜱虫', reason: '高草、灌木和林地路线需重点留意。' },
-  蜂类: { name: '蜂类', reason: '林地、果园和花草较多区域应避免惊扰蜂群。' },
-  隐翅虫: { name: '隐翅虫', reason: '暖季夜间灯光附近及潮湿植被周边可能出现。' }
-};
-
-const ROUTE_CITY_INSECTS = {
-  杭州: ['蚊虫', '蜱虫', '蜂类'], 宁波: ['蚊虫', '蠓虫', '蜂类'],
-  温州: ['蚊虫', '蠓虫', '蜱虫'], 嘉兴: ['蚊虫', '蠓虫'],
-  湖州: ['蚊虫', '蜱虫', '蜂类'], 绍兴: ['蚊虫', '蠓虫', '蜱虫'],
-  金华: ['蚊虫', '蜱虫', '蜂类'], 衢州: ['蚊虫', '蜱虫', '蜂类'],
-  舟山: ['蚊虫', '蠓虫'], 台州: ['蚊虫', '蠓虫', '蜱虫'],
-  丽水: ['蚊虫', '蜱虫', '蜂类']
-};
-
 function addUnique(list, value) {
   if (value && list.indexOf(value) === -1) {
     list.push(value);
   }
-}
-
-function getMentionedCities(place) {
-  const text = String(place || '');
-  return Object.keys(ROUTE_CITY_INSECTS).filter(city => text.indexOf(city) > -1);
-}
-
-function getRouteInsects(form) {
-  const input = form || {};
-  const start = input.routeStart || '';
-  const end = input.routeEnd || '';
-  if (!start && !end) return { summary: '', insects: [] };
-  const insectKeys = [];
-  const isWarm = WARM_MONTHS.indexOf(input.month) > -1;
-  [start, end].filter(Boolean).forEach(place => {
-    getMentionedCities(place).forEach(city => {
-      ROUTE_CITY_INSECTS[city].forEach(key => addUnique(insectKeys, key));
-    });
-  });
-  // 具体地点未必包含城市名；给出保守的常见户外提示，并用季节和生境继续细化。
-  if (!insectKeys.length) addUnique(insectKeys, '蚊虫');
-  if (isWarm) {
-    addUnique(insectKeys, '蚊虫');
-    addUnique(insectKeys, '隐翅虫');
-  }
-  const habitats = input.habitatTags || [];
-  if (habitats.some(item => ['高草/灌木', '林地/落叶层', '农田/果园'].indexOf(item) > -1)) {
-    addUnique(insectKeys, '蜱虫');
-    addUnique(insectKeys, '蜂类');
-  }
-  if (habitats.indexOf('水边/湿地') > -1) {
-    addUnique(insectKeys, '蚊虫');
-    addUnique(insectKeys, '蠓虫');
-  }
-  const routeText = start && end ? start + ' → ' + end : (start ? '起点：' + start : '终点：' + end);
-  return { summary: '路线：' + routeText + (input.month ? ' · ' + input.month : ''), insects: insectKeys.slice(0, 4).map(key => ROUTE_INSECT_PROFILES[key]) };
 }
 
 function evaluatePlan(form) {
@@ -225,6 +172,5 @@ function evaluatePlan(form) {
 
 module.exports = {
   RULE_VERSION,
-  evaluatePlan,
-  getRouteInsects
+  evaluatePlan
 };

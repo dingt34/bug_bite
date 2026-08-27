@@ -4,11 +4,19 @@ const https = require('https');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const MAP_KEY = process.env.TENCENT_MAP_KEY;
-const POLICIES = [
-  { key: 'RECOMMEND', name: '推荐路线' },
-  { key: 'LEAST_TIME', name: '用时较短' },
-  { key: 'LEAST_DISTANCE', name: '距离较短' }
-];
+const MODE_CONFIG = {
+  walking: { path: '/ws/direction/v1/walking', name: '步行', policies: [null] },
+  bicycling: { path: '/ws/direction/v1/bicycling', name: '骑行', policies: [null] },
+  driving: {
+    path: '/ws/direction/v1/driving',
+    name: '驾车',
+    policies: [
+      { key: 'RECOMMEND', name: '推荐路线' },
+      { key: 'LEAST_TIME', name: '用时较短' },
+      { key: 'LEAST_DISTANCE', name: '距离较短' }
+    ]
+  }
+};
 
 function request(path, params) {
   const query = Object.keys(params).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&');
@@ -45,32 +53,56 @@ function decodePolyline(source) {
 function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(1) + ' km' : meters + ' m'; }
 function formatDuration(seconds) { return Math.max(1, Math.round(seconds / 60)) + ' 分钟'; }
 
-async function getRoute(start, end, policy) {
-  const data = await request('/ws/direction/v1/driving', {
-    from: start.latitude + ',' + start.longitude,
-    to: end.latitude + ',' + end.longitude,
-    policy: policy.key,
-    key: MAP_KEY
-  });
-  const route = data.result && data.result.routes && data.result.routes[0];
-  if (!route) throw new Error('未找到' + policy.name);
+function buildRoute(route, name, id) {
   return {
-    id: policy.key,
-    name: policy.name,
+    id,
+    name,
     distanceText: formatDistance(route.distance || 0),
     durationText: formatDuration(route.duration || 0),
     points: decodePolyline(route.polyline)
   };
 }
 
+async function getRoutes(start, end, mode, policy) {
+  const config = MODE_CONFIG[mode];
+  const params = {
+    from: start.latitude + ',' + start.longitude,
+    to: end.latitude + ',' + end.longitude,
+    key: MAP_KEY
+  };
+  if (policy) params.policy = policy.key;
+  const data = await request(config.path, params);
+  const source = (data.result && data.result.routes) || [];
+  return source.slice(0, 3).map((route, index) => {
+    const name = policy ? policy.name : (index === 0 ? '推荐路线' : '备选路线 ' + (index + 1));
+    const id = (policy ? policy.key : mode) + '_' + index;
+    return buildRoute(route, name, id);
+  });
+}
+
+function uniqueRoutes(routes) {
+  const seen = {};
+  return routes.filter(route => {
+    const signature = route.distanceText + '|' + route.durationText + '|' + route.points.length;
+    if (seen[signature]) return false;
+    seen[signature] = true;
+    return route.points.length > 1;
+  });
+}
+
 exports.main = async event => {
   if (!MAP_KEY) return { routes: [], message: '尚未配置地图服务 Key' };
   const startText = String(event.start || '').trim();
   const endText = String(event.end || '').trim();
+  const mode = MODE_CONFIG[event.mode] ? event.mode : 'walking';
   if (!startText || !endText) throw new Error('请填写起点和终点');
   const [start, end] = await Promise.all([locate(startText), locate(endText)]);
-  const results = await Promise.allSettled(POLICIES.map(policy => getRoute(start, end, policy)));
-  const routes = results.filter(item => item.status === 'fulfilled' && item.value.points.length > 1).map(item => item.value);
+  const config = MODE_CONFIG[mode];
+  const results = await Promise.allSettled(config.policies.map(policy => getRoutes(start, end, mode, policy)));
+  const routes = uniqueRoutes(results
+    .filter(item => item.status === 'fulfilled')
+    .reduce((list, item) => list.concat(item.value), []))
+    .slice(0, 3);
   if (!routes.length) throw new Error('未能找到可用路线');
-  return { start, end, routes };
+  return { start, end, mode, modeName: config.name, routes };
 };

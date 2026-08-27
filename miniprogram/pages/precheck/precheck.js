@@ -13,19 +13,8 @@ Page({
     gears: mock.GEARS,
     overnights: ['当日往返', '户外过夜', '室内住宿'],
     monthIndex: -1,
-    routePreview: { summary: '', insects: [] },
-    routeLoading: false,
-    routeMessage: '',
-    routeOptions: [],
-    selectedRouteIndex: 0,
-    routeMarkers: [],
-    routePolylines: [],
-    mapLatitude: 30.2741,
-    mapLongitude: 120.1551,
-    mapScale: 12,
+    selectedRoute: null,
     form: {
-      routeStart: '',
-      routeEnd: '',
       regionCodes: [],
       month: '',
       activityType: '',
@@ -40,90 +29,17 @@ Page({
     this.toggleArray('regionCodes', e.currentTarget.dataset.v);
   },
 
+  onShow() {
+    this.setData({ selectedRoute: wx.getStorageSync('selectedRoutePlan') || null });
+  },
+
+  goRoutePlan() {
+    wx.navigateTo({ url: '/pages/route-plan/route-plan' });
+  },
+
   onMonthChange(e) {
-    const month = this.data.months[e.detail.value];
-    const form = Object.assign({}, this.data.form, { month });
-    this.setData({
-      monthIndex: Number(e.detail.value),
-      'form.month': month,
-      routePreview: precheckRules.getRouteInsects(form)
-    });
-  },
-
-  onRouteStartInput(e) {
-    const routeStart = String(e.detail.value || '').trim();
-    const form = Object.assign({}, this.data.form, { routeStart });
-    this.setData({
-      'form.routeStart': routeStart,
-      routePreview: precheckRules.getRouteInsects(form),
-      routeOptions: [], routePolylines: [], routeMarkers: [], routeMessage: ''
-    });
-  },
-
-  onRouteEndInput(e) {
-    const routeEnd = String(e.detail.value || '').trim();
-    const form = Object.assign({}, this.data.form, { routeEnd });
-    this.setData({
-      'form.routeEnd': routeEnd,
-      routePreview: precheckRules.getRouteInsects(form),
-      routeOptions: [], routePolylines: [], routeMarkers: [], routeMessage: ''
-    });
-  },
-
-  planRoute() {
-    const form = this.data.form;
-    if (!form.routeStart || !form.routeEnd || this.data.routeLoading) return;
-    this.setData({ routeLoading: true, routeMessage: '', routeOptions: [], routePolylines: [] });
-    wx.cloud.callFunction({
-      name: 'routePlan',
-      data: { start: form.routeStart, end: form.routeEnd },
-      success: result => {
-        const data = result && result.result;
-        if (!data || !data.routes || !data.routes.length) {
-          this.setData({ routeLoading: false, routeMessage: (data && data.message) || '未找到可用路线' });
-          return;
-        }
-        this.applyRoutes(data);
-      },
-      fail: error => {
-        this.setData({ routeLoading: false, routeMessage: (error && error.errMsg) || '路线规划失败，请稍后重试。' });
-      }
-    });
-  },
-
-  applyRoutes(data) {
-    const colors = ['#2E7D5B', '#77B997', '#B2D9C3'];
-    const routes = data.routes.slice(0, 3);
-    const routePolylines = routes.map((route, index) => ({
-      points: route.points,
-      color: colors[index],
-      width: index === 0 ? 8 : 5,
-      borderColor: '#FFFFFF',
-      borderWidth: 1
-    }));
-    this.setData({
-      routeLoading: false,
-      routeMessage: '已生成 ' + routes.length + ' 条绿色路线，点击下方路线可高亮查看。',
-      routeOptions: routes,
-      selectedRouteIndex: 0,
-      routePolylines,
-      routeMarkers: [
-        { id: 1, latitude: data.start.latitude, longitude: data.start.longitude, title: '起点：' + this.data.form.routeStart, width: 28, height: 36 },
-        { id: 2, latitude: data.end.latitude, longitude: data.end.longitude, title: '终点：' + this.data.form.routeEnd, width: 28, height: 36 }
-      ],
-      mapLatitude: (data.start.latitude + data.end.latitude) / 2,
-      mapLongitude: (data.start.longitude + data.end.longitude) / 2,
-      mapScale: 11
-    });
-  },
-
-  selectRoute(e) {
-    const selectedRouteIndex = Number(e.currentTarget.dataset.index);
-    const routePolylines = this.data.routePolylines.map((line, index) => Object.assign({}, line, {
-      color: index === selectedRouteIndex ? '#2E7D5B' : '#9BCDB5',
-      width: index === selectedRouteIndex ? 9 : 4
-    }));
-    this.setData({ selectedRouteIndex, routePolylines });
+    this.setData({ monthIndex: Number(e.detail.value) });
+    this.setData({ 'form.month': this.data.months[e.detail.value] });
   },
 
   onActivityTap(e) {
@@ -162,10 +78,7 @@ Page({
     } else {
       arr.push(v);
     }
-    const nextForm = Object.assign({}, this.data.form, { [key]: arr });
-    const data = { ['form.' + key]: arr };
-    if (key === 'habitatTags') data.routePreview = precheckRules.getRouteInsects(nextForm);
-    this.setData(data);
+    this.setData({ ['form.' + key]: arr });
   },
 
   onShareAppMessage() {},
@@ -179,6 +92,17 @@ Page({
     const rule = precheckRules.evaluatePlan(form);
     const timestamp = Date.now();
     const destinationName = form.regionCodes.join('、');
+    const selectedRoute = this.data.selectedRoute;
+    const routeSummary = selectedRoute ? {
+      id: selectedRoute.id,
+      startName: selectedRoute.startName,
+      endName: selectedRoute.endName,
+      mode: selectedRoute.mode,
+      modeName: selectedRoute.modeName,
+      routeName: selectedRoute.routeName,
+      distanceText: selectedRoute.distanceText,
+      durationText: selectedRoute.durationText
+    } : null;
     const plan = Object.assign({}, form, {
       id: 'plan_' + timestamp,
       schemaVersion: planUtils.PLAN_SCHEMA_VERSION,
@@ -189,6 +113,7 @@ Page({
       riskTags: rule.riskTags,
       matchedRules: rule.matchedRules,
       ruleSnapshot: rule,
+      routePlan: routeSummary,
       status: '进行中',
       createdAtTimestamp: timestamp,
       updatedAtTimestamp: timestamp

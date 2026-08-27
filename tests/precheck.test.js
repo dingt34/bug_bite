@@ -80,9 +80,4 @@ const farming = precheck.evaluatePlan(plan({ activityType: '农事/采摘', habi
 assert.ok(farming.riskTags.includes('植被接触'));
 assert.ok(farming.checklist.includes('准备手套'));
 
-const routePreview = precheck.getRouteInsects({ routeStart: '浙江大学玉泉校区', routeEnd: '西湖', month: '8月', habitatTags: ['水边/湿地'] });
-assert.strictEqual(routePreview.summary, '路线：浙江大学玉泉校区 → 西湖 · 8月');
-assert.ok(routePreview.insects.some(item => item.name === '蚊虫'));
-assert.ok(routePreview.insects.some(item => item.name === '蠓虫'));
-
 console.log('precheck tests passed');

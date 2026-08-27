@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="card form-card">
+    <view class="card-title">规划本次出行路线</view>
+    <view class="form-tip">可在出发前输入任意具体地点，路线结果用于完善行前计划。</view>
+
+    <view class="place-row">
+      <view class="place-dot start-dot"></view>
+      <view class="place-field">
+        <view class="field-label">起点</view>
+        <input class="place-input" value="{{form.startName}}" placeholder="如：浙江大学玉泉校区" maxlength="40" bindinput="onStartInput" />
+      </view>
+    </view>
+    <view class="place-line"></view>
+    <view class="place-row">
+      <view class="place-dot end-dot"></view>
+      <view class="place-field">
+        <view class="field-label">终点</view>
+        <input class="place-input" value="{{form.endName}}" placeholder="如：西湖景区" maxlength="40" bindinput="onEndInput" />
+      </view>
+    </view>
+    <button class="swap-button" bindtap="swapPlaces">⇅ 交换起终点</button>
+
+    <view class="mode-title">出行方式</view>
+    <view class="mode-list">
+      <view class="mode-item {{form.mode === item.key ? 'active' : ''}}" wx:for="{{modes}}" wx:key="key" bindtap="selectMode" data-mode="{{item.key}}">{{item.name}}</view>
+    </view>
+    <button class="plan-button" loading="{{loading}}" disabled="{{!form.startName || !form.endName || loading}}" bindtap="planRoute">{{loading ? '正在规划…' : '查看备选路线'}}</button>
+    <view class="message {{routes.length ? 'success' : ''}}" wx:if="{{message}}">{{message}}</view>
+  </view>
+
+  <view class="card" wx:if="{{routes.length}}">
+    <map id="routeMap" class="route-map" latitude="{{mapLatitude}}" longitude="{{mapLongitude}}" scale="{{mapScale}}" polyline="{{polylines}}"></map>
+    <view class="map-legend"><text class="legend-selected"></text>当前路线 <text class="legend-other"></text>其他路线</view>
+
+    <view class="route-option {{selectedIndex === index ? 'selected' : ''}}" wx:for="{{routes}}" wx:key="id" bindtap="selectRoute" data-index="{{index}}">
+      <view>
+        <view class="route-name">{{item.name}}</view>
+        <view class="route-meta">{{item.distanceText}} · {{item.durationText}}</view>
+      </view>
+      <view class="route-state">{{selectedIndex === index ? '已选择' : '选择'}}</view>
+    </view>
+    <button class="confirm-button" bindtap="confirmRoute">确认路线并返回行前准备</button>
+    <view class="route-notice">路线由地图服务生成，仅供行前规划参考；实际出行请遵守交通规则和现场指引。</view>
+  </view>
+</view>
