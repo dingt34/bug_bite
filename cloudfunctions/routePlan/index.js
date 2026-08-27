@@ -1,5 +1,6 @@
 const cloud = require('wx-server-sdk');
 const https = require('https');
+const { readableError } = require('./error-message');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
@@ -27,8 +28,13 @@ function request(path, params) {
       response.on('end', () => {
         try {
           const data = JSON.parse(body);
-          if (data.status !== 0) reject(new Error(data.message || '地图服务请求失败'));
-          else resolve(data);
+          if (data.status !== 0) {
+            const error = new Error(data.message || '地图服务请求失败');
+            error.mapStatus = data.status;
+            error.httpStatus = response.statusCode;
+            error.isMapProviderError = true;
+            reject(error);
+          } else resolve(data);
         } catch (error) { reject(error); }
       });
     }).on('error', reject);
@@ -90,15 +96,6 @@ function uniqueRoutes(routes) {
   });
 }
 
-function readableError(error) {
-  const message = String((error && error.message) || error || '');
-  if (message.indexOf('WebserviceAPI') > -1) return '腾讯地图 Key 尚未开启 WebService API。';
-  if (message.indexOf('未找到地点') > -1) return message;
-  if (message.indexOf('未能找到可用路线') > -1) return '未找到可用路线，请补充城市或区县名称，或更换出行方式。';
-  if (message.indexOf('额度') > -1 || message.indexOf('频率') > -1) return '地图服务调用已达到限制，请稍后重试。';
-  return '地图服务请求失败，请检查路线云函数配置。';
-}
-
 async function planRoute(event) {
   if (!MAP_KEY) return { routes: [], message: '尚未配置地图服务 Key' };
   const startText = String(event.start || '').trim();
@@ -112,7 +109,11 @@ async function planRoute(event) {
     .filter(item => item.status === 'fulfilled')
     .reduce((list, item) => list.concat(item.value), []))
     .slice(0, 3);
-  if (!routes.length) throw new Error('未能找到可用路线');
+  if (!routes.length) {
+    const failedRequest = results.find(item => item.status === 'rejected');
+    if (failedRequest) throw failedRequest.reason;
+    throw new Error('未能找到可用路线');
+  }
   return { start, end, mode, modeName: config.name, routes };
 }
 
@@ -121,6 +122,10 @@ exports.main = async event => {
     return await planRoute(event || {});
   } catch (error) {
     console.error('routePlan failed:', error);
-    return { routes: [], message: readableError(error) };
+    return {
+      routes: [],
+      message: readableError(error, MAP_KEY),
+      serviceStatus: error && error.mapStatus !== undefined ? error.mapStatus : null
+    };
   }
 };
