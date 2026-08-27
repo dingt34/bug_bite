@@ -2,13 +2,24 @@
 .form-card { position: relative; }
 .form-tip { margin: 8rpx 0 24rpx; color: #7D8983; font-size: 24rpx; line-height: 1.55; }
 .place-row { display: flex; align-items: center; }
+.place-block { position: relative; }
 .place-dot { flex: none; width: 16rpx; height: 16rpx; margin-right: 18rpx; border-radius: 50%; }
 .start-dot { background: #2E7D5B; }
+.waypoint-dot { background: #E2A43C; }
 .end-dot { background: #E86F51; }
 .place-field { flex: 1; padding: 14rpx 18rpx; background: #F7F8F9; border-radius: 12rpx; }
 .field-label { color: #728078; font-size: 22rpx; }
 .place-input { height: 48rpx; color: #26342D; font-size: 28rpx; }
+.input-with-action { display: flex; align-items: center; }
+.waypoint-input { flex: 1; min-width: 0; }
+.clear-waypoint { flex: none; padding-left: 18rpx; color: #8A9690; font-size: 22rpx; }
 .place-line { width: 2rpx; height: 22rpx; margin: 2rpx 0 2rpx 7rpx; background: #B8C8BF; }
+.suggest-panel { position: absolute; z-index: 20; top: calc(100% + 6rpx); right: 0; left: 34rpx; max-height: 430rpx; overflow-y: auto; background: #FFFFFF; border: 2rpx solid #DCE8E1; border-radius: 12rpx; box-shadow: 0 10rpx 30rpx rgba(28, 69, 49, .14); }
+.suggest-item { padding: 18rpx 20rpx; border-bottom: 1rpx solid #EDF2EF; }
+.suggest-item:last-child { border-bottom: 0; }
+.suggest-title { color: #26342D; font-size: 26rpx; font-weight: 600; }
+.suggest-address { margin-top: 5rpx; overflow: hidden; color: #849089; font-size: 21rpx; text-overflow: ellipsis; white-space: nowrap; }
+.suggest-status { padding: 20rpx; color: #849089; font-size: 23rpx; text-align: center; }
 .swap-button { margin: 18rpx 0 0; padding: 0; background: transparent; color: #2E7D5B; font-size: 24rpx; line-height: 1.8; text-align: right; }
 .swap-button::after { border: 0; }
 .mode-title { margin-top: 24rpx; color: #26342D; font-size: 27rpx; font-weight: 600; }

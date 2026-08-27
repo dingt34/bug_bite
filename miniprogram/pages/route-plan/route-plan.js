@@ -3,7 +3,12 @@ const routeUtils = require('../../utils/route-plan.js');
 Page({
   data: {
     modes: routeUtils.MODES,
-    form: { startName: '', endName: '', mode: 'walking' },
+    form: { startName: '', waypointName: '', endName: '', mode: 'walking' },
+    selectedPlaces: { startName: null, waypointName: null, endName: null },
+    activeSuggestKey: '',
+    suggestions: [],
+    suggestLoading: false,
+    suggestMessage: '',
     loading: false,
     message: '',
     routes: [],
@@ -18,8 +23,18 @@ Page({
     const saved = wx.getStorageSync('selectedRoutePlan');
     if (!saved) return;
     this.setData({
-      form: { startName: saved.startName || '', endName: saved.endName || '', mode: saved.mode || 'walking' }
+      form: {
+        startName: saved.startName || '',
+        waypointName: saved.waypointName || '',
+        endName: saved.endName || '',
+        mode: saved.mode || 'walking'
+      }
     });
+  },
+
+  onUnload() {
+    clearTimeout(this.suggestTimer);
+    clearTimeout(this.hideSuggestTimer);
   },
 
   onStartInput(e) {
@@ -30,9 +45,89 @@ Page({
     this.updateInput('endName', e.detail.value);
   },
 
+  onWaypointInput(e) {
+    this.updateInput('waypointName', e.detail.value);
+  },
+
   updateInput(key, value) {
+    const text = routeUtils.normalizeText(value);
     this.setData({
-      ['form.' + key]: routeUtils.normalizeText(value),
+      ['form.' + key]: text,
+      ['selectedPlaces.' + key]: null,
+      routes: [], polylines: [], message: ''
+    });
+    this.scheduleSuggestions(key, text);
+  },
+
+  onPlaceFocus(e) {
+    const key = e.currentTarget.dataset.key;
+    this.scheduleSuggestions(key, this.data.form[key]);
+  },
+
+  onPlaceBlur() {
+    clearTimeout(this.hideSuggestTimer);
+    this.hideSuggestTimer = setTimeout(() => {
+      this.setData({ activeSuggestKey: '', suggestions: [], suggestMessage: '' });
+    }, 180);
+  },
+
+  scheduleSuggestions(key, keyword) {
+    clearTimeout(this.suggestTimer);
+    this.suggestSequence = (this.suggestSequence || 0) + 1;
+    const sequence = this.suggestSequence;
+    if (!keyword || keyword.length < 2) {
+      this.setData({ activeSuggestKey: '', suggestions: [], suggestLoading: false, suggestMessage: '' });
+      return;
+    }
+    this.setData({ activeSuggestKey: key, suggestions: [], suggestLoading: true, suggestMessage: '' });
+    this.suggestTimer = setTimeout(() => {
+      if (!wx.cloud || typeof wx.cloud.callFunction !== 'function') {
+        this.setData({ suggestLoading: false, suggestMessage: '当前未连接项目云环境。' });
+        return;
+      }
+      wx.cloud.callFunction({
+        name: 'routePlan',
+        data: { action: 'suggest', keyword },
+        success: result => {
+          if (sequence !== this.suggestSequence) return;
+          const data = (result && result.result) || {};
+          this.setData({
+            suggestions: data.suggestions || [],
+            suggestLoading: false,
+            suggestMessage: data.message || (!(data.suggestions || []).length ? '没有找到匹配地点' : '')
+          });
+        },
+        fail: () => {
+          if (sequence !== this.suggestSequence) return;
+          this.setData({ suggestions: [], suggestLoading: false, suggestMessage: '地点候选暂时不可用，可继续输入完整名称。' });
+        }
+      });
+    }, 350);
+  },
+
+  selectSuggestion(e) {
+    clearTimeout(this.hideSuggestTimer);
+    const key = e.currentTarget.dataset.key;
+    const suggestion = this.data.suggestions[Number(e.currentTarget.dataset.index)];
+    if (!suggestion) return;
+    this.suggestSequence = (this.suggestSequence || 0) + 1;
+    this.setData({
+      ['form.' + key]: suggestion.title,
+      ['selectedPlaces.' + key]: suggestion,
+      activeSuggestKey: '',
+      suggestions: [],
+      suggestLoading: false,
+      suggestMessage: '',
+      routes: [], polylines: [], message: ''
+    });
+  },
+
+  clearWaypoint() {
+    this.suggestSequence = (this.suggestSequence || 0) + 1;
+    this.setData({
+      'form.waypointName': '',
+      'selectedPlaces.waypointName': null,
+      activeSuggestKey: '', suggestions: [], suggestMessage: '',
       routes: [], polylines: [], message: ''
     });
   },
@@ -41,6 +136,10 @@ Page({
     const form = this.data.form;
     this.setData({
       form: Object.assign({}, form, { startName: form.endName, endName: form.startName }),
+      selectedPlaces: Object.assign({}, this.data.selectedPlaces, {
+        startName: this.data.selectedPlaces.endName,
+        endName: this.data.selectedPlaces.startName
+      }),
       routes: [], polylines: [], message: ''
     });
   },
@@ -62,7 +161,15 @@ Page({
     this.setData({ loading: true, message: '', routes: [], polylines: [] });
     wx.cloud.callFunction({
       name: 'routePlan',
-      data: { start: form.startName, end: form.endName, mode: form.mode },
+      data: {
+        start: form.startName,
+        waypoint: form.waypointName,
+        end: form.endName,
+        mode: form.mode,
+        startPlace: this.data.selectedPlaces.startName,
+        waypointPlace: this.data.selectedPlaces.waypointName,
+        endPlace: this.data.selectedPlaces.endName
+      },
       success: result => {
         const data = result && result.result;
         if (!data || !data.routes || !data.routes.length) {

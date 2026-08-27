@@ -3,19 +3,60 @@
     <view class="card-title">规划本次出行路线</view>
     <view class="form-tip">可在出发前输入任意具体地点，路线结果用于完善行前计划。</view>
 
-    <view class="place-row">
-      <view class="place-dot start-dot"></view>
-      <view class="place-field">
-        <view class="field-label">起点</view>
-        <input class="place-input" value="{{form.startName}}" placeholder="如：浙江大学玉泉校区" maxlength="40" bindinput="onStartInput" />
+    <view class="place-block">
+      <view class="place-row">
+        <view class="place-dot start-dot"></view>
+        <view class="place-field">
+          <view class="field-label">起点</view>
+          <input class="place-input" value="{{form.startName}}" placeholder="输入两个字即可选择地点" maxlength="40" bindinput="onStartInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="startName" />
+        </view>
+      </view>
+      <view class="suggest-panel" wx:if="{{activeSuggestKey === 'startName'}}">
+        <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view>
+        <view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
+        <view class="suggest-item" wx:for="{{suggestions}}" wx:key="id" catchtap="selectSuggestion" data-key="startName" data-index="{{index}}">
+          <view class="suggest-title">{{item.title}}</view>
+          <view class="suggest-address">{{item.city}}{{item.district}} · {{item.address}}</view>
+        </view>
       </view>
     </view>
     <view class="place-line"></view>
-    <view class="place-row">
-      <view class="place-dot end-dot"></view>
-      <view class="place-field">
-        <view class="field-label">终点</view>
-        <input class="place-input" value="{{form.endName}}" placeholder="如：西湖景区" maxlength="40" bindinput="onEndInput" />
+    <view class="place-block">
+      <view class="place-row">
+        <view class="place-dot waypoint-dot"></view>
+        <view class="place-field">
+          <view class="field-label">途经点（选填，可生成对比路线）</view>
+          <view class="input-with-action">
+            <input class="place-input waypoint-input" value="{{form.waypointName}}" placeholder="如：黄龙体育中心" maxlength="40" bindinput="onWaypointInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="waypointName" />
+            <view class="clear-waypoint" wx:if="{{form.waypointName}}" catchtap="clearWaypoint">清除</view>
+          </view>
+        </view>
+      </view>
+      <view class="suggest-panel" wx:if="{{activeSuggestKey === 'waypointName'}}">
+        <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view>
+        <view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
+        <view class="suggest-item" wx:for="{{suggestions}}" wx:key="id" catchtap="selectSuggestion" data-key="waypointName" data-index="{{index}}">
+          <view class="suggest-title">{{item.title}}</view>
+          <view class="suggest-address">{{item.city}}{{item.district}} · {{item.address}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="place-line"></view>
+    <view class="place-block">
+      <view class="place-row">
+        <view class="place-dot end-dot"></view>
+        <view class="place-field">
+          <view class="field-label">终点</view>
+          <input class="place-input" value="{{form.endName}}" placeholder="输入两个字即可选择地点" maxlength="40" bindinput="onEndInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="endName" />
+        </view>
+      </view>
+      <view class="suggest-panel" wx:if="{{activeSuggestKey === 'endName'}}">
+        <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view>
+        <view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
+        <view class="suggest-item" wx:for="{{suggestions}}" wx:key="id" catchtap="selectSuggestion" data-key="endName" data-index="{{index}}">
+          <view class="suggest-title">{{item.title}}</view>
+          <view class="suggest-address">{{item.city}}{{item.district}} · {{item.address}}</view>
+        </view>
       </view>
     </view>
     <button class="swap-button" bindtap="swapPlaces">⇅ 交换起终点</button>
@@ -40,6 +81,6 @@
       <view class="route-state">{{selectedIndex === index ? '已选择' : '选择'}}</view>
     </view>
     <button class="confirm-button" bindtap="confirmRoute">确认路线并返回行前准备</button>
-    <view class="route-notice">路线由地图服务生成，仅供行前规划参考；实际出行请遵守交通规则和现场指引。</view>
+    <view class="route-notice">驾车最多提供三条地图备选方案；步行与骑行在填写途经点后提供“途经路线”和“直接路线”对比。路线仅供行前规划参考。</view>
   </view>
 </view>

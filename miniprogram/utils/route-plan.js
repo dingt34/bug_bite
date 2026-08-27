@@ -24,6 +24,7 @@ function buildSelectedRoute(route, context, now) {
   return {
     id: 'route_' + (now || Date.now()),
     startName: normalizeText(context.startName),
+    waypointName: normalizeText(context.waypointName),
     endName: normalizeText(context.endName),
     mode: mode.key,
     modeName: mode.name,
