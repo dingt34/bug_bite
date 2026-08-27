@@ -40,6 +40,7 @@ function getErrorMessage(error) {
   const text = String((error && (error.message || error.errMsg)) || error || '');
   if (text.indexOf('FunctionName') > -1 || text.indexOf('FUNCTION_NOT_FOUND') > -1) return '路线服务尚未部署，请联系项目管理员。';
   if (text.indexOf('WebserviceAPI') > -1) return '地图服务权限尚未开启，请联系项目管理员。';
+  if (text.indexOf('functions execute fail') > -1 || text.indexOf('FUNCTIONS_EXECUTE_FAIL') > -1) return '路线云函数执行失败，请重新部署 routePlan 后重试。';
   if (text.indexOf('未找到地点') > -1) {
     const match = text.match(/未找到地点[^\n]*/);
     return (match && match[0]) || '未找到输入的地点，请补充城市或区县名称。';

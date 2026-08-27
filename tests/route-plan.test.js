@@ -23,5 +23,6 @@ assert.strictEqual(selected.points.length, 1);
 
 assert.ok(route.getErrorMessage({ errMsg: 'FUNCTION_NOT_FOUND' }).includes('尚未部署'));
 assert.ok(route.getErrorMessage({ errMsg: 'WebserviceAPI' }).includes('权限'));
+assert.ok(route.getErrorMessage({ errMsg: 'FUNCTIONS_EXECUTE_FAIL' }).includes('重新部署'));
 
 console.log('route plan tests passed');

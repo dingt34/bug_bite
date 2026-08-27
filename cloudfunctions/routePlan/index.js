@@ -90,7 +90,16 @@ function uniqueRoutes(routes) {
   });
 }
 
-exports.main = async event => {
+function readableError(error) {
+  const message = String((error && error.message) || error || '');
+  if (message.indexOf('WebserviceAPI') > -1) return '腾讯地图 Key 尚未开启 WebService API。';
+  if (message.indexOf('未找到地点') > -1) return message;
+  if (message.indexOf('未能找到可用路线') > -1) return '未找到可用路线，请补充城市或区县名称，或更换出行方式。';
+  if (message.indexOf('额度') > -1 || message.indexOf('频率') > -1) return '地图服务调用已达到限制，请稍后重试。';
+  return '地图服务请求失败，请检查路线云函数配置。';
+}
+
+async function planRoute(event) {
   if (!MAP_KEY) return { routes: [], message: '尚未配置地图服务 Key' };
   const startText = String(event.start || '').trim();
   const endText = String(event.end || '').trim();
@@ -105,4 +114,13 @@ exports.main = async event => {
     .slice(0, 3);
   if (!routes.length) throw new Error('未能找到可用路线');
   return { start, end, mode, modeName: config.name, routes };
+}
+
+exports.main = async event => {
+  try {
+    return await planRoute(event || {});
+  } catch (error) {
+    console.error('routePlan failed:', error);
+    return { routes: [], message: readableError(error) };
+  }
 };
