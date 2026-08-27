@@ -1,12 +1,14 @@
 const aiService = require('../../utils/ai-service.js');
 const aiContext = require('../../utils/ai-context.js');
+const markdown = require('../../utils/markdown.js');
 const privacy = require('../../utils/privacy.js');
 
 function welcomeMessage() {
   return {
     id: 'welcome',
     role: 'assistant',
-    content: '你好，我可以根据你的描述、图片和已有记录整理安全建议。请先说明发生了什么；如有呼吸困难、意识异常或口唇舌喉肿胀，请立即呼叫120。'
+    content: '你好，我可以根据你的描述、图片和已有记录整理安全建议。请先说明发生了什么；如有呼吸困难、意识异常或口唇舌喉肿胀，请立即呼叫120。',
+    markdownHtml: markdown.renderMarkdown('你好，我可以根据你的描述、图片和已有记录整理安全建议。请先说明发生了什么；如有呼吸困难、意识异常或口唇舌喉肿胀，请立即呼叫120。')
   };
 }
 
@@ -136,6 +138,7 @@ Page({
       { plans, events },
       { plans: plans.length, events: events.length, maxLength: 6000 }
     );
+    const recordCards = aiContext.buildRecordCards({ plans, events });
     if (context.empty) {
       this.closeRecordSelector();
       wx.showToast({ title: '所选记录已不存在，请重新选择', icon: 'none' });
@@ -144,7 +147,8 @@ Page({
     this.setData({ recordSelectorVisible: false });
     this.sendMessage({
       requestText: '请结合以下由我选择的个人记录，指出当前最值得关注的风险、准备建议和需要复查的事项。\n\n' + context.text,
-      displayText: '已发送所选记录（' + context.planCount + ' 个计划，' + context.eventCount + ' 条事件）'
+      displayText: '请结合这些记录给出建议',
+      recordCards
     });
   },
 
@@ -183,6 +187,7 @@ Page({
         role: 'user',
         content: settings.displayText || requestText,
         requestContent: requestText,
+        recordCards: (settings.recordCards || []).map(item => Object.assign({}, item)),
         images: images.map(item => ({ kind: item.kind, label: item.label, path: item.path }))
       },
       { id: assistantId, role: 'assistant', content: '', loading: true }
@@ -231,7 +236,12 @@ Page({
 
   updateAssistantMessage(id, content, loading, error) {
     const messages = this.data.messages.map(item => item.id === id
-      ? Object.assign({}, item, { content, loading: !!loading, error: !!error })
+      ? Object.assign({}, item, {
+        content,
+        markdownHtml: markdown.renderMarkdown(content),
+        loading: !!loading,
+        error: !!error
+      })
       : item
     );
     this.setData({ messages, scrollIntoView: 'message-' + id });

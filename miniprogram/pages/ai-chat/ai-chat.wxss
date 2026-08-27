@@ -141,6 +141,114 @@
   font-size: 18rpx;
   text-align: center;
 }
+.message-records {
+  margin-bottom: 10rpx;
+}
+.message-record-card {
+  min-width: 360rpx;
+  margin-bottom: 10rpx;
+  padding: 18rpx 20rpx;
+  border: 1rpx solid #CFE0D7;
+  border-left: 7rpx solid #2E7D5B;
+  border-radius: 18rpx;
+  background: #FFFFFF;
+  box-shadow: 0 4rpx 14rpx rgba(35, 74, 56, 0.07);
+  box-sizing: border-box;
+}
+.message-record-card:last-child {
+  margin-bottom: 0;
+}
+.record-event {
+  border-color: #E5DCC1;
+  border-left-color: #B78929;
+}
+.record-card-head {
+  display: flex;
+  align-items: center;
+}
+.record-card-badge {
+  flex-shrink: 0;
+  margin-right: 10rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 12rpx;
+  background: #E8F3ED;
+  color: #2E7D5B;
+  font-size: 17rpx;
+  font-weight: 600;
+}
+.record-event .record-card-badge {
+  background: #FFF5DC;
+  color: #926A19;
+}
+.record-card-title {
+  overflow: hidden;
+  color: #2E3A34;
+  font-size: 24rpx;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.record-card-subtitle {
+  margin-top: 10rpx;
+  color: #738078;
+  font-size: 20rpx;
+}
+.record-card-detail {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 8rpx;
+  color: #59675F;
+  font-size: 20rpx;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.markdown-content {
+  line-height: 1.7;
+  word-break: break-word;
+}
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  margin: 12rpx 0 8rpx;
+  color: #24352D;
+  font-weight: 700;
+}
+.markdown-content h1 { font-size: 31rpx; }
+.markdown-content h2 { font-size: 28rpx; }
+.markdown-content h3 { font-size: 26rpx; }
+.markdown-content p { margin: 7rpx 0; }
+.markdown-content ul,
+.markdown-content ol { margin: 8rpx 0; padding-left: 34rpx; }
+.markdown-content li { margin: 5rpx 0; }
+.markdown-content blockquote {
+  margin: 10rpx 0;
+  padding: 10rpx 14rpx;
+  border-left: 5rpx solid #88B7A1;
+  background: #F1F7F4;
+  color: #53645B;
+}
+.markdown-content code {
+  padding: 2rpx 7rpx;
+  border-radius: 7rpx;
+  background: #EEF2F0;
+  color: #8B4C2E;
+  font-family: monospace;
+}
+.markdown-content pre {
+  overflow-x: auto;
+  margin: 10rpx 0;
+  padding: 14rpx;
+  border-radius: 12rpx;
+  background: #25312B;
+  color: #F4F7F5;
+  white-space: pre-wrap;
+}
+.markdown-content pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
 .scroll-spacer {
   height: 30rpx;
 }

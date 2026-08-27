@@ -19,8 +19,19 @@
             <view class="message-image-label">{{item.label}}</view>
           </view>
         </view>
+        <view class="message-records" wx:if="{{item.recordCards && item.recordCards.length}}">
+          <view class="message-record-card record-{{record.kind}}" wx:for="{{item.recordCards}}" wx:for-item="record" wx:key="key">
+            <view class="record-card-head">
+              <text class="record-card-badge">{{record.badge}}</text>
+              <text class="record-card-title">{{record.title}}</text>
+            </view>
+            <view class="record-card-subtitle">{{record.subtitle}}</view>
+            <view class="record-card-detail" wx:if="{{record.detail}}">{{record.detail}}</view>
+          </view>
+        </view>
         <view class="message-bubble {{item.error ? 'bubble-error' : ''}}">
           <view wx:if="{{item.loading && !item.content}}" class="typing"><text></text><text></text><text></text></view>
+          <rich-text wx:elif="{{item.role === 'assistant'}}" class="markdown-content" nodes="{{item.markdownHtml}}" selectable></rich-text>
           <text wx:else selectable>{{item.content}}</text>
         </view>
         <view class="ai-label" wx:if="{{item.role === 'assistant' && item.id !== 'welcome'}}">AI生成内容，请结合危险信号判断</view>

@@ -18,7 +18,7 @@ global.wx = {
     init() {},
     deleteFile() { return Promise.resolve({ fileList: [] }); },
     callFunction() {
-      return Promise.resolve({ result: { ok: true, text: '建议先观察危险信号。' } });
+      return Promise.resolve({ result: { ok: true, text: '## 建议\n\n- 观察危险信号\n- 记录变化' } });
     }
   }
 };
@@ -38,7 +38,8 @@ const page = Object.assign({}, pageDefinition, {
   page.sendMessage();
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.strictEqual(page.data.sending, false);
-  assert.strictEqual(page.data.messages.at(-1).content, '建议先观察危险信号。');
+  assert.ok(page.data.messages.at(-1).content.includes('观察危险信号'));
+  assert.ok(page.data.messages.at(-1).markdownHtml.includes('<h2>建议</h2>'));
 
   const previousCount = page.data.messages.length;
   page.sendRecords();
@@ -51,9 +52,11 @@ const page = Object.assign({}, pageDefinition, {
   page.confirmSendRecords();
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.ok(page.data.messages.length > previousCount);
-  const selectedMessage = page.data.messages.find(item => String(item.content).includes('已发送所选记录'));
+  const selectedMessage = page.data.messages.find(item => item.recordCards && item.recordCards.length);
   assert.ok(selectedMessage);
-  assert.ok(selectedMessage.content.includes('0 个计划，1 条事件'));
+  assert.strictEqual(selectedMessage.recordCards.length, 1);
+  assert.strictEqual(selectedMessage.recordCards[0].badge, '接触事件');
+  assert.strictEqual(selectedMessage.recordCards[0].detail, '局部发红');
   assert.ok(selectedMessage.requestContent.includes('局部发红'));
   assert.ok(!selectedMessage.requestContent.includes('杭州'));
   assert.strictEqual(page.data.recordSelectorVisible, false);
