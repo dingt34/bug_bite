@@ -2,6 +2,15 @@
   <!-- 免责声明 -->
   <view class="disclaimer">💡 社群内容为个人经验分享，不构成医疗诊断，也不参与风险评分。</view>
 
+  <view class="social-entry" bindtap="goFriends">
+    <view class="social-icon">👥</view>
+    <view class="social-copy">
+      <view class="social-title">好友与私信</view>
+      <view class="social-sub">处理好友申请、查看私信和转发帖子</view>
+    </view>
+    <view class="social-arrow">›</view>
+  </view>
+
   <view class="search-box">
     <text class="search-icon">⌕</text>
     <input class="search-input" value="{{query}}" bindinput="onSearchInput" placeholder="搜索经历、地区、标签或发布者" confirm-type="search" />
@@ -47,7 +56,7 @@
       <view class="post-avatar">{{item.avatarText}}</view>
       <view class="post-meta">
         <view class="post-name">{{item.displayName}}</view>
-        <view class="post-time">{{item.time}}</view>
+        <view class="post-time">{{item.time}}{{item.edited ? ' · 已编辑' : ''}}</view>
       </view>
     </view>
     <view class="post-text">{{item.text}}</view>
@@ -75,6 +84,10 @@
       <view class="action" catchtap="goDetail" data-id="{{item.id}}">
         <text class="action-icon comment-icon">💬</text>
         <text class="action-num">{{item.commentCount}}</text>
+      </view>
+      <view class="action" catchtap="goDetail" data-id="{{item.id}}">
+        <text class="action-icon comment-icon">↗</text>
+        <text class="action-num">{{item.shareCount || 0}}</text>
       </view>
     </view>
   </view>

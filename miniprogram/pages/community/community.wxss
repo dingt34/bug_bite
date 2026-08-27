@@ -11,6 +11,20 @@
   padding: 18rpx 24rpx;
   margin-bottom: 24rpx;
 }
+.social-entry {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding: 20rpx 22rpx;
+  border-radius: 18rpx;
+  background: #FFFFFF;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.035);
+}
+.social-icon { width: 62rpx; height: 62rpx; margin-right: 16rpx; border-radius: 50%; background: var(--primary-light); font-size: 30rpx; line-height: 62rpx; text-align: center; }
+.social-copy { flex: 1; }
+.social-title { color: #304038; font-size: 27rpx; font-weight: 600; }
+.social-sub { color: #929D98; font-size: 21rpx; }
+.social-arrow { color: #A2ADA7; font-size: 40rpx; }
 .search-box {
   display: flex;
   align-items: center;
@@ -163,7 +177,7 @@
 .action {
   display: flex;
   align-items: center;
-  margin-right: 56rpx;
+  margin-right: 42rpx;
 }
 .action-icon {
   font-size: 34rpx;

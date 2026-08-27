@@ -153,6 +153,10 @@ Page({
     wx.navigateTo({ url: '/pages/post-publish/post-publish' });
   },
 
+  goFriends() {
+    wx.navigateTo({ url: '/pages/friends/friends' });
+  },
+
   goDetail(e) {
     wx.navigateTo({ url: '/pages/post-detail/post-detail?id=' + e.currentTarget.dataset.id });
   },

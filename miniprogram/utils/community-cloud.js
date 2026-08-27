@@ -59,6 +59,28 @@ function publish(wxApi, draft, profile) {
   });
 }
 
+function update(wxApi, postId, draft) {
+  let uploadedFileId = '';
+  const isNewUpload = draft.previewImage && draft.previewImage.indexOf('cloud://') !== 0;
+  return uploadImage(wxApi, draft.previewImage).then(fileId => {
+    if (isNewUpload) uploadedFileId = fileId;
+    return call(wxApi, 'updatePost', {
+      postId,
+      post: {
+        text: draft.text,
+        region: draft.region,
+        contactType: draft.contactType,
+        contactTypeName: draft.contactTypeName,
+        stage: draft.stage,
+        imageRefs: fileId ? [fileId] : []
+      }
+    });
+  }).catch(error => {
+    if (uploadedFileId) cloudService.deleteFiles(wxApi, [uploadedFileId]).catch(() => {});
+    throw error;
+  });
+}
+
 function toggleReaction(wxApi, postId, key) {
   return call(wxApi, 'toggleReaction', { postId, key });
 }
@@ -189,6 +211,7 @@ module.exports = {
   getFeed,
   getThread,
   publish,
+  update,
   toggleReaction,
   comment,
   deleteComment,

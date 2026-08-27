@@ -27,6 +27,7 @@ function decoratePost(post, reactions, now) {
   return Object.assign({}, post, {
     avatarText: post.avatarText || String(post.displayName || '匿').slice(0, 1),
     time: formatRelativeTime(post.createdAtTimestamp, post.time, now),
+    edited: !!post.updatedAtTimestamp && post.updatedAtTimestamp > (post.createdAtTimestamp || 0),
     liked: !!reaction.liked,
     collected: !!reaction.collected,
     likeCount: (post.likeCount || 0) + (reaction.liked ? 1 : 0),
@@ -34,8 +35,12 @@ function decoratePost(post, reactions, now) {
   });
 }
 
-function postHeat(post) {
-  return (post.likeCount || 0) * 2 + (post.collectCount || 0) * 3;
+function postHeat(post, now) {
+  const engagement = (post.likeCount || 0) * 2 +
+    (post.collectCount || 0) * 3 + (post.commentCount || 0) * 2;
+  if (!post.createdAtTimestamp) return engagement;
+  const ageHours = Math.max(0, ((now || Date.now()) - post.createdAtTimestamp) / (60 * 60 * 1000));
+  return (engagement + 1) / Math.pow(ageHours + 2, 1.15);
 }
 
 function matchesQuery(post, query) {
@@ -72,7 +77,8 @@ function listPosts(localPosts, demoPosts, reactions, filterMode, now, options) {
   if (settings.topic) posts = posts.filter(post => post.contactType === settings.topic);
   posts = posts.filter(post => matchesQuery(post, settings.query));
   if (settings.sortMode === 'hot') {
-    posts.sort((a, b) => postHeat(b) - postHeat(a) || (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+    posts.sort((a, b) => postHeat(b, now) - postHeat(a, now) ||
+      (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
   } else if (settings.sortMode === 'latest') {
     posts.sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
   }
@@ -96,6 +102,7 @@ function validatePost(input) {
   const text = String(input.text || '').trim();
   if (!text) return { valid: false, message: '请填写经历内容。' };
   if (text.length < 5) return { valid: false, message: '请至少填写 5 个字，说明发生了什么。' };
+  if (text.length > 500) return { valid: false, message: '经历内容不能超过 500 个字。' };
   if (!input.contactType) return { valid: false, message: '请选择接触类型。' };
   if (!input.stage) return { valid: false, message: '请选择当前阶段。' };
   return { valid: true, text };
@@ -153,7 +160,8 @@ function decorateComments(comments, now) {
 function decorateCloudPost(post, now) {
   return Object.assign({}, post, {
     avatarText: post.avatarText || String(post.displayName || '匿').slice(0, 1),
-    time: formatRelativeTime(post.createdAtTimestamp, post.time, now)
+    time: formatRelativeTime(post.createdAtTimestamp, post.time, now),
+    edited: !!post.updatedAtTimestamp && post.updatedAtTimestamp > (post.createdAtTimestamp || 0)
   });
 }
 

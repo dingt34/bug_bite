@@ -2,6 +2,26 @@
   padding: 24rpx 24rpx 60rpx;
 }
 
+.loading-page {
+  padding: 220rpx 40rpx;
+  color: #7C8983;
+  font-size: 26rpx;
+  text-align: center;
+}
+.draft-banner {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  padding: 18rpx 22rpx;
+  border-radius: 14rpx;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 23rpx;
+}
+.draft-clear {
+  font-weight: 600;
+}
+
 .optional {
   font-size: 22rpx;
   color: #B7C0C7;
@@ -50,6 +70,18 @@
 .preview {
   width: 100%;
   height: 100%;
+}
+.image-actions {
+  display: flex;
+  margin-top: 16rpx;
+  color: var(--primary);
+  font-size: 24rpx;
+}
+.image-actions text {
+  margin-right: 32rpx;
+}
+.image-remove {
+  color: var(--danger);
 }
 
 .chips {

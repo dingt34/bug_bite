@@ -16,8 +16,14 @@
       <view class="post-avatar">{{post.avatarText}}</view>
       <view class="post-meta">
         <view class="post-name">{{post.displayName}}</view>
-        <view class="post-time">{{post.time}}</view>
+        <view class="post-time">{{post.time}}{{post.edited ? ' · 已编辑' : ''}}</view>
       </view>
+    </view>
+    <view class="friend-strip" wx:if="{{authorCard && authorCard.status !== 'self'}}">
+      <text class="friend-tip">与作者交流时请保护个人隐私</text>
+      <button class="friend-button" disabled="{{friendBusy}}" bindtap="handleFriendAction">
+        {{authorCard.status === 'accepted' ? '发私信' : (authorCard.status === 'incoming' ? '接受好友' : (authorCard.status === 'outgoing' ? '已申请' : '+ 加好友'))}}
+      </button>
     </view>
     <view class="post-text">{{post.text}}</view>
     <image
@@ -35,8 +41,13 @@
     <view class="post-actions">
       <view class="action {{post.liked ? 'action-on' : ''}}" bindtap="toggleLike">{{post.liked ? '❤️' : '🤍'}} {{post.likeCount}}</view>
       <view class="action {{post.collected ? 'action-on' : ''}}" bindtap="toggleCollect">{{post.collected ? '⭐' : '☆'}} {{post.collectCount}}</view>
+      <view class="action" bindtap="forwardToFriend">📨 {{post.shareCount || 0}}</view>
+      <button class="action action-button" open-type="share">↗ 微信</button>
     </view>
-    <view class="delete-own" wx:if="{{canDelete}}" bindtap="deletePost">删除我的分享</view>
+    <view class="owner-actions" wx:if="{{canDelete}}">
+      <text class="edit-own" bindtap="goEdit">编辑分享</text>
+      <text class="delete-own" bindtap="deletePost">删除分享</text>
+    </view>
   </view>
 
   <view class="card comment-card">

@@ -1,6 +1,7 @@
 const auth = require('../../utils/auth.js');
 const community = require('../../utils/community.js');
 const communityCloud = require('../../utils/community-cloud.js');
+const social = require('../../utils/community-social.js');
 
 Page({
   data: {
@@ -13,7 +14,10 @@ Page({
     loading: true,
     loadError: '',
     actionBusy: '',
-    commentSubmitting: false
+    commentSubmitting: false,
+    reportReasons: ['医疗误导', '不当或冒犯内容', '广告或垃圾信息', '侵犯隐私', '其他'],
+    authorCard: null,
+    friendBusy: false
   },
 
   onLoad(options) {
@@ -39,6 +43,9 @@ Page({
         loading: false,
         loadError: ''
       });
+      social.getAuthorCard(wx, this.postId)
+        .then(card => this.setData({ authorCard: card }))
+        .catch(() => {});
     }).catch(error => {
       if (this.loadToken !== token) return;
       const message = error && error.message ? error.message : '帖子加载失败';
@@ -153,6 +160,67 @@ Page({
     });
   },
 
+  goEdit() {
+    if (!this.data.canDelete || this.data.actionBusy) return;
+    wx.navigateTo({ url: '/pages/post-publish/post-publish?id=' + this.postId });
+  },
+
+  handleFriendAction() {
+    const user = auth.readLocalUser(wx);
+    if (!user || user.mode !== 'wechat_cloud') {
+      wx.showModal({
+        title: '需要微信云登录',
+        content: '添加好友和发送私信前，请先完成微信云登录。',
+        confirmText: '去登录',
+        success: result => {
+          if (result.confirm) wx.navigateTo({ url: '/pages/login/login' });
+        }
+      });
+      return;
+    }
+    const card = this.data.authorCard;
+    if (!card || this.data.friendBusy) return;
+    if (card.status === 'accepted') {
+      wx.navigateTo({
+        url: '/pages/friend-chat/friend-chat?id=' + encodeURIComponent(card.user.id) +
+          '&name=' + encodeURIComponent(card.user.displayName)
+      });
+      return;
+    }
+    if (card.status === 'outgoing') {
+      wx.showToast({ title: '好友申请已发送', icon: 'none' });
+      return;
+    }
+    this.setData({ friendBusy: true });
+    const request = card.status === 'incoming'
+      ? social.respondFriendRequest(wx, card.requestId, true)
+      : social.sendFriendRequest(wx, this.postId);
+    request.then(result => {
+      const status = result.status || 'outgoing';
+      this.setData({ authorCard: Object.assign({}, card, { status }) });
+      wx.showToast({ title: status === 'accepted' ? '已成为好友' : '好友申请已发送', icon: 'success' });
+    }).catch(error => wx.showToast({ title: error.message || '操作失败', icon: 'none' }))
+      .then(() => this.setData({ friendBusy: false }));
+  },
+
+  forwardToFriend() {
+    const user = auth.readLocalUser(wx);
+    if (!user || user.mode !== 'wechat_cloud') {
+      wx.showToast({ title: '请先完成微信云登录', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({ url: '/pages/friends/friends?mode=forward&postId=' + this.postId });
+  },
+
+  onShareAppMessage() {
+    const post = this.data.post || {};
+    return {
+      title: (post.displayName || '社群用户') + '分享了一条虫咬防护经历',
+      path: '/pages/post-detail/post-detail?id=' + this.postId,
+      imageUrl: (post.imageRefs || [])[0] || ''
+    };
+  },
+
   previewImage(e) {
     const urls = this.data.post.imageRefs || [];
     if (urls.length) wx.previewImage({ current: e.currentTarget.dataset.src || urls[0], urls });
@@ -163,15 +231,26 @@ Page({
       wx.showToast({ title: '已提交云端审核', icon: 'none' });
       return;
     }
+    if (wx.showActionSheet) {
+      wx.showActionSheet({
+        itemList: this.data.reportReasons,
+        success: result => this.confirmReport(this.data.reportReasons[result.tapIndex])
+      });
+      return;
+    }
+    this.confirmReport('其他');
+  },
+
+  confirmReport(reason) {
     wx.showModal({
       title: '举报不当内容',
-      content: '举报会提交至云端审核，同时从你的社群列表隐藏。',
+      content: '举报原因：' + reason + '。提交后内容将从你的社群列表隐藏，并进入云端审核。',
       confirmText: '确认举报',
       confirmColor: '#E53935',
       success: result => {
         if (!result.confirm) return;
         this.setData({ actionBusy: 'report' });
-        communityCloud.report(wx, this.postId, '用户标记不当内容')
+        communityCloud.report(wx, this.postId, reason)
           .then(() => {
             this.setData({ reported: true });
             wx.showToast({ title: '已提交云端审核', icon: 'success' });
@@ -188,7 +267,7 @@ Page({
   },
 
   goSafety() {
-    wx.navigateTo({ url: '/pages/danger/danger' });
+    wx.navigateTo({ url: '/pages/contact/contact' });
   },
 
   onUnload() {
