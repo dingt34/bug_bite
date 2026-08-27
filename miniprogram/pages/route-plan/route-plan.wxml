@@ -21,14 +21,18 @@
       </view>
     </view>
     <view class="place-line"></view>
-    <view class="place-block">
+    <view class="add-waypoint-row" wx:if="{{!waypointEnabled}}" bindtap="addWaypoint">
+      <view class="add-waypoint-icon">＋</view>
+      <view>添加途经点</view>
+    </view>
+    <view class="place-block" wx:if="{{waypointEnabled}}">
       <view class="place-row">
         <view class="place-dot waypoint-dot"></view>
         <view class="place-field">
           <view class="field-label">途经点（选填，可生成对比路线）</view>
           <view class="input-with-action">
             <input class="place-input waypoint-input" value="{{form.waypointName}}" placeholder="如：黄龙体育中心" maxlength="40" bindinput="onWaypointInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="waypointName" />
-            <view class="clear-waypoint" wx:if="{{form.waypointName}}" catchtap="clearWaypoint">清除</view>
+            <view class="clear-waypoint" catchtap="clearWaypoint">移除</view>
           </view>
         </view>
       </view>

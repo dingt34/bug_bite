@@ -47,6 +47,8 @@ assert.ok(pageSource.includes("action: 'suggest'"));
 assert.ok(pageSource.includes('waypointPlace: this.data.selectedPlaces.waypointName'));
 assert.ok(templateSource.includes('bindinput="onWaypointInput"'));
 assert.ok(templateSource.includes('catchtap="selectSuggestion"'));
+assert.ok(templateSource.includes('bindtap="addWaypoint"'));
+assert.ok(templateSource.includes('wx:if="{{!waypointEnabled}}"'));
 
 global.setTimeout = originalSetTimeout;
 console.log('route plan page tests passed');

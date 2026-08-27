@@ -4,6 +4,7 @@ Page({
   data: {
     modes: routeUtils.MODES,
     form: { startName: '', waypointName: '', endName: '', mode: 'walking' },
+    waypointEnabled: false,
     selectedPlaces: { startName: null, waypointName: null, endName: null },
     activeSuggestKey: '',
     suggestions: [],
@@ -28,7 +29,8 @@ Page({
         waypointName: saved.waypointName || '',
         endName: saved.endName || '',
         mode: saved.mode || 'walking'
-      }
+      },
+      waypointEnabled: Boolean(saved.waypointName)
     });
   },
 
@@ -122,11 +124,16 @@ Page({
     });
   },
 
+  addWaypoint() {
+    this.setData({ waypointEnabled: true });
+  },
+
   clearWaypoint() {
     this.suggestSequence = (this.suggestSequence || 0) + 1;
     this.setData({
       'form.waypointName': '',
       'selectedPlaces.waypointName': null,
+      waypointEnabled: false,
       activeSuggestKey: '', suggestions: [], suggestMessage: '',
       routes: [], polylines: [], message: ''
     });
