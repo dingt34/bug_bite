@@ -34,6 +34,12 @@
   line-height: 1.5;
 }
 
+.route-entry { display: flex; align-items: center; justify-content: space-between; border: 2rpx solid #DCEDE5; }
+.route-entry-main { flex: 1; min-width: 0; }
+.route-entry-summary { margin-top: 8rpx; color: #276747; font-size: 27rpx; font-weight: 600; }
+.route-entry-detail { margin-top: 8rpx; color: #7B8881; font-size: 23rpx; line-height: 1.5; }
+.route-entry-action { flex: none; margin-left: 20rpx; color: #2E7D5B; font-size: 25rpx; font-weight: 600; }
+
 .submit-wrap {
   padding: 20rpx 24rpx 0;
 }

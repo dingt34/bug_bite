@@ -13,6 +13,7 @@ Page({
     gears: mock.GEARS,
     overnights: ['当日往返', '户外过夜', '室内住宿'],
     monthIndex: -1,
+    selectedRoute: null,
     form: {
       regionCodes: [],
       month: '',
@@ -26,6 +27,14 @@ Page({
 
   onRegionTap(e) {
     this.toggleArray('regionCodes', e.currentTarget.dataset.v);
+  },
+
+  onShow() {
+    this.setData({ selectedRoute: wx.getStorageSync('selectedRoutePlan') || null });
+  },
+
+  goRoutePlan() {
+    wx.navigateTo({ url: '/pages/route-plan/route-plan' });
   },
 
   onMonthChange(e) {
@@ -83,6 +92,17 @@ Page({
     const rule = precheckRules.evaluatePlan(form);
     const timestamp = Date.now();
     const destinationName = form.regionCodes.join('、');
+    const selectedRoute = this.data.selectedRoute;
+    const routeSummary = selectedRoute ? {
+      id: selectedRoute.id,
+      startName: selectedRoute.startName,
+      endName: selectedRoute.endName,
+      mode: selectedRoute.mode,
+      modeName: selectedRoute.modeName,
+      routeName: selectedRoute.routeName,
+      distanceText: selectedRoute.distanceText,
+      durationText: selectedRoute.durationText
+    } : null;
     const plan = Object.assign({}, form, {
       id: 'plan_' + timestamp,
       schemaVersion: planUtils.PLAN_SCHEMA_VERSION,
@@ -93,6 +113,7 @@ Page({
       riskTags: rule.riskTags,
       matchedRules: rule.matchedRules,
       ruleSnapshot: rule,
+      routePlan: routeSummary,
       status: '进行中',
       createdAtTimestamp: timestamp,
       updatedAtTimestamp: timestamp

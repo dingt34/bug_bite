@@ -5,6 +5,7 @@
     "pages/community/community",
     "pages/profile/profile",
     "pages/privacy/privacy",
+    "pages/route-plan/route-plan",
     "pages/precheck/precheck",
     "pages/precheck-result/precheck-result",
     "pages/contact/contact",

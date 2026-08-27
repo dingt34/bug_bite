@@ -29,8 +29,16 @@
 - `cloudfunctions/syncData`
 - `cloudfunctions/community`
 - `cloudfunctions/cozeAgent`
+- `cloudfunctions/routePlan`
 
 部署环境必须与 `ENV_ID` 指向的环境一致。
+
+`routePlan` 使用腾讯位置服务 WebService API。请在该云函数的“版本与配置”中增加环境变量：
+
+- 名称：`TENCENT_MAP_KEY`
+- 值：项目管理员统一维护的腾讯位置服务 Key
+
+该 Key 不应写入代码或提交到 GitHub。团队成员只要使用同一个小程序 AppID 和云开发环境，即可共用已部署的路线服务。
 
 ## 4. 验证
 
