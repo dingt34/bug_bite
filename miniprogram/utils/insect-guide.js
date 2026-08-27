@@ -17,7 +17,33 @@ const SOURCES = {
   zhejiangMosquito: { title: '浙江省 2021 年蚊媒监测结果分析', url: 'https://html.rhhz.net/ZGMJSWXJKZXZZ/1741159356592-1532348306.htm' },
   zhejiangTick: { title: '浙江省部分地区蜱种调查与鉴定', url: 'https://html.rhhz.net/ZGMJSWXJKZXZZ/20150406.htm' },
   zhejiangTeaMoth: { title: '浙江省地方标准 · 油茶主要病虫害防治', url: 'https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web3707/site/attach/0/c4a93f0cfcfd48e9a758c9488e9a5541.pdf' },
-  hangzhouPineMoth: { title: '国家林草局 · 杭州马尾松毛虫防治', url: 'https://www.forestry.gov.cn/c/www/dfdt/640155.jhtml' }
+  hangzhouPineMoth: { title: '国家林草局 · 杭州马尾松毛虫防治', url: 'https://www.forestry.gov.cn/c/www/dfdt/640155.jhtml' },
+  cdcCulex: { title: 'CDC · About Culex Mosquitoes', url: 'https://www.cdc.gov/mosquitoes/about/culex-mosquitoes.html' },
+  chinaCdcDengue: { title: '中国疾控 · 埃及伊蚊与登革热', url: 'https://icdc.chinacdc.cn/sjd/sjzxxx/sjhydt/202409/t20240925_301016.html' },
+  cdcMidge: { title: 'CDC · Meet the Midge', url: 'https://www.cdc.gov/oropouche/stories/meet-the-midge.html' },
+  hainanMidge: { title: '海南省卫健委 · 别拿「小咬」不当回事', url: 'https://wst.hainan.gov.cn/sjkzx/info/1213/59298.htm' },
+  sanyaMidge: { title: '三亚市疾控 · 夏日将至，防止蠓咬', url: 'https://ws.sanya.gov.cn/wjwsite/jkdt/202502/d2b79868d6584e21a570a4b20e36b5e1.shtml' },
+  cdcLeishmaniasis: { title: 'CDC Yellow Book · Leishmaniasis', url: 'https://www.cdc.gov/yellow-book/hcp/travel-associated-infections-diseases/leishmaniasis.html' },
+  chinaCdcSandfly: { title: '中国疾控周报 · 中华白蛉适宜生境分布', url: 'https://weekly.chinacdc.cn/en/article/doi/10.46234/ccdcw2020.223' },
+  pmidBlisterBeetle: { title: 'PubMed · Blister dermatitis caused by Epicauta', url: 'https://pubmed.ncbi.nlm.nih.gov/2813877/' },
+  mdedgeBlisterBeetle: { title: 'MDedge/Cutis · Blister Beetles Revisited', url: 'https://blogs.the-hospitalist.org/content/whats-eating-you-blister-beetles-revisited' },
+  taiwanCdcScrubTyphus: { title: '台湾疾管署 · 恙虫病（丛林斑疹伤寒）', url: 'https://www.cdc.gov.tw/Uploads/files/201301/1936a0bd-f8f5-4aa2-be4c-2f5644e49ba4.pdf' },
+  cdcScrubTyphus: { title: 'CDC · Scrub Typhus', url: 'https://www.cdc.gov/typhus/scrub/index.html' },
+  islandHealthHornet: { title: 'Island Health · Asian giant hornet stings', url: 'https://www.islandhealth.ca/sites/default/files/2019-09/medical-guidance-asian-giant-hornet-stings.pdf' },
+  statpearlsCentipede: { title: 'StatPearls · Centipede Bites', url: 'https://www.ncbi.nlm.nih.gov/books/NBK542312/' },
+  hkmjCentipede: { title: 'Hong Kong Med J · Centipede bite victims in Hong Kong', url: 'https://www.hkmj.org/system/files/hkm1110p381.pdf' },
+  ufStableFly: { title: 'University of Florida · Stable Fly (Stomoxys calcitrans)', url: 'https://entnemdept.ufl.edu/creatures/URBAN/MEDICAL/Stomoxys_calcitrans.htm' },
+  zjLishuiBlackfly: { title: '中国媒介生物学及控制杂志 · 浙江省丽水市蚋叮咬人事件调查', url: 'http://www.bmsw.net.cn/CN/10.11853/j.issn.1003.8280.2017.01.026' },
+  purdueBlackfly: { title: 'Purdue University · Black Flies (Simuliidae)', url: 'https://extension.entm.purdue.edu/publichealth/print/insects/blackfly.html' },
+  cdcHeadLouse: { title: 'CDC · About Head Lice', url: 'https://www.cdc.gov/lice/about/head-lice.html' },
+  nhsHeadLice: { title: 'NHS · Head lice and nits', url: 'https://www.nhs.uk/conditions/head-lice-and-nits/' },
+  statpearlsPediculosis: { title: 'StatPearls · Pediculosis', url: 'https://www.ncbi.nlm.nih.gov/books/NBK470343/' },
+  cdcScabies: { title: 'CDC · About Scabies', url: 'https://www.cdc.gov/scabies/about/index.html' },
+  nhsScabies: { title: 'NHS · Scabies', url: 'https://www.nhs.uk/conditions/scabies/' },
+  statpearlsScabies: { title: 'StatPearls · Scabies', url: 'https://www.ncbi.nlm.nih.gov/books/NBK544306/' },
+  wikiThereuopoda: { title: 'Wikipedia · Thereuopoda clunifera', url: 'https://en.wikipedia.org/wiki/Thereuopoda_clunifera' },
+  statpearlsScorpion: { title: 'StatPearls · Scorpion Toxicity', url: 'https://www.ncbi.nlm.nih.gov/books/NBK430928/' },
+  mesobuthusDistribution: { title: 'Journal of Arachnology · Geographical Distribution of Two Species of Mesobuthus in China', url: 'https://bioone.org/journals/the-journal-of-arachnology/volume-35/issue-2/T06-20.1/GEOGRAPHICAL-DISTRIBUTION-OF-TWO-SPECIES-OF-MESOBUTHUS-SCORPIONES-BUTHIDAE-IN/10.1636/T06-20.1.short' }
 };
 
 const COMMON_URGENT = [
@@ -276,6 +302,321 @@ const ITEMS = [
       { src: '/images/insect-guide/rhipicephalus-sanguineus/01-overview.webp', caption: '吸血后雌蜱：腹部膨大，前端仍可见足部', alt: '吸血后的血红扇头蜱照片', credit: 'gailhampshire', license: 'CC BY 2.0', sourceUrl: commonsFile('Brown Dog Tick. Rhipicephalus sanguineus - Flickr - gailhampshire (1).jpg') },
       { src: '/images/insect-guide/rhipicephalus-sanguineus/02-side.webp', caption: '侧面整体：观察棕褐体色、八足与前端口器', alt: '血红扇头蜱侧面整体照片', credit: 'gailhampshire', license: 'CC BY 2.0', sourceUrl: commonsFile('Brown Dog Tick. Rhipicephalus sanguineus - Flickr - gailhampshire.jpg') },
       { src: '/images/insect-guide/rhipicephalus-sanguineus/03-sexes.webp', caption: '雌雄背面对照：观察盾板覆盖范围差异', alt: '血红扇头蜱雌雄背面对照照片', credit: 'Daktaridudu', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Rhipicephalus-sanguineus-female-male.jpg') }
+    ]
+  },
+  {
+    id: 'culex_pipiens', name: '致倦库蚊', scientificName: 'Culex pipiens quinquefasciatus', commonCategory: '蚊类',
+    aliases: ['家蚊', '淡色库蚊', '南方家蚊'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#5B7A5B',
+    summary: '库蚊属最常见的室内叮咬蚊种，雌蚊夜间吸血、偏好人血，是南方城区居室内最主要的“家蚊”。',
+    appearance: '中型蚊，体色黄褐至淡褐色，无鲜艳斑纹；喙与各足跗节均无白环，翅鳞密而暗色，腹部背板有淡色基带；停落时腹部与停落面大致平行，体态低调，不像伊蚊那样黑白醒目。',
+    identificationKeys: ['体色黄褐、喙与足跗节无白环，翅无明显斑块', '停落时身体与停落面近平行，不翘起后足', '多在室内阴暗处、夜间至凌晨活动'],
+    distribution: '广布全球热带亚热带；在中国大致分布于北纬 32°—34° 以南的南方地区及沿海岛屿，浙江等南方城区室内极常见。',
+    habitat: '幼虫孳生于污水沟、下水道、化粪池、旧轮胎及各类污染积水；成蚊栖息于住房、地下室、车库、楼道等室内外阴暗处。',
+    contactPattern: '雌蚊夜间吸血、偏好人血兼吸动物血，活动高峰在黄昏至黎明；常在睡觉时反复叮咬。',
+    commonReaction: '叮咬处出现红肿、瘙痒的丘疹或风团，中央可有小刺点，通常数日内自行消退。',
+    compareClues: '与白纹伊蚊、埃及伊蚊相比体色黄褐、无白斑、夜间活动；与中华按蚊相比停落时腹部与停落面近平行。',
+    firstActions: ['用肥皂水或清水清洗叮咬处，避免抓挠', '冷敷减轻红肿与瘙痒', '瘙痒明显可外用炉甘石洗剂；夜间防叮咬用纱窗、蚊帐和驱蚊剂'],
+    caution: '库蚊在南方少数地区可传播乙脑、丝虫病等，但绝大多数叮咬仅引起局部瘙痒红肿、数日自愈；叮咬后若出现高热、剧烈头痛、意识异常应就医并告知蚊叮史。',
+    confusedWith: ['mosquito', 'aedes_aegypti', 'culex_tritaeniorhynchus', 'anopheles_sinensis', 'armigeres_subalbatus'],
+    sourceKeys: ['cdcMosquito', 'cdcCulex'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Culex_quinquefasciatus',
+    images: [
+      { src: '/images/insect-guide/culex-quinquefasciatus/01-feeding.webp', caption: '正在人体皮肤上吸血的雌性致倦库蚊，腹部因饱血而膨大呈红色', alt: '一只雌性致倦库蚊正以口针刺入皮肤吸血', credit: 'CDC / James Gathany', license: 'Public domain', sourceUrl: commonsFile('Culexquinquefasciatus.png') },
+      { src: '/images/insect-guide/culex-quinquefasciatus/02-illustration.webp', caption: '1905 年彩色科学插画，左为雄蚊、右为雌蚊，可整体观察库蚊形态', alt: '致倦库蚊雄蚊与雌蚊并排的彩色科学插画', credit: 'Emil August Goeldi', license: 'Public domain', sourceUrl: commonsFile('Culex quinquefasciatus E-A-Goeldi 1905.jpg') },
+      { src: '/images/insect-guide/culex-quinquefasciatus/03-overview.webp', caption: '自然光下的致倦库蚊成蚊，可见黄褐体色与无白环的足', alt: '一只黄褐色的致倦库蚊成蚊停落', credit: 'Robert Webster', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Culex quinquefasciatus - inat 83267718.jpg') }
+    ]
+  },
+  {
+    id: 'aedes_aegypti', name: '埃及伊蚊', scientificName: 'Aedes aegypti', commonCategory: '蚊类',
+    aliases: ['黄热病蚊', '埃及花斑蚊'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#5B6E7A',
+    summary: '典型“家栖”伊蚊，体黑、胸背有银白色里拉琴形斑纹，是登革热、黄热病等病毒的重要传播媒介。',
+    appearance: '体色黑色，全身具黑白相间斑纹，俗称“花斑蚊”；最醒目的是胸背盾片上左右各一个镰刀形（里拉琴状）银白色斑纹，各足有清晰白色环带；停落时后足常上翘、身体斜置。',
+    identificationKeys: ['胸背具银白色里拉琴形斑纹，是本种最典型标志', '足有黑白相间白环，整体呈“花斑”外观', '白昼吸血，多在人居室内及其周边活动'],
+    distribution: '广布全球热带；在中国分布局限，主要见于海南沿海、广东雷州半岛、云南边境区县、台湾嘉义以南等地。',
+    habitat: '家栖蚊种，与人类“共居一室”；幼虫孳生于室内外中小型清洁积水，如水缸、水培植物、花盆托、旧轮胎等。',
+    contactPattern: '雌蚊嗜吸人血、可多次反复叮咬，吸血以白天为主（早晨与近黄昏为高峰）。',
+    commonReaction: '叮咬处出现红肿、瘙痒的丘疹或风团，一般数日消退；过敏者红肿瘙痒可较明显。',
+    compareClues: '与白纹伊蚊同为黑白花蚊，但埃及伊蚊胸背为左右里拉琴形白斑，白纹伊蚊为中央一条纵向白纹。',
+    firstActions: ['用肥皂水或清水清洗叮咬处，避免抓挠', '冷敷或外涂炉甘石洗剂止痒消肿', '清除室内外积水以防孳生'],
+    caution: '埃及伊蚊是登革热、黄热病等的重要传播媒介，但仅在疫区且蚊体实际带毒时才传播，并非每只都带病毒；若突发高热、皮疹、眼眶后疼痛或出血倾向应及时就医并告知旅居史与蚊叮史。',
+    confusedWith: ['mosquito', 'culex_pipiens', 'culex_tritaeniorhynchus', 'anopheles_sinensis'],
+    sourceKeys: ['cdcMosquito', 'chinaCdcDengue'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Aedes_aegypti',
+    images: [
+      { src: '/images/insect-guide/aedes-aegypti/01-dorsal.webp', caption: '埃及伊蚊特写，胸背清晰的里拉琴形银白斑纹是本种关键辨识点', alt: '埃及伊蚊背面特写，胸背有左右对称的里拉琴形银白色斑纹', credit: 'James Gathany', license: 'Public domain', sourceUrl: commonsFile('Aedes aegypti CDC-Gathany.jpg') },
+      { src: '/images/insect-guide/aedes-aegypti/02-overview.webp', caption: '停落在叶上的埃及伊蚊，足部白色环带清晰可见', alt: '埃及伊蚊停落在叶片上，各足有明显白色环带', credit: 'Wee Hong', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Aedes aegypti on leaf.jpg') },
+      { src: '/images/insect-guide/aedes-aegypti/03-feeding.webp', caption: '正在吸血的埃及伊蚊，可观察其黑体白斑的整体形态', alt: '埃及伊蚊正以口针刺入皮肤吸血', credit: 'Malena Lorente', license: 'CC BY 4.0', sourceUrl: commonsFile('Aedes aegypti 255499300.jpg') }
+    ]
+  },
+  {
+    id: 'biting_midge', name: '蠓', scientificName: 'Culicoides spp.', commonCategory: '蠓类',
+    aliases: ['小咬', '库蠓', '蠛蠓', '墨蚊', '吸血蠓'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#7A5B7A',
+    summary: '体型仅 1—4 毫米的极小微吸血蝇类，常成群围攻叮咬，叮咬处奇痒且比蚊子包更持久，代表属为库蠓 Culicoides。',
+    appearance: '双翅目蠓科极小型昆虫，成虫仅约 1—4 毫米，外形似微型“黑芝麻”或“小黑点”，比蚊子小得多；翅多具斑点花纹，口器短、为刺吸式，雌蠓吸血。',
+    identificationKeys: ['体型仅 1—4 毫米，明显小于蚊，肉眼接近“小黑点”', '翅具斑点花纹、口器短（库蠓属特征）', '常成群同时叮咬，叮咬处奇痒且持续数日'],
+    distribution: '全国广泛分布，南方湿润地区尤多；浙江西湖、湘湖及各地公园、湖边、绿化带等潮湿植被茂盛处是常见叮咬场所。',
+    habitat: '水边、池塘、湖边、草地、树荫等阴凉潮湿、植被茂盛处；幼虫孳生于水体边缘淤泥、湿润沙土等。',
+    contactPattern: '雌蠓吸血，库蠓多晨昏吸血、蠛蠓多白天活动；常在户外草丛、湖边成群围攻裸露皮肤，甚至可穿透薄织物叮咬。',
+    commonReaction: '叮咬处呈绿豆大小红色丘疹、风团或红斑，中央可见小刺点，包多成片密集、奇痒难忍，比蚊子包更痒、持续更久。',
+    compareClues: '与蚊子区分：蠓极小、无长喙与带鳞翅，叮咬常成片且更痒；与跳蚤、臭虫的成串或成线叮咬分布不同。',
+    firstActions: ['用肥皂水或清水反复冲洗叮咬处，避免抓挠', '冰块或冷水冷敷，外用炉甘石洗剂等止痒', '红肿明显或起小水泡可在医生指导下外用糖皮质激素软膏'],
+    caution: '蠓叮咬以局部奇痒、红肿为主，多数数日至一周自行缓解；极少数过敏者可出现明显水肿或全身反应，若呼吸困难、发热等应及时就医。',
+    confusedWith: ['mosquito', 'culex_pipiens', 'aedes_aegypti', 'flea', 'bedbug'],
+    sourceKeys: ['cdcMidge', 'hainanMidge', 'sanyaMidge'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Culicoides',
+    images: [
+      { src: '/images/insect-guide/culicoides/01-overview.webp', caption: '库蠓（吸血蠓）成蠓，可见典型的翅斑与短小刺吸式口器', alt: '一只库蠓成蠓，翅膀上有斑点花纹，口器短小', credit: 'Daktaridudu', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Culicoides-cornutus-midge.jpg') },
+      { src: '/images/insect-guide/culicoides/02-on-skin.webp', caption: '停落在人体皮肤上的吸血蠓，可直观感受其仅数毫米的微小体型', alt: '一只微小的吸血蠓停落在人体皮肤上', credit: 'CSIRO', license: 'CC BY 3.0', sourceUrl: commonsFile('CSIRO ScienceImage 11052 Biting midge on human skin.jpg') },
+      { src: '/images/insect-guide/culicoides/03-feeding.webp', caption: '正在吸血的雌性库蠓，展示其刺吸式取食行为', alt: '一只雌性库蠓正通过口器吸血', credit: 'Scott Bauer, USDA ARS', license: 'Public domain', sourceUrl: commonsFile('Culicoides sonorensis.jpg') }
+    ]
+  },
+  {
+    id: 'sandfly', name: '白蛉', scientificName: 'Phlebotomus chinensis', commonCategory: '白蛉类',
+    aliases: ['沙蝇', '白蛉子'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#8B7355',
+    summary: '体型极小、夜晚无声叮咬的吸血蝇类，是我国内脏利什曼病（黑热病）的主要传播媒介。',
+    appearance: '体型微小，体长约 1.5—3.5 毫米，约为普通蚊子的 1/3 到 1/2，全身和翅膀密被细毛；停落时翅膀上举呈明显 V 字形，不像蚊子那样平贴体侧；飞行无声。',
+    identificationKeys: ['体型很小（约 1.5—3.5 毫米），远小于常见蚊类', '停落时双翅竖起呈 V 字形，全身密被细毛', '飞行无声，多在黄昏至清晨活动叮咬'],
+    distribution: '我国白蛉主要分布在长江以北地区，以黄土高原及周边山丘地带为主；浙江省并非主要分布区，相关风险主要出现在北方或中西部疫区旅行时。',
+    habitat: '土房墙缝、畜圈、石缝、洞穴、鼠洞等阴暗潮湿处，多见于农村、丘陵和林草地带。',
+    contactPattern: '雌蛉在黄昏至黎明叮咬裸露皮肤吸血，叮咬时分泌麻醉物质，往往无痛、不易察觉。',
+    commonReaction: '叮咬处多为不明显的小红点或轻度瘙痒丘疹；在疫区被带虫白蛉叮咬后数月可出现长期不愈合的皮肤溃疡，或持续发热、消瘦、肝脾肿大等。',
+    compareClues: '远小于蚊子、停落时翅膀呈 V 字形竖起、飞行无声，是与普通蚊类区别的关键。',
+    firstActions: ['用肥皂水清洗叮咬处，避免搔抓', '疫区活动后留意叮咬部位，若出现长期不愈合溃疡或持续发热应就医', '疫区防护：黄昏至清晨减少裸露、使用含避蚊胺的驱虫剂、用细网眼蚊帐'],
+    caution: '我国大部分地区（含浙江）白蛉并不常见，黑热病风险主要与疫区旅行或居住史相关；若曾在西北、华北等疫区活动后出现上述症状，应主动告知医生旅行史。',
+    confusedWith: ['mosquito', 'culex_tritaeniorhynchus', 'anopheles_sinensis', 'armigeres_subalbatus', 'flea'],
+    sourceKeys: ['cdcLeishmaniasis', 'chinaCdcSandfly'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Phlebotomus',
+    images: [
+      { src: '/images/insect-guide/phlebotomus/01-bloodfed.webp', caption: '吸血后的白蛉（近缘种 Phlebotomus papatasi），腹部因吸饱血而胀大透明', alt: '白蛉吸血后腹部胀大透明的显微照片', credit: 'CDC / Frank Collins（摄影：James Gathany）', license: 'Public domain', sourceUrl: commonsFile('Phlebotomus pappatasi bloodmeal finished.jpg') },
+      { src: '/images/insect-guide/phlebotomus/02-resting.webp', caption: '白蛉（Phlebotomus sp.）停落时双翅竖起呈 V 字形、全身被毛', alt: '白蛉停落时双翅呈 V 字形上举的照片', credit: 'Luis Fernández García', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Phlebotomus-sp-20150705-a.jpg') },
+      { src: '/images/insect-guide/phlebotomus/03-specimen.webp', caption: '白蛉雄虫标本（Phlebotomus sp.），因外形相似易被误认为蚊子', alt: '白蛉雄虫整体标本照片', credit: 'CDC / 世界卫生组织（WHO）', license: 'Public domain', sourceUrl: commonsFile('Phlebotomus sp. 6274 lores.jpg') }
+    ]
+  },
+  {
+    id: 'vespa_mandarinia', name: '金环胡蜂', scientificName: 'Vespa mandarinia', commonCategory: '胡蜂类',
+    aliases: ['大虎头蜂', '金环马蜂', '亚洲大虎头蜂', '地龙蜂'], group: 'stinging', groupName: '蜇刺类', accent: '#B8860B',
+    summary: '世界上体型最大的胡蜂，蜇刺剧痛且可反复蜇刺，多次蜇伤或过敏可能危及生命。',
+    appearance: '工蜂体长约 2.5—4 厘米，蜂王可达 4.5 厘米以上，为体型最大的胡蜂。头部宽大、呈橙红至橙黄色，复眼大，上颚粗壮；胸部深褐至黑色；腹部深褐色，具黄褐色至橙黄色环带；翅深褐色。',
+    identificationKeys: ['头部宽大呈橙红色，明显大于普通胡蜂与蜜蜂', '体型硕大，腹部具黄褐色环带', '翅深褐色，飞行时翅展大、嗡鸣声低沉', '螫针无倒钩，可反复蜇刺（区别于蜜蜂留针）'],
+    distribution: '分布于东亚：中国（华北、华东、华中、西南等地）、日本、韩国、俄罗斯远东及东南亚；近年被意外引入北美部分地区。',
+    habitat: '营巢于地下土洞、树洞、岩缝及房屋墙缝、屋顶下等隐蔽处；夏末至秋季蜂群最活跃。',
+    contactPattern: '靠近、惊扰或拍打蜂巢时群起攻击；踩踏、身穿深色衣物或浓烈气味也可能招致蜇刺。',
+    commonReaction: '蜇刺处如烧红铁钉刺入般剧痛，伴局部红肿、灼热；大量或多次蜇刺可出现溶血、横纹肌溶解、急性肾损伤等，重者可致多器官损伤甚至死亡。',
+    compareClues: '与黄脚胡蜂相比头部更宽大、体型更大；与蜜蜂相比体表近无毛、蜇后螫针不留在皮肤且可反复蜇刺。',
+    firstActions: ['迅速离开现场，避免再次被蜇', '用冷敷或冰袋敷蜇处减痛、减慢毒液扩散，不要揉搓', '出现呼吸困难、全身荨麻疹、头晕、恶心呕吐等立即拨打急救电话，过敏者尽早使用肾上腺素'],
+    caution: '单次蜇刺对过敏体质者即可引起致死性过敏性休克；多次蜇刺即使非过敏者也可能发生中毒性全身反应；发现蜂巢切勿自行处理，应联系专业人员清除。',
+    confusedWith: ['bee_wasp', 'apis_cerana'],
+    sourceKeys: ['cdcStings', 'nhsBites', 'islandHealthHornet'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Vespa_mandarinia',
+    images: [
+      { src: '/images/insect-guide/vespa-mandarinia/01-queen.webp', caption: '金环胡蜂（大虎头蜂）蜂王整体形态，示橙红色宽大头部与深色腹部', alt: '金环胡蜂蜂王特写，头部橙红色，腹部深褐带黄橙色环带', credit: 'Yasunori Koide', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('20200512-P1090972 Vespa mandarinia japonica.jpg') },
+      { src: '/images/insect-guide/vespa-mandarinia/02-side.webp', caption: '金环胡蜂蜂王侧面观，示深褐色翅与硕大体型', alt: '金环胡蜂蜂王侧面照片，体型硕大，翅深褐色', credit: 'Yasunori Koide', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('20200512-P1090983 Vespa mandarinia japonica.jpg') },
+      { src: '/images/insect-guide/vespa-mandarinia/03-head.webp', caption: '金环胡蜂蜂王近观，示橙红色头部与发达上颚', alt: '金环胡蜂头部近观照片，可见橙红色头部与强壮上颚', credit: 'Yasunori Koide', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('20200512-P1100051 Vespa mandarinia japonica.jpg') }
+    ]
+  },
+  {
+    id: 'apis_cerana', name: '中华蜜蜂', scientificName: 'Apis cerana', commonCategory: '蜜蜂类',
+    aliases: ['中蜂', '土蜂', '中华蜂'], group: 'stinging', groupName: '蜇刺类', accent: '#D4A017',
+    summary: '中国本土蜜蜂，蜇刺后螫针带倒钩留于皮肤、蜂自身死亡；过敏者单次蜇刺即可发生危险。',
+    appearance: '工蜂体长约 10—13 毫米，比常见意大利蜜蜂略小、体色更黑褐。胸部密布灰黄色绒毛，腹部具灰黑色与黄色相间环带；后足有花粉篮。',
+    identificationKeys: ['体小、黑褐色、多毛', '蜇后螫针（带毒囊）留在皮肤上，蜂自身死亡', '胸部灰黄色绒毛、腹部黑黄相间环带'],
+    distribution: '中国本土广泛分布（华南、西南、华中、华东等），并见于东亚、东南亚及南亚。',
+    habitat: '野生常营巢于树洞、岩洞、石缝；人工饲养于传统桶养或活框蜂箱；多在花丛附近活动。',
+    contactPattern: '靠近蜂巢、踩踏或拍打蜜蜂、采蜜作业时被蜇；蜂群御敌时会群起攻击。',
+    commonReaction: '蜇处立即刺痛，局部红肿、灼热、瘙痒，多数数小时至数日内消退。',
+    compareClues: '与胡蜂相比体型小、毛多、螫针有倒钩且蜇后留针；与金环胡蜂相比明显更小更黑。',
+    firstActions: ['尽快用指甲、卡片等边缘刮除留在皮肤的螫针（速度优先，勿用镊子挤压毒囊）', '肥皂水清洗蜇处，冷敷并抬高患肢', '出现呼吸困难、喉头或舌肿胀、全身荨麻疹、头晕等立即急救并就医'],
+    caution: '对蜂毒过敏者单次蜇刺即可致过敏性休克，需立即就医；口咽部被蜇可致气道梗阻；多次蜇刺可致中毒性全身反应。',
+    confusedWith: ['bee_wasp', 'vespa_mandarinia'],
+    sourceKeys: ['cdcStings', 'nhsBites'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Apis_cerana',
+    images: [
+      { src: '/images/insect-guide/apis-cerana/01-worker.webp', caption: '中华蜜蜂工蜂特写，可见黑褐色体色与灰黄色绒毛', alt: '中华蜜蜂工蜂微距照片，展示黑褐色身体与胸部灰黄色绒毛', credit: 'Vengolis', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Apis cerana08409.jpg') },
+      { src: '/images/insect-guide/apis-cerana/02-overview.webp', caption: '中华蜜蜂（湖南乡间自然环境）', alt: '中华蜜蜂在湖南乡村自然环境中的照片', credit: 'FlyingBatt', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Apis cerana (Asian honeybee) in rural areas of Hunan, China.jpg') },
+      { src: '/images/insect-guide/apis-cerana/03-foraging.webp', caption: '中华蜜蜂在花上觅食', alt: '中华蜜蜂在花丛采蜜的照片', credit: 'FlyingBatt', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Apis cerana (Asian honeybee) on flowing trees.jpg') }
+    ]
+  },
+  {
+    id: 'scolopendra_subspinipes_mutilans', name: '少棘蜈蚣', scientificName: 'Scolopendra subspinipes mutilans', commonCategory: '蜈蚣类',
+    aliases: ['红头蜈蚣', '金头蜈蚣', '百足虫'], group: 'stinging', groupName: '蜇刺类', accent: '#8B4513',
+    summary: '大型蜈蚣，用头部下方毒颚咬刺注毒，多为剧痛局部反应，少数可出现严重全身症状。',
+    appearance: '体长可达 12—20 厘米，身体扁平、分节，共 21 个体节、21 对步足；头部及第一背板呈橙红至红褐色，触角细长；体色深褐至黑褐，步足黄色，最后一对足向后伸长。',
+    identificationKeys: ['身体扁平长条、21 对步足（多足，非昆虫）', '头部橙红至红褐色，触角细长', '夜行、喜湿，藏于石块、枯木、落叶下', '咬伤处常留两个针尖样刺痕'],
+    distribution: '分布于中国（华南、华东、华中、西南等地）、日本、韩国及东南亚。',
+    habitat: '栖息于潮湿阴暗处：石块下、枯木与落叶下、洞穴、墙缝及潮湿的卫生间、厨房角落；夜间活动。',
+    contactPattern: '翻动石块或木料、清理杂物、穿鞋或穿衣时被其毒颚咬刺；蜈蚣可爬入鞋内、衣物中。',
+    commonReaction: '咬伤处立即剧烈灼痛，局部红肿、水肿，常留两个针尖样刺痕；疼痛可放射并持续数小时至数日。',
+    compareClues: '与胡蜂或蜜蜂蜇刺的锐痛类似，但为多足长条形节肢动物所致；咬痕常为两个针尖样点。',
+    firstActions: ['用肥皂水或清水冲洗伤口，避免挤压或自行切开', '冷敷或温热敷缓解疼痛，抬高患肢', '口服止痛药、抗组胺药；出现呼吸困难、胸痛、心悸、恶心呕吐等立即就医'],
+    caution: '多数为局部反应、可自愈，但儿童、老人、过敏体质者或反复被蜇伤者风险更高；极少数可出现横纹肌溶解、急性肾损伤或过敏性休克，症状加重应尽早就医。',
+    confusedWith: ['vespa_mandarinia', 'apis_cerana'],
+    sourceKeys: ['statpearlsCentipede', 'hkmjCentipede'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Scolopendra_subspinipes_mutilans',
+    images: [
+      { src: '/images/insect-guide/scolopendra-subspinipes/01-overview.webp', caption: '少棘蜈蚣整体形态，与手指对比可见体长可达约 18 厘米', alt: '红头蜈蚣全身照片，旁边有手指作大小对比', credit: 'Thomas Brown', license: 'CC BY 2.0', sourceUrl: commonsFile('Chinese Red-headed Centipede (Scolopendra subspinipes) (5780837186).jpg') },
+      { src: '/images/insect-guide/scolopendra-subspinipes/02-body.webp', caption: '少棘蜈蚣整体观，示扁平分节身体与 21 对步足', alt: '红头蜈蚣全身照片，身体扁平分节，多对步足', credit: 'Thomas Brown', license: 'CC BY 2.0', sourceUrl: commonsFile('Chinese Red-headed Centipede (Scolopendra subspinipes) (5804635464).jpg') },
+      { src: '/images/insect-guide/scolopendra-subspinipes/03-head.webp', caption: '少棘蜈蚣头部特写，示橙红色头部、触角与毒颚', alt: '红头蜈蚣头部特写，头部橙红色，可见触角', credit: 'Thomas Brown', license: 'CC BY 2.0', sourceUrl: commonsFile('Chinese Red-headed Centipede (Scolopendra subspinipes) (5804636142).jpg') }
+    ]
+  },
+  {
+    id: 'blister_beetle', name: '豆芫菁', scientificName: 'Epicauta gorhami', commonCategory: '芫菁类',
+    aliases: ['豆芜菁', '锯角豆芫菁', '斑蝥', '红头娘', '葛上亭长'], group: 'contact', groupName: '接触刺激', accent: '#C0392B',
+    summary: '头部红色、鞘翅黑色的甲虫，受惊或受压时分泌含斑蝥素的黄色体液，接触皮肤可引起水疱性皮炎。',
+    appearance: '成虫体长约 10.5—18.5 毫米，头部红色，胸腹部和鞘翅黑色，前胸背板中央和每片鞘翅中央常有灰白色纵纹；雄虫触角锯齿状，雌虫触角丝状。',
+    identificationKeys: ['红色头部＋黑色鞘翅，鞘翅上有灰白色纵纹', '受惊时腿节末端会分泌黄色（含斑蝥素）液体', '群集啃食大豆、豇豆等豆科植物叶片'],
+    distribution: '广泛分布于我国多数省区，包括江苏、浙江、江西、湖南、四川、广东、广西、台湾等，也见于日本。',
+    habitat: '大豆、菜豆、豇豆、花生等豆科作物田和农田草地，成虫群集取食叶片。',
+    contactPattern: '爬落在皮肤上被拍打或碾压，或夜间趋光落在皮肤上，受惊受压时从腿节末端分泌黄色体液，斑蝥素直接接触皮肤引起刺激。',
+    commonReaction: '接触后数分钟至数小时皮肤出现灼热、刺痛感，随后起红斑和水疱（可为条状、片状），破溃后结痂，搔抓可继发感染。',
+    compareClues: '与隐翅虫皮炎相似都会起水疱，但豆芫菁体型明显更大、有红头黑身和灰白色纵纹，且为主动分泌黄色液体。',
+    firstActions: ['切勿在皮肤上拍打或碾压，应轻轻吹落或用纸片拨开', '立即用大量肥皂水或酒精擦洗接触部位', '已起水疱者保持局部清洁、避免抓破；大水疱请就医处理'],
+    caution: '斑蝥素有毒，误服或大量接触可引起腹痛、血尿、肾损伤等全身中毒；若出现恶心、腹痛、血尿等全身症状应立即急诊就医。',
+    confusedWith: ['rove_beetle', 'ant', 'caterpillar', 'bee_wasp'],
+    sourceKeys: ['pmidBlisterBeetle', 'mdedgeBlisterBeetle'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Epicauta',
+    images: [
+      { src: '/images/insect-guide/epicauta-gorhami/01-overview.webp', caption: '豆芫菁（Epicauta gorhami），红色头部＋黑色鞘翅', alt: '豆芫菁红色头部黑色鞘翅的清晰照片', credit: 'Phonon.b', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Epicauta gorhami.jpg') },
+      { src: '/images/insect-guide/epicauta-gorhami/02-related.webp', caption: '近缘芫菁（Epicauta hirticornis），示红头黑身的典型特征', alt: '红头黑身芫菁近缘种的照片', credit: 'Vaikoovery', license: 'CC BY 3.0', sourceUrl: commonsFile('Epicauta hirticornis (Haag-Rutenberg, 1880).jpg') },
+      { src: '/images/insect-guide/epicauta-gorhami/03-perched.webp', caption: '芫菁（Epicauta sp.）停栖于植物上，示整体形态', alt: '芫菁甲虫停栖在植物上的照片', credit: 'xpda', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Epicauta P1460083a.jpg') }
+    ]
+  },
+  {
+    id: 'chigger', name: '恙螨（恙虫）', scientificName: 'Leptotrombidium deliense', commonCategory: '恙螨类',
+    aliases: ['恙虫', '地里纤恙螨'], group: 'attached', groupName: '附着类', accent: '#E67E22',
+    summary: '肉眼难辨的红色螨类幼虫，叮咬时无痛，是恙虫病（丛林斑疹伤寒）的传播媒介。',
+    appearance: '仅幼虫（恙螨）营寄生，体长约 0.2—0.5 毫米，呈橙红或红色，肉眼仅见针尖大的红点；幼虫具 6 条腿。叮咬时注入消化酶，取食组织液而非血液。',
+    identificationKeys: ['红色、针尖大小的极小微螨，常在草丛或灌木', '叮咬无痛，好发于腰际、腋下、腹股沟、膝窝等潮湿隐蔽处', '叮咬处可形成中央有黑痂（焦痂）的无痛性溃疡'],
+    distribution: '地里纤恙螨是我国南方及台湾地区恙虫病的主要媒介，长江以南及东南沿海（含浙江）的草地、林缘、河谷等均有分布。',
+    habitat: '草丛、灌木、田埂、河岸、林地边缘等潮湿环境，幼虫爬到草叶顶端等待宿主经过。',
+    contactPattern: '野外活动时幼虫爬到皮肤上，钻入腰际、袖口、裤脚、腋下、腹股沟等束紧潮湿处附着叮咬，分泌酶使局部麻醉，故叮咬时多无感觉。',
+    commonReaction: '叮咬处先出现不痛不痒的小红丘疹，可成片瘙痒；感染恙虫病者经 6—21 天潜伏期后突发高热、头痛、皮疹、淋巴结肿大，并在叮咬处形成圆形黑色焦痂。',
+    compareClues: '与蜱虫都会叮咬传播疾病，但恙螨极小、叮咬无痛且不留明显虫体，典型焦痂加高热是其特征。',
+    firstActions: ['野外活动后尽快沐浴，重点搓洗腋窝、腹股沟、膝窝、腰际等部位并换洗衣物', '叮咬处保持清洁、避免搔抓，可外用止痒药', '叮咬后 2—3 周内出现发热或皮肤黑色焦痂、溃疡，应立即就医并告知野外活动史'],
+    caution: '恙虫病若不治疗可发展为肺炎、脑炎、心肌炎、多器官损害甚至危及生命，但早期用多西环素等抗生素治疗效果好；务必观察焦痂与持续发热。本病不人传人。',
+    confusedWith: ['tick', 'flea', 'bedbug', 'brown_dog_tick'],
+    sourceKeys: ['taiwanCdcScrubTyphus', 'cdcScrubTyphus'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Trombiculidae',
+    images: [
+      { src: '/images/insect-guide/leptotrombidium/01-overview.webp', caption: '恙螨（Leptotrombidium，恙虫病媒介）显微照片', alt: '恙螨（地里纤恙螨）显微照片', credit: 'Michael Wunderli', license: 'CC BY 2.0', sourceUrl: commonsFile('Leptotrombidium, chigger mites (14854410979).jpg') },
+      { src: '/images/insect-guide/leptotrombidium/02-larva.webp', caption: '恙螨幼虫（Leptotrombidium）另一视角，示微小红色虫体', alt: '恙螨幼虫另一角度的显微照片', credit: 'Michael Wunderli', license: 'CC BY 2.0', sourceUrl: commonsFile('Leptotrombidium, chigger mites (15041128245).jpg') },
+      { src: '/images/insect-guide/leptotrombidium/03-stylostome.webp', caption: '恙螨幼虫（近缘属 Trombicula）吸血期，可见刺入皮肤的茎状口针', alt: '恙螨幼虫带茎状口针的显微照片', credit: 'Alan R Walker', license: 'CC BY-SA 3.0', sourceUrl: commonsFile('Trombicula-larva-stylostome.jpg') }
+    ]
+  },
+  {
+    id: 'stable_fly', name: '厩螫蝇', scientificName: 'Stomoxys calcitrans', commonCategory: '蝇类',
+    aliases: ['厩螯蝇', '吸血厩蝇', '螫蝇', '刺蝇'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#5F7A5F',
+    summary: '形似家蝇但会吸血的蝇类，口器像刺刀前伸，白天多叮咬小腿脚踝。',
+    appearance: '灰褐色，与家蝇大小相近；头部前方平伸细长刺吸式口器，胸部有 4 条深色纵纹。',
+    identificationKeys: ['口器像刺刀般向前平伸', '胸部背面 4 条深色纵纹', '雌雄均叮咬、白天活动'],
+    distribution: '世界性分布，我国华北、华中、华南均常见，华东及浙江有分布。',
+    habitat: '牛舍、马厩、猪场等牲畜场所及其周边，也见于海滨和河滩。',
+    contactPattern: '白天叮咬裸露的小腿、脚踝和足背，叮咬瞬间锐痛，可隔着薄衣物叮咬。',
+    commonReaction: '叮咬处锐痛后出现红色丘疹或风团，中央有小叮痕，多数数天内消退。',
+    compareClues: '与家蝇区分看口器——家蝇舐食不吸血、口器短软，厩螫蝇口器前伸且叮咬锐痛。',
+    firstActions: ['用肥皂和清水清洗叮咬处', '冷敷减轻疼痛和肿胀', '避免抓挠，必要时外用止痒药'],
+    caution: '叮咬多为自限性；红肿流脓、发热或大量叮咬后不适时就医。',
+    confusedWith: ['mosquito', 'biting_midge', 'flea'],
+    sourceKeys: ['nhsBites', 'ufStableFly'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Stomoxys_calcitrans',
+    images: [
+      { src: '/images/insect-guide/stomoxys-calcitrans/01-overview.webp', caption: '厩螫蝇成虫整体形态，可见头部前方平伸的刺吸式口器与胸部纵纹', alt: '一只灰褐色的厩螫蝇成虫，头部前方伸出一根细长的刺吸式口器', credit: 'Stu\'s Images', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Stomoxys calcitrans, Stable Fly, UK.jpg') },
+      { src: '/images/insect-guide/stomoxys-calcitrans/02-detail.webp', caption: '头部与口器细节：从下方视角特写刺吸式喙（吸血针）', alt: '厩螫蝇头部与口器的特写，展示向前伸出的刺吸式喙', credit: 'KnochenJochen', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Stomoxys calcitrans Kopfnahansicht.png') },
+      { src: '/images/insect-guide/stomoxys-calcitrans/03-behavior.webp', caption: '厩螫蝇正在人体皮肤上吸血，展示其叮咬行为', alt: '一只厩螫蝇落在皮肤上用口器吸血的特写', credit: 'Peterwchen', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Stomoxys calcitrans-sucking blood.jpg') }
+    ]
+  },
+  {
+    id: 'black_fly', name: '蚋（黑蝇）', scientificName: 'Simulium spp.', commonCategory: '蚋类',
+    aliases: ['黑蝇', '驼背蚋', '挖背', '吸血蚋'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#4A6B6B',
+    summary: '俗称黑蝇，体型微小、背部隆起，雌蚋白天成群叮咬，事后瘙痒红肿明显。',
+    appearance: '体长约 2～5 毫米，粗壮、多为黑色，背部隆起似驼背；翅宽阔，静止时平叠于体背。',
+    identificationKeys: ['体型微小、背部隆起', '翅宽阔、静止时平叠', '成群白天叮咬头面颈等暴露处'],
+    distribution: '世界性分布，我国山区溪流附近广布，浙江丽水、宁波等地有吸血蚋记录。',
+    habitat: '山溪、河流等清洁流水附近的草丛灌木；幼虫孳生于流动清水。',
+    contactPattern: '白天在溪边、林缘成群叮咬，多咬头面部、耳后和四肢，叮咬瞬间常无痛。',
+    commonReaction: '叮后局部红肿剧痒，中央有针尖样出血点，反应重时可伴“蚋热”等全身症状。',
+    compareClues: '与蠓区分看大小与翅型——蠓更小、翅窄、孳生于湿地；与蚊子区分看活动环境与口器。',
+    firstActions: ['离开溪边等孳生环境并清洗叮咬处', '冷敷减轻红肿瘙痒', '必要时外用止痒药或口服抗组胺药'],
+    caution: '在我国一般不传播河盲症，主要危害是剧痒和过敏；溃烂、发热或呼吸困难时就医。',
+    confusedWith: ['biting_midge', 'mosquito', 'flea'],
+    sourceKeys: ['nhsBites', 'zjLishuiBlackfly', 'purdueBlackfly'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Simulium',
+    images: [
+      { src: '/images/insect-guide/simulium/01-overview.webp', caption: '蚋（黑蝇）成虫整体形态：体型粗短、背部隆起呈驼背状', alt: '一只黑色的小型蚋成虫，背部隆起，翅宽阔', credit: 'Fritz Geller-Grimm', license: 'CC BY-SA 2.5', sourceUrl: commonsFile('Simuliidae fg01.jpg') },
+      { src: '/images/insect-guide/simulium/02-detail.webp', caption: '蚋的头部特写：可见复眼与短粗的刺吸式口器', alt: '蚋的头部特写，展示复眼和口器', credit: 'Erin Hayes-Pontius', license: 'CC BY-SA 3.0', sourceUrl: commonsFile('Simuliidae - Face.jpg') },
+      { src: '/images/insect-guide/simulium/03-behavior.webp', caption: '一对蚋成虫在河边交配，展示其生活于流水环境的行为', alt: '两只蚋成虫在交配的行为特写', credit: 'Syrio', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Simuliidae sp couple 01.jpg') }
+    ]
+  },
+  {
+    id: 'head_louse', name: '头虱', scientificName: 'Pediculus humanus capitis', commonCategory: '虱类',
+    aliases: ['头虱子', '人头虱', '发虱'], group: 'attached', groupName: '附着类', accent: '#8B5A5A',
+    summary: '专一寄生于人头发的吸血型体表寄生虫，不会跳飞，主要靠头对头接触传播。',
+    appearance: '成虱体长约 2～3 毫米，扁平灰白至棕褐色，6 足末端带爪；卵（虮子）牢固粘附发干。',
+    identificationKeys: ['头皮持续瘙痒（枕部耳后多见）', '发丝上发现活虱或紧贴发根的卵壳', '密切接触者有相似病例'],
+    distribution: '全球分布，与卫生条件无关，儿童高发；浙江及华东校园聚集性感染常见。',
+    habitat: '寄生于头皮和头发，尤其耳后、枕部、颈后发际。',
+    contactPattern: '主要通过头对头直接接触或共用梳子、帽子、枕套等个人物品传播。',
+    commonReaction: '头皮瘙痒（对虱唾液过敏），搔抓可致抓痕、破损和继发细菌感染。',
+    compareClues: '与头皮屑区分——虮子牢固粘附发干需用力才能滑落，头皮屑轻拍即落。',
+    firstActions: ['用密齿篦子反复篦除活虱和卵', '按说明使用灭虱洗剂并隔期重复', '热水清洗或密封隔离个人物品'],
+    caution: '头虱不致命也不传播严重疾病；头皮红肿、渗脓、发热时提示继发感染应就医。',
+    confusedWith: ['bedbug', 'flea', 'chigger', 'tick', 'mosquito'],
+    sourceKeys: ['cdcHeadLouse', 'nhsHeadLice', 'statpearlsPediculosis'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Pediculus_humanus_capitis',
+    images: [
+      { src: '/images/insect-guide/pediculus-humanus-capitis/01-adult.webp', caption: '雄性头虱整体形态（微距放大）', alt: '雄性头虱的微距照片，可见其扁平身体与六条带爪的足', credit: 'Gilles San Martin', license: 'CC BY-SA 2.0', sourceUrl: commonsFile('Male human head louse.jpg') },
+      { src: '/images/insect-guide/pediculus-humanus-capitis/02-cdc.webp', caption: '头虱形态（美国疾控中心 PHIL 图像库）', alt: '头虱的显微图像，展示其身体与足部结构', credit: 'CDC（美国疾病控制与预防中心）', license: 'Public domain', sourceUrl: commonsFile('Pediculus humanus capitis CDC0377.png') },
+      { src: '/images/insect-guide/pediculus-humanus-capitis/03-on-hair.webp', caption: '头虱紧抓发丝（显微放大）', alt: '显微照片显示一只头虱附着并抓握头发发干', credit: 'Janek Lass', license: 'CC BY 4.0', sourceUrl: commonsFile('Inimese peatäi.jpg') }
+    ]
+  },
+  {
+    id: 'scabies_mite', name: '疥螨', scientificName: 'Sarcoptes scabiei', commonCategory: '螨类',
+    aliases: ['疥虫', '疥疮螨', '痒螨', '人疥螨'], group: 'attached', groupName: '附着类', accent: '#B07050',
+    summary: '钻入皮肤角质层挖隧道生活的微小寄生虫，引起疥疮——剧烈瘙痒和特征性丘疹。',
+    appearance: '成螨约 0.3～0.4 毫米，肉眼几乎不可见，近圆形、乳白至淡棕色；皮疹见丘疹、水疱和灰色隧道。',
+    identificationKeys: ['夜间或遇热后瘙痒明显加重', '指缝、腕、腋下、腰腹等褶皱处丘疹与隧道', '同住者同时或相继瘙痒'],
+    distribution: '全球流行，集体生活环境中高发；浙江及华东人口密集、集体住宿多。',
+    habitat: '寄生于皮肤角质层内，好发于指缝、腕部、腋窝、腹股沟等薄嫩温暖处。',
+    contactPattern: '通过长时间皮肤直接接触或污染衣物、床单传播；短暂握手通常不传播。',
+    commonReaction: '潜伏 2～6 周后出现剧烈瘙痒（夜间加重）、红色丘疹、水疱和隧道，搔抓可继发感染。',
+    compareClues: '与湿疹区分看隧道与好发部位；与蚊蚤叮咬的散发丘疹不同，疥疮密集且累及指缝。',
+    firstActions: ['尽早就医明确诊断，勿自行长期涂激素药膏', '遵医嘱用杀疥药物从颈以下全身涂抹', '同住者同治疗并高温清洗或隔离衣物寝具'],
+    caution: '一般不致命，主要危害是瘙痒和继发感染；红肿渗脓、发热或久治不愈应复诊。',
+    confusedWith: ['bedbug', 'flea', 'chigger', 'mosquito'],
+    sourceKeys: ['cdcScabies', 'nhsScabies', 'statpearlsScabies'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Sarcoptes_scabiei',
+    images: [
+      { src: '/images/insect-guide/sarcoptes-scabiei/01-microscope.webp', caption: '光学显微镜下的疥螨（放大 20 倍）', alt: '光学显微镜下的疥螨照片，可见其近圆形虫体和足', credit: 'Arthur Goldstein', license: 'CC BY-SA 4.0', sourceUrl: commonsFile('Sarcopte scabiei under a microscope.jpg') },
+      { src: '/images/insect-guide/sarcoptes-scabiei/02-adult.webp', caption: '疥螨成虫（微距）', alt: '疥螨成虫的微距照片，展示其圆形身体与四对足', credit: 'Alan R Walker', license: 'CC BY-SA 3.0', sourceUrl: commonsFile('Sarcoptes-scabiei-adult-mite-2.JPG') },
+      { src: '/images/insect-guide/sarcoptes-scabiei/03-mite.webp', caption: '疥螨（Sarcoptes scabiei）形态', alt: '疥螨的放大照片，展示虫体轮廓与腿部结构', credit: 'Alan R Walker', license: 'CC BY-SA 3.0', sourceUrl: commonsFile('Sarcoptes-scabiei.JPG') }
+    ]
+  },
+  {
+    id: 'house_centipede', name: '花蚰蜒', scientificName: 'Thereuopoda clunifera', commonCategory: '蚰蜒类',
+    aliases: ['蚰蜒', '大蚰蜒', '墙串子', '钱串子'], group: 'stinging', groupName: '蜇刺类', accent: '#7A6B4A',
+    summary: '步足纤细、行动极快的蚰蜒，以蚊蝇蟑螂为食，仅被捕捉受压时才咬人，毒性弱。',
+    appearance: '体长 2.5～4 厘米，黄褐至灰褐；共 15 对极细长步足，末对特长超出身体末端如触角。',
+    identificationKeys: ['15 对细长步足，末对特长', '体背深浅相间斑纹、行动极快', '头部有长触角和钩状毒颚'],
+    distribution: '分布于东亚，中国华东、华中、华南及西南有记录，浙江有分布。',
+    habitat: '卫生间、厨房、地下室等潮湿阴暗处，也见于室外石缝、落叶层，夜间活跃。',
+    contactPattern: '通常避人；被咬多因夜间触碰、穿衣时衣物内藏有蚰蜒或徒手捕捉。',
+    commonReaction: '咬处针刺样疼痛、局部发红和轻度肿胀，一般数小时至 1～2 天消退。',
+    compareClues: '与蜈蚣区分——蚰蜒步足细长（15 对）、末对特长、咬伤通常更轻。',
+    firstActions: ['用肥皂和清水清洗咬伤部位', '局部冷敷减痛消肿', '症状加重或过敏时就医'],
+    caution: '毒性弱，多为轻微局部反应；出现全身荨麻疹、呼吸困难等过敏征象时就医。',
+    confusedWith: ['scolopendra_subspinipes_mutilans'],
+    sourceKeys: ['statpearlsCentipede', 'hkmjCentipede', 'wikiThereuopoda'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Thereuopoda_clunifera',
+    images: [
+      { src: '/images/insect-guide/thereuopoda/01-overview.webp', caption: '花蚰蜒整体形态，可见 15 对细长步足与末对特长后足', alt: '一只花蚰蜒的完整侧面照，身体细长，多对细长步足向四周展开，末对足向后延伸超过身体末端', credit: 'Thomas Brown', license: 'CC BY 2.0', sourceUrl: commonsFile('Long-legged Centipede (Thereuopoda clunifera) (5827306239).jpg') },
+      { src: '/images/insect-guide/thereuopoda/02-head.webp', caption: '花蚰蜒头部特写，可见发达复眼、长触角与钩状毒颚', alt: '花蚰蜒头部近距离特写，显示复眼、细长触角和位于头部下方的钩状毒颚', credit: 'heikindai_87', license: 'CC0', sourceUrl: commonsFile('Thereuopoda clunifera 126701283.jpg') },
+      { src: '/images/insect-guide/thereuopoda/03-habitat.webp', caption: '花蚰蜒在野外水渠旁捕食（旁为蟋蟀残骸），展示其生活场景', alt: '一只花蚰蜒在石缝水渠旁，旁边有被它捕食的蟋蟀残骸，展示其夜间捕食行为', credit: 'Thomas Brown', license: 'CC BY 2.0', sourceUrl: commonsFile('Long-legged Centipede (Thereuopoda clunifera) (6747989937).jpg') }
+    ]
+  },
+  {
+    id: 'chinese_scorpion', name: '东亚钳蝎', scientificName: 'Mesobuthus martensii', commonCategory: '蝎类',
+    aliases: ['马氏钳蝎', '中华钳蝎', '远东钳蝎', '全蝎'], group: 'stinging', groupName: '蜇刺类', accent: '#5A4A6B',
+    summary: '中国及东亚常见的蝎类，尾部末端有毒针，蜇刺以局部剧痛为主，预后多良好。',
+    appearance: '体长（含尾）约 4～6 厘米，黄褐至黄绿；前部一对螯和 4 对步足，尾部末端有球状尾节和向上弯的毒针。',
+    identificationKeys: ['前部一对螯、4 对步足', '后体细长如尾，末端有毒针', '昼伏夜出，藏于石缝土穴'],
+    distribution: '主要分布于长江以北（华北、西北东部、东北南部）；浙江非自然分布区，偶见养殖流通个体。',
+    habitat: '山坡石缝、土穴、砖石堆、墙缝及农田边缘，昼伏夜出。',
+    contactPattern: '翻动石块、搬柴草、穿鞋时鞋内有蝎或徒手捕捉时被蜇。',
+    commonReaction: '蜇后立即剧痛，局部发红肿胀，疼痛向近端放射，持续数小时至 1～2 天。',
+    compareClues: '与蜈蚣咬伤区分——蝎蜇多为单个刺点、灼痛为主；东亚钳蝎毒性弱、致死风险很低。',
+    firstActions: ['用肥皂和清水清洗蜇伤部位', '局部冷敷镇痛并抬高患肢', '出现全身症状或儿童被蜇时尽快就医'],
+    caution: '多为局部剧痛、可自行缓解；恶心呕吐、心慌、呼吸困难等全身反应或儿童被蜇应就医。',
+    confusedWith: ['scolopendra_subspinipes_mutilans'],
+    sourceKeys: ['statpearlsScorpion', 'mesobuthusDistribution'], taxonUrl: 'https://commons.wikimedia.org/wiki/Category:Mesobuthus_martensii',
+    images: [
+      { src: '/images/insect-guide/mesobuthus-martensii/01-overview.webp', caption: '东亚钳蝎（中国金蝎）整体形态，可见一对螯、4 对步足与末端的尾针', alt: '一只黄褐色的东亚钳蝎整体照，前部有一对螯和四对步足，后部细长的尾巴末端向上弯曲带有毒针', credit: 'Holger Krisp', license: 'CC BY 4.0', sourceUrl: commonsFile('Olivierus martensii Chinesischer Goldskorpion 1.jpg') },
+      { src: '/images/insect-guide/mesobuthus-martensii/02-dorsal.webp', caption: '东亚钳蝎背面观，显示黄褐体色与细长的尾节', alt: '东亚钳蝎从上方拍摄的背面照片，身体黄褐色，尾部细长，末端尾针清晰可见', credit: 'Já', license: 'CC BY-SA 3.0', sourceUrl: commonsFile('Mesobuthus martensii (283).jpg') },
+      { src: '/images/insect-guide/mesobuthus-martensii/03-live.webp', caption: '东亚钳蝎侧面生活照，展示其爬行姿态与体态特征', alt: '一只活体东亚钳蝎的侧面照片，正趴在基质上，前部螯肢与后部弯曲的尾部清晰可见', credit: 'Holger Krisp', license: 'CC BY 4.0', sourceUrl: commonsFile('Olivierus martensii Chinesischer Goldskorpion 2.jpg') }
     ]
   }
 ];
