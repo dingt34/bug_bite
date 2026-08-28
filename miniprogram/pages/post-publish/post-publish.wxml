@@ -17,9 +17,20 @@
     <view class="event-import-arrow">›</view>
   </view>
 
+  <view class="event-import route-import" bindtap="chooseRoute">
+    <view class="event-import-icon">⌖</view>
+    <view class="event-import-copy">
+      <view class="event-import-title">{{routePlan ? '已添加路线（选填）' : '添加路线（选填）'}}</view>
+      <view class="event-import-sub" wx:if="{{routePlan}}">{{routePathText}}</view>
+      <view class="event-import-sub" wx:else>先规划路线，可添加多个途经点</view>
+    </view>
+    <view class="route-remove" wx:if="{{routePlan}}" catchtap="removeRoute">移除</view>
+    <view class="event-import-arrow">›</view>
+  </view>
+
   <view class="card">
     <view class="card-title">{{editing ? '编辑你的分享' : '分享你的经历'}}</view>
-    <textarea class="editor" placeholder="描述你的户外经历、接触情况或处理经验…" maxlength="500" bindinput="onInput" value="{{text}}" />
+    <textarea class="editor" placeholder="描述你的户外经历、接触情况、路线心得或处理经验…" maxlength="500" bindinput="onInput" value="{{text}}" />
     <view class="char-count">{{charCount}} / 500</view>
   </view>
 
@@ -39,7 +50,7 @@
 
   <view class="card">
     <view class="card-title">事件发生地点 <text class="required">*</text></view>
-    <view class="field-help">请选择最接近的浙江省内城市</view>
+    <view class="field-help">请选择最接近的浙江省内城市；添加路线后会辅助选择</view>
     <view class="chips">
       <text class="tag {{region === item ? 'active' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="onRegionTap" data-v="{{item}}">{{item}}</text>
     </view>

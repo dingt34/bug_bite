@@ -37,6 +37,11 @@
   margin-top: 20rpx;
   line-height: 1.7;
 }
+.route-share-card { margin-top: 22rpx; padding: 22rpx; border: 1rpx solid #CFE4D9; border-radius: 16rpx; background: #F3FAF6; }
+.route-share-badge { color: #2E7D5B; font-size: 22rpx; font-weight: 600; }
+.route-share-path { margin-top: 10rpx; color: #26342D; font-size: 27rpx; font-weight: 600; line-height: 1.65; }
+.route-arrow { margin: 0 8rpx; color: #74A38D; }
+.route-share-meta { margin-top: 8rpx; color: #75827C; font-size: 22rpx; line-height: 1.5; }
 .post-img {
   width: 100%;
   border-radius: 16rpx;

@@ -51,4 +51,15 @@ assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_湖州'
 assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_嘉兴'));
 assert.ok(navigatedUrl.includes('planId=' + storage.plans[0].id));
 
+const progressPage = Object.assign({}, pageDefinition, {
+  data: {
+    requiredCount: 3,
+    form: { regionCodes: ['杭州'], month: '8月', activityType: '' }
+  },
+  setData(update) { this.data = Object.assign({}, this.data, update); }
+});
+progressPage.updateCompletion();
+assert.strictEqual(progressPage.data.answeredCount, 2);
+assert.strictEqual(progressPage.data.completionPercent, 67);
+
 console.log('precheck page tests passed');

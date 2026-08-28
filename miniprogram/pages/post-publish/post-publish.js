@@ -8,6 +8,8 @@ const DRAFT_KEY = 'communityPostDraftV1';
 Page({
   data: {
     text: '',
+    routePlan: null,
+    routePathText: '',
     previewImage: '',
     regions: mock.REGIONS,
     types: mock.CONTACT_TYPES,
@@ -46,7 +48,37 @@ Page({
     } else {
       this.restoreDraft();
       this.loadPreviousEvents();
+      this.attachRouteRequested = !!(options && (options.attachRoute === '1' || options.type === 'route'));
+      if (this.attachRouteRequested) this.loadSavedRoute();
     }
+  },
+
+  onShow() {
+    if (this.attachRouteRequested) this.loadSavedRoute();
+  },
+
+  loadSavedRoute() {
+    const routePlan = wx.getStorageSync('selectedRoutePlan') || null;
+    if (!routePlan) return;
+    const names = [routePlan.startName].concat(routePlan.waypointNames || [], [routePlan.endName]).filter(Boolean);
+    const suggestedRegion = (routePlan.regions || []).find(region => this.data.regions.indexOf(region) > -1) || '';
+    this.setData({
+      routePlan,
+      routePathText: names.join(' → '),
+      region: this.data.region || suggestedRegion,
+      validationMessage: ''
+    });
+  },
+
+  chooseRoute() {
+    this.attachRouteRequested = true;
+    wx.navigateTo({ url: '/pages/route-plan/route-plan' });
+  },
+
+  removeRoute() {
+    this.attachRouteRequested = false;
+    this.setData({ routePlan: null, routePathText: '', validationMessage: '' });
+    this.persistDraft();
   },
 
   loadPreviousEvents() {
@@ -151,6 +183,8 @@ Page({
       const post = result.post;
       this.setData({
         text: post.text || '',
+        routePlan: post.routePlan || null,
+        routePathText: post.routePlan ? [post.routePlan.startName].concat(post.routePlan.waypointNames || [], [post.routePlan.endName]).filter(Boolean).join(' → ') : '',
         previewImage: (post.imageRefs || [])[0] || '',
         region: post.region || '',
         contactType: post.contactType || '',
@@ -176,6 +210,8 @@ Page({
     const text = String(draft.text || '').slice(0, 500);
     this.setData({
       text,
+      routePlan: draft.routePlan || null,
+      routePathText: draft.routePlan ? [draft.routePlan.startName].concat(draft.routePlan.waypointNames || [], [draft.routePlan.endName]).filter(Boolean).join(' → ') : '',
       region: draft.region || '',
       contactType: draft.contactType || '',
       contactTypeName: draft.contactTypeName || '',
@@ -189,13 +225,14 @@ Page({
     if (this.data.editing || this.data.publishing) return;
     const draft = {
       text: this.data.text,
+      routePlan: this.data.routePlan,
       region: this.data.region,
       contactType: this.data.contactType,
       contactTypeName: this.data.contactTypeName,
       stage: this.data.stage,
       savedAtTimestamp: Date.now()
     };
-    const hasContent = draft.text.trim() || draft.region || draft.contactType || draft.stage;
+    const hasContent = draft.text.trim() || draft.region || draft.contactType || draft.stage || draft.routePlan;
     if (hasContent) wx.setStorageSync(DRAFT_KEY, draft);
     else if (wx.removeStorageSync) wx.removeStorageSync(DRAFT_KEY);
   },
@@ -263,7 +300,7 @@ Page({
         if (!result.confirm) return;
         this.clearDraft();
         this.setData({
-          text: '', previewImage: '', region: '', contactType: '',
+          text: '', previewImage: '', region: '', contactType: '', routePlan: null, routePathText: '',
           contactTypeName: '', stage: '', charCount: 0, validationMessage: ''
         });
       }

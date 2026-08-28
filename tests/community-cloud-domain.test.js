@@ -19,6 +19,14 @@ const post = domain.normalizePost({
 });
 assert.deepStrictEqual(post.tags, ['丽水', '叮咬', '观察中']);
 assert.deepStrictEqual(post.imageRefs, ['cloud://env/community.jpg']);
+const routePost = domain.normalizePost({
+  text: '沿途补给充足，雨天注意石阶湿滑。', region: '湖州',
+  contactType: 'bite', stage: '观察中',
+  routePlan: { startName: '湖州站', waypointNames: ['南浔古镇'], endName: '莫干山', modeName: '驾车' }
+});
+assert.strictEqual(routePost.contentType, 'experience');
+assert.deepStrictEqual(routePost.tags, ['湖州', '叮咬', '观察中', '含路线']);
+assert.deepStrictEqual(routePost.routePlan.waypointNames, ['南浔古镇']);
 assert.throws(() => domain.normalizePost({ text: '太短' }), /至少填写5个字/);
 assert.throws(() => domain.normalizePost({
   text: '记录一次完整的户外叮咬经历', contactType: 'bite', stage: '观察中'

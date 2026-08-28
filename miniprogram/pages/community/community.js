@@ -8,6 +8,8 @@ Page({
     posts: [],
     filterMode: 'all',
     sortMode: 'latest',
+    region: '',
+    regions: ['全部地区'].concat(mock.REGIONS),
     query: '',
     topic: '',
     topics: [{ key: '', name: '全部主题' }].concat(mock.CONTACT_TYPES.map(item => ({
@@ -75,6 +77,7 @@ Page({
       filterMode: this.data.filterMode,
       query: this.data.query,
       topic: this.data.topic,
+      region: this.data.region,
       sortMode: this.data.sortMode,
       offset: append ? this.data.posts.length : 0,
       limit: 20
@@ -121,6 +124,12 @@ Page({
 
   setSort(e) {
     this.setData({ sortMode: e.currentTarget.dataset.mode });
+    this.loadPosts({ reset: true });
+  },
+
+  setRegion(e) {
+    const value = e.currentTarget.dataset.region || '';
+    this.setData({ region: value === '全部地区' ? '' : value });
     this.loadPosts({ reset: true });
   },
 

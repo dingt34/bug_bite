@@ -44,11 +44,11 @@ assert.strictEqual(toastTitle, '路线已保存');
 const pageSource = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/route-plan/route-plan.js'), 'utf8');
 const templateSource = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/route-plan/route-plan.wxml'), 'utf8');
 assert.ok(pageSource.includes("action: 'suggest'"));
-assert.ok(pageSource.includes('waypointPlace: this.data.selectedPlaces.waypointName'));
+assert.ok(pageSource.includes('waypointPlaces: this.data.waypoints'));
 assert.ok(templateSource.includes('bindinput="onWaypointInput"'));
 assert.ok(templateSource.includes('catchtap="selectSuggestion"'));
 assert.ok(templateSource.includes('bindtap="addWaypoint"'));
-assert.ok(templateSource.includes('wx:if="{{!waypointEnabled}}"'));
+assert.ok(templateSource.includes('waypoints.length < 5'));
 
 global.setTimeout = originalSetTimeout;
 console.log('route plan page tests passed');

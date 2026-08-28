@@ -42,3 +42,5 @@
 .route-meta { margin-top: 6rpx; color: #7B8881; font-size: 23rpx; }
 .route-state { color: #2E7D5B; font-size: 24rpx; font-weight: 600; }
 .route-notice { margin-top: 16rpx; color: #919B96; font-size: 21rpx; line-height: 1.5; }
+.share-route-button { margin-top: 14rpx; border: 2rpx solid #2E7D5B; border-radius: 12rpx; background: #FFFFFF; color: #2E7D5B; font-size: 26rpx; font-weight: 600; }
+.share-route-button::after { border: none; }
