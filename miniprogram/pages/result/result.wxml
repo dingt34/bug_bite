@@ -1,16 +1,20 @@
 <safety-nav current="4" allow-back="{{allowStepBack}}" bind:stepchange="onStepChange" />
-<view class="page" wx:if="{{content}}">
+<view class="page result-{{level}}" wx:if="{{content}}">
   <!-- 风险等级横幅 -->
   <view class="banner" style="background: {{content.color}};">
+    <view class="banner-eyebrow">行动建议</view>
     <view class="banner-icon">{{content.icon}}</view>
     <view class="banner-title">{{content.levelName}}</view>
+    <view class="banner-desc" wx:if="{{!content.isEmergency}}">请按以下步骤处理，并持续观察身体变化</view>
     <view class="banner-sub" wx:if="{{content.isEmergency}}">已触发危险信号，请优先联系急救服务</view>
   </view>
 
   <!-- 下一步行动 -->
-  <view class="card">
-    <view class="card-kicker">01</view>
-    <view class="card-title">现在做什么</view>
+  <view class="card advice-card action-card">
+    <view class="section-head">
+      <view class="card-kicker">01</view>
+      <view class="card-title">现在做什么</view>
+    </view>
     <view class="action-item" wx:for="{{content.actions}}" wx:key="*this">
       <view class="action-num">{{index + 1}}</view>
       <view class="action-text">{{item}}</view>
@@ -19,9 +23,11 @@
   </view>
 
   <!-- 记录清单 -->
-  <view class="card">
-    <view class="card-kicker">02</view>
-    <view class="card-title">观察什么</view>
+  <view class="card advice-card observe-card">
+    <view class="section-head">
+      <view class="card-kicker">02</view>
+      <view class="card-title">观察什么</view>
+    </view>
     <view class="check-item" wx:for="{{content.checklist}}" wx:key="*this">
       <view class="check-box">✓</view>
       <view class="check-text">{{item}}</view>
@@ -29,9 +35,11 @@
   </view>
 
   <!-- 升级求助条件 -->
-  <view class="card seek-card">
-    <view class="card-kicker">03</view>
-    <view class="card-title">何时求助</view>
+  <view class="card advice-card seek-card">
+    <view class="section-head">
+      <view class="card-kicker">03</view>
+      <view class="card-title">何时求助</view>
+    </view>
     <view class="seek-item" wx:for="{{content.seekHelp}}" wx:key="*this">
       <view class="seek-icon">!</view>
       <view class="seek-text">{{item}}</view>
@@ -40,7 +48,7 @@
   </view>
 
   <!-- 触发依据 -->
-  <view class="card evidence-card">
+  <view class="card advice-card evidence-card">
     <view class="card-title small-title">判断依据</view>
     <view class="basis">{{content.basis}}</view>
     <view class="basis-note">安全判断以症状和危险信号为准，图片仅作记录。</view>
@@ -48,7 +56,7 @@
   </view>
 
   <!-- 就医摘要 -->
-  <view class="card">
+  <view class="card advice-card summary-card">
     <view class="card-title">事件与就医沟通摘要</view>
     <view class="summary-box">{{summary}}</view>
     <view class="copy-btn" bindtap="copySummary">复制摘要</view>

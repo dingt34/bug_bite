@@ -1,31 +1,80 @@
 .page {
-  padding-bottom: 60rpx;
+  min-height: 100vh;
+  padding-bottom: calc(52rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #F0FAF5 0%, #F7FBFD 42%, #F7FAF8 100%);
 }
 
 .banner {
+  position: relative;
+  overflow: hidden;
   color: #fff;
-  padding: 48rpx 40rpx;
+  margin: 0 24rpx 28rpx;
+  padding: 30rpx 40rpx 38rpx;
+  border-radius: 28rpx;
   text-align: center;
+  box-shadow: 0 10rpx 26rpx rgba(43, 87, 67, 0.14);
+}
+.banner::after {
+  content: '';
+  position: absolute;
+  right: -58rpx;
+  bottom: -94rpx;
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.10);
+}
+.banner-eyebrow {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 21rpx;
+  font-weight: 600;
+  letter-spacing: 5rpx;
 }
 .banner-icon {
-  font-size: 64rpx;
+  position: relative;
+  z-index: 1;
+  margin-top: 8rpx;
+  font-size: 58rpx;
 }
 .banner-title {
-  font-size: 44rpx;
+  position: relative;
+  z-index: 1;
+  font-size: 40rpx;
   font-weight: 700;
-  margin-top: 8rpx;
+  margin-top: 4rpx;
 }
+.banner-desc,
 .banner-sub {
-  font-size: 24rpx;
-  opacity: 0.9;
+  position: relative;
+  z-index: 1;
   margin-top: 8rpx;
+  font-size: 24rpx;
+  opacity: 0.86;
+}
+
+.advice-card {
+  border: 1rpx solid #D9E9E2;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  box-shadow: 0 7rpx 22rpx rgba(43, 87, 67, 0.07);
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 22rpx;
+}
+.section-head .card-title {
+  margin: 0;
 }
 
 .basis {
   font-size: 28rpx;
-  color: #3A414A;
-  background: #F7F8F9;
-  border-radius: 12rpx;
+  color: #40544A;
+  background: #F4F9F7;
+  border: 1rpx solid #DCEAE4;
+  border-radius: 16rpx;
   padding: 20rpx;
 }
 .basis-note {
@@ -36,11 +85,12 @@
 
 .card-kicker {
   display: inline-block;
-  margin-bottom: 8rpx;
-  padding: 2rpx 12rpx;
-  border-radius: 16rpx;
-  background: var(--primary-light);
-  color: var(--primary);
+  flex-shrink: 0;
+  margin: 0 14rpx 0 0;
+  padding: 4rpx 13rpx;
+  border-radius: 18rpx;
+  background: #E4F6EC;
+  color: #31825E;
   font-size: 20rpx;
   font-weight: 700;
 }
@@ -50,7 +100,7 @@
 }
 
 .seek-card {
-  border-left: 8rpx solid #F57C00;
+  border-left: 7rpx solid #F2B74B;
 }
 
 .action-item {
@@ -62,8 +112,8 @@
   width: 40rpx;
   height: 40rpx;
   border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--primary);
+  background: #E4F6EC;
+  color: #31825E;
   text-align: center;
   line-height: 40rpx;
   font-size: 24rpx;
@@ -84,6 +134,7 @@
   font-size: 30rpx;
   font-weight: 600;
   margin-top: 16rpx;
+  box-shadow: 0 8rpx 20rpx rgba(211, 65, 59, 0.18);
 }
 
 .review {
@@ -118,7 +169,8 @@
 .review-plan {
   margin-top: 20rpx;
   padding: 16rpx 18rpx;
-  border-radius: 12rpx;
+  border: 1rpx solid #F2DFC0;
+  border-radius: 14rpx;
   background: #FFF8ED;
   color: #8A5200;
   font-size: 24rpx;
@@ -126,7 +178,7 @@
 .source-note {
   margin-top: 16rpx;
   padding-top: 14rpx;
-  border-top: 1rpx solid #ECEEF0;
+  border-top: 1rpx solid #E2ECE7;
   color: #9AA0A6;
   font-size: 20rpx;
   line-height: 1.5;
@@ -141,8 +193,8 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--primary);
+  background: #E4F6EC;
+  color: #31825E;
   font-size: 22rpx;
   text-align: center;
   line-height: 36rpx;
@@ -156,17 +208,18 @@
 
 .summary-box {
   font-size: 26rpx;
-  color: #3A414A;
-  background: #F7F8F9;
-  border-radius: 12rpx;
+  color: #40544A;
+  background: #F4F9F7;
+  border: 1rpx solid #DCEAE4;
+  border-radius: 16rpx;
   padding: 20rpx;
   line-height: 1.7;
 }
 .copy-btn {
   margin-top: 20rpx;
   text-align: center;
-  border: 2rpx solid var(--primary);
-  color: var(--primary);
+  border: 1rpx solid #43AE79;
+  color: #31825E;
   border-radius: 40rpx;
   padding: 16rpx 0;
   font-size: 28rpx;
@@ -180,4 +233,13 @@
 .action-bar button {
   flex: 1;
   margin: 0;
+}
+.action-bar .btn-ghost {
+  border-width: 1rpx;
+  border-color: #43AE79;
+  color: #31825E;
+}
+.action-bar .btn-primary {
+  background: #43AE79;
+  box-shadow: 0 8rpx 22rpx rgba(48, 151, 104, 0.22);
 }
