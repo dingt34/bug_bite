@@ -58,6 +58,10 @@ Page({
     this.setData({ inputText: e.detail.value || '' });
   },
 
+  onSendTap() {
+    this.sendMessage();
+  },
+
   chooseImage(e) {
     if (this.data.sending) return;
     const kind = e.currentTarget.dataset.kind;

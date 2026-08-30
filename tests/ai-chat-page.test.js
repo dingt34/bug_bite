@@ -36,8 +36,12 @@ cloudService.resetForTests();
 require('../miniprogram/pages/ai-chat/ai-chat.js');
 
 const styles = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/ai-chat/ai-chat.wxss'), 'utf8');
+const template = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/ai-chat/ai-chat.wxml'), 'utf8');
 assert.ok(styles.includes('min-width: 0;'), '输入框应允许在 Flex 中收缩，避免覆盖发送按钮');
 assert.ok(styles.includes('z-index: 2;'), '发送按钮应位于原生 textarea 点击层之上');
+assert.ok(template.includes('bindconfirm="onSendTap"'), '输入法发送动作应触发消息发送');
+assert.ok(template.includes('bindtap="onSendTap"'), '发送视图应绑定独立点击处理器');
+assert.ok(template.includes('<view class="send-button'), '发送控件不应使用可能被原生 textarea 抢占点击层的 button');
 
 const page = Object.assign({}, pageDefinition, {
   data: Object.assign({}, pageDefinition.data),
@@ -50,7 +54,7 @@ const page = Object.assign({}, pageDefinition, {
   assert.strictEqual(page.data.imageAvailable, true);
   assert.strictEqual(page.data.modeText, '千问多模态');
   page.onInput({ detail: { value: '被虫咬后需要注意什么？' } });
-  page.sendMessage();
+  page.onSendTap();
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.strictEqual(page.data.sending, false);
   assert.ok(page.data.messages.at(-1).content.includes('观察危险信号'));

@@ -358,17 +358,20 @@
   position: relative;
   z-index: 2;
   width: 120rpx;
+  height: 72rpx;
   flex-shrink: 0;
   margin: 0 0 0 12rpx;
-  padding: 18rpx 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 20rpx;
   background: #2E7D5B;
   color: #FFFFFF;
   font-size: 24rpx;
-  line-height: 1.5;
+  box-sizing: border-box;
 }
-.send-button::after {
-  border: none;
+.send-button-disabled {
+  background: #9DB8AB;
 }
 .record-selector-mask {
   position: fixed;

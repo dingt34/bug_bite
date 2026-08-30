@@ -63,8 +63,8 @@
     </view>
 
     <view class="input-row">
-      <textarea class="chat-input" value="{{inputText}}" bindinput="onInput" maxlength="1000" auto-height placeholder="描述接触情况、症状变化或想了解的问题…" disabled="{{sending}}" />
-      <button class="send-button" disabled="{{sending}}" bindtap="sendMessage">{{sending ? '回复中' : '发送'}}</button>
+      <textarea class="chat-input" value="{{inputText}}" bindinput="onInput" bindconfirm="onSendTap" confirm-type="send" maxlength="1000" auto-height placeholder="描述接触情况、症状变化或想了解的问题…" disabled="{{sending}}" />
+      <view class="send-button {{sending ? 'send-button-disabled' : ''}}" role="button" aria-label="发送消息" bindtap="onSendTap">{{sending ? '回复中' : '发送'}}</view>
     </view>
   </view>
 
