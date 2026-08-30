@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const config = require('../miniprogram/config/cloud.js');
 const cloudService = require('../miniprogram/utils/cloud-service.js');
 
@@ -32,6 +34,10 @@ global.wx = {
 
 cloudService.resetForTests();
 require('../miniprogram/pages/ai-chat/ai-chat.js');
+
+const styles = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/ai-chat/ai-chat.wxss'), 'utf8');
+assert.ok(styles.includes('min-width: 0;'), '输入框应允许在 Flex 中收缩，避免覆盖发送按钮');
+assert.ok(styles.includes('z-index: 2;'), '发送按钮应位于原生 textarea 点击层之上');
 
 const page = Object.assign({}, pageDefinition, {
   data: Object.assign({}, pageDefinition.data),
