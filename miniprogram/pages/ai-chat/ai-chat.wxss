@@ -254,6 +254,7 @@
 }
 .composer {
   position: fixed;
+  z-index: 10;
   right: 0;
   bottom: 0;
   left: 0;
@@ -293,10 +294,15 @@
   position: relative;
   margin-right: 14rpx;
 }
-.preview-image {
+.preview-thumb {
   width: 100rpx;
   height: 100rpx;
   border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #EEF4F1;
+  font-size: 46rpx;
 }
 .preview-label {
   color: #7F8A84;
@@ -344,8 +350,7 @@
   width: 0;
   min-width: 0;
   flex: 1;
-  min-height: 72rpx;
-  max-height: 170rpx;
+  height: 72rpx;
   padding: 17rpx 20rpx;
   border: 1rpx solid #DDE5E1;
   border-radius: 20rpx;
@@ -368,7 +373,13 @@
   background: #2E7D5B;
   color: #FFFFFF;
   font-size: 24rpx;
+  line-height: 1;
+  padding: 0;
+  border: 0;
   box-sizing: border-box;
+}
+.send-button::after {
+  border: 0;
 }
 .send-button-disabled {
   background: #9DB8AB;

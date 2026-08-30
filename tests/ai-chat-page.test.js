@@ -39,9 +39,14 @@ const styles = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/ai-cha
 const template = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/ai-chat/ai-chat.wxml'), 'utf8');
 assert.ok(styles.includes('min-width: 0;'), '输入框应允许在 Flex 中收缩，避免覆盖发送按钮');
 assert.ok(styles.includes('z-index: 2;'), '发送按钮应位于原生 textarea 点击层之上');
-assert.ok(template.includes('bindconfirm="onSendTap"'), '输入法发送动作应触发消息发送');
-assert.ok(template.includes('bindtap="onSendTap"'), '发送视图应绑定独立点击处理器');
-assert.ok(template.includes('<view class="send-button'), '发送控件不应使用可能被原生 textarea 抢占点击层的 button');
+assert.ok(template.includes('bindconfirm="sendMessage"'), '输入法发送动作应直接触发消息发送');
+assert.ok(template.includes('bindtap="sendMessage"'), '发送按钮应直接绑定已有消息发送方法');
+assert.ok(template.includes('<button class="send-button'), '发送控件应使用点击行为稳定的原生 button');
+assert.ok(template.includes('<input class="chat-input"'), '聊天输入应避免使用重排后可能覆盖发送按钮的原生 textarea');
+assert.ok(!template.includes('<textarea class="chat-input"'), '聊天输入区不应残留原生 textarea');
+assert.ok(template.includes('<view class="preview-thumb"'), '图片预览应使用普通视图，避免原生 image 点击层覆盖发送按钮');
+assert.ok(!template.includes('<image class="preview-image"'), '图片预览区不应残留会拦截点击的原生 image');
+assert.ok(styles.includes('z-index: 10;'), '底部编辑区应位于聊天滚动层之上');
 
 const page = Object.assign({}, pageDefinition, {
   data: Object.assign({}, pageDefinition.data),
@@ -54,7 +59,7 @@ const page = Object.assign({}, pageDefinition, {
   assert.strictEqual(page.data.imageAvailable, true);
   assert.strictEqual(page.data.modeText, '千问多模态');
   page.onInput({ detail: { value: '被虫咬后需要注意什么？' } });
-  page.onSendTap();
+  page.sendMessage();
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.strictEqual(page.data.sending, false);
   assert.ok(page.data.messages.at(-1).content.includes('观察危险信号'));
