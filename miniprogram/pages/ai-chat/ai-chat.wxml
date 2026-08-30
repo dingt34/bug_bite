@@ -62,9 +62,12 @@
       <view class="attachment-tip">图片会发送至阿里云分析，回答后清理临时文件</view>
     </view>
 
+    <view class="image-consent" wx:if="{{images.length}}">点击“同意并发送”即同意将所选图片临时上传至微信云存储并发送到阿里云百炼分析；回答后会尝试删除临时图片。</view>
+
     <view class="input-row">
       <input class="chat-input" value="{{inputText}}" bindinput="onInput" bindconfirm="sendMessage" confirm-type="send" maxlength="1000" placeholder="描述接触情况、症状变化或想了解的问题…" disabled="{{sending}}" />
-      <button class="send-button {{sending ? 'send-button-disabled' : ''}}" aria-label="发送消息" bindtap="sendMessage" disabled="{{sending}}">{{sending ? '回复中' : '发送'}}</button>
+      <button wx:if="{{images.length}}" class="send-button send-image-button {{sending ? 'send-button-disabled' : ''}}" aria-label="同意并发送图片" bindtap="sendImageMessage" disabled="{{sending}}">{{sending ? '回复中' : '同意并发送'}}</button>
+      <button wx:else class="send-button {{sending ? 'send-button-disabled' : ''}}" aria-label="发送消息" bindtap="sendMessage" disabled="{{sending}}">{{sending ? '回复中' : '发送'}}</button>
     </view>
   </view>
 

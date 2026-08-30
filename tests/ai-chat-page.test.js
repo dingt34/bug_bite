@@ -41,7 +41,9 @@ assert.ok(styles.includes('min-width: 0;'), '输入框应允许在 Flex 中收�
 assert.ok(styles.includes('z-index: 2;'), '发送按钮应位于原生 textarea 点击层之上');
 assert.ok(template.includes('bindconfirm="sendMessage"'), '输入法发送动作应直接触发消息发送');
 assert.ok(template.includes('bindtap="sendMessage"'), '发送按钮应直接绑定已有消息发送方法');
-assert.ok(template.includes('<button class="send-button'), '发送控件应使用点击行为稳定的原生 button');
+assert.ok(template.includes('bindtap="sendImageMessage"'), '图片消息应通过明确同意后的独立发送动作提交');
+assert.ok(template.includes('点击“同意并发送”即同意'), '选图后应直接展示图片上传与分析说明');
+assert.ok(template.includes('class="send-button'), '发送控件应使用点击行为稳定的原生 button');
 assert.ok(template.includes('<input class="chat-input"'), '聊天输入应避免使用重排后可能覆盖发送按钮的原生 textarea');
 assert.ok(!template.includes('<textarea class="chat-input"'), '聊天输入区不应残留原生 textarea');
 assert.ok(template.includes('<view class="preview-thumb"'), '图片预览应使用普通视图，避免原生 image 点击层覆盖发送按钮');
@@ -89,7 +91,7 @@ const page = Object.assign({}, pageDefinition, {
     inputText: '请描述虫体特征',
     images: [{ kind: 'insect', label: '虫体图片', path: 'C:/temp/insect.jpg' }]
   });
-  page.sendMessage();
+  page.sendImageMessage();
   await new Promise(resolve => setTimeout(resolve, 30));
   assert.deepStrictEqual(lastCloudData.fileIds, ['cloud://temporary/insect.jpg']);
   assert.deepStrictEqual(lastCloudData.imageKinds, ['insect']);

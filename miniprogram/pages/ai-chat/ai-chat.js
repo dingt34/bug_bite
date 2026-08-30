@@ -58,6 +58,11 @@ Page({
     this.setData({ inputText: e.detail.value || '' });
   },
 
+  sendImageMessage() {
+    if (this.data.sending || !this.data.images.length) return;
+    this.sendMessage({ imageConsentConfirmed: true });
+  },
+
   chooseImage(e) {
     if (this.data.sending) return;
     const kind = e.currentTarget.dataset.kind;
@@ -175,14 +180,7 @@ Page({
       return;
     }
     if (images.length && !settings.imageConsentConfirmed) {
-      wx.showModal({
-        title: '发送图片前请确认',
-        content: '图片将临时上传到微信云存储，并发送至阿里云百炼进行分析；回答完成后会尝试删除临时图片。图片只用于描述可见特征，不用于医疗确诊或风险分级。',
-        confirmText: '同意并发送',
-        success: result => {
-          if (result.confirm) this.sendMessage(Object.assign({}, settings, { imageConsentConfirmed: true }));
-        }
-      });
+      wx.showToast({ title: '请点击“同意并发送”', icon: 'none' });
       return;
     }
 
