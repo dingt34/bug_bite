@@ -3,6 +3,8 @@ const config = require('../miniprogram/config/cloud.js');
 const cloudService = require('../miniprogram/utils/cloud-service.js');
 
 let pageDefinition = null;
+let lastCloudData = null;
+let deletedFileIds = [];
 const storage = {
   plans: [{ id: 'p1', destinationName: '杭州', month: '8月', activityType: '徒步' }],
   events: [{ id: 'e1', contactTypeName: '叮咬', occurredAt: '今天', summary: '局部发红' }]
@@ -16,8 +18,13 @@ global.wx = {
   navigateTo() {},
   cloud: {
     init() {},
-    deleteFile() { return Promise.resolve({ fileList: [] }); },
-    callFunction() {
+    uploadFile() { return Promise.resolve({ fileID: 'cloud://temporary/insect.jpg' }); },
+    deleteFile(options) {
+      deletedFileIds = options.fileList;
+      return Promise.resolve({ fileList: options.fileList });
+    },
+    callFunction(options) {
+      lastCloudData = options.data;
       return Promise.resolve({ result: { ok: true, text: '## 建议\n\n- 观察危险信号\n- 记录变化' } });
     }
   }
@@ -34,6 +41,8 @@ const page = Object.assign({}, pageDefinition, {
 (async () => {
   page.onLoad();
   assert.strictEqual(page.data.aiAvailable, true);
+  assert.strictEqual(page.data.imageAvailable, true);
+  assert.strictEqual(page.data.modeText, '千问多模态');
   page.onInput({ detail: { value: '被虫咬后需要注意什么？' } });
   page.sendMessage();
   await new Promise(resolve => setTimeout(resolve, 20));
@@ -60,6 +69,17 @@ const page = Object.assign({}, pageDefinition, {
   assert.ok(selectedMessage.requestContent.includes('局部发红'));
   assert.ok(!selectedMessage.requestContent.includes('杭州'));
   assert.strictEqual(page.data.recordSelectorVisible, false);
+
+  page.setData({
+    inputText: '请描述虫体特征',
+    images: [{ kind: 'insect', label: '虫体图片', path: 'C:/temp/insect.jpg' }]
+  });
+  page.sendMessage();
+  await new Promise(resolve => setTimeout(resolve, 30));
+  assert.deepStrictEqual(lastCloudData.fileIds, ['cloud://temporary/insect.jpg']);
+  assert.deepStrictEqual(lastCloudData.imageKinds, ['insect']);
+  assert.deepStrictEqual(deletedFileIds, ['cloud://temporary/insect.jpg']);
+  assert.strictEqual(page.pendingFileIds.length, 0);
   cloudService.resetForTests();
   console.log('ai chat page tests passed');
 })().catch(error => {

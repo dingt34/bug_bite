@@ -5,8 +5,8 @@ function getStatus(wxApi) {
   const available = !!(wxApi && wxApi.cloud && typeof wxApi.cloud.callFunction === 'function');
   return {
     available,
-    imageAvailable: false,
-    mode: 'coze',
+    imageAvailable: available,
+    mode: 'qwen',
     reason: available ? '' : '当前微信基础库不支持云函数，请升级微信后重试'
   };
 }
@@ -22,17 +22,21 @@ async function streamReply(wxApi, options) {
   if (!status.available) throw new Error(status.reason);
   const message = String(options.message || '').trim();
   const history = normalizeHistory(options.history);
-  const fileIds = options.fileIds || [];
+  const fileIds = (options.fileIds || []).map(value => String(value || '').trim());
+  const imageKinds = (options.imageKinds || []).map(value => String(value || '').trim());
   if (!message) throw new Error('请输入要咨询的内容');
-  if (fileIds.length) throw new Error('当前扣子 API 尚未启用图片输入，请先使用文字描述');
+  if (fileIds.length > 2) throw new Error('一次最多发送2张图片');
+  if (fileIds.some(fileId => !fileId.startsWith('cloud://'))) throw new Error('图片上传地址无效');
   const result = await cloudService.callFunction(wxApi, config.COZE_AGENT_FUNCTION, {
     message,
     history,
+    fileIds,
+    imageKinds,
     conversationId: String(options.conversationId || '')
   });
   if (!result.ok) {
     const upstreamError = result.error && result.error.message;
-    throw new Error(upstreamError || '扣子 Agent 暂时不可用');
+    throw new Error(upstreamError || '千问多模态助手暂时不可用');
   }
   const text = String(result.text || '');
   if (options.onText) options.onText(text, text);

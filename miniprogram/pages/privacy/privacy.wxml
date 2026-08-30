@@ -16,7 +16,7 @@
   <view class="card">
     <view class="card-title">各功能的数据边界</view>
     <view class="boundary-item"><view class="boundary-title">微信身份</view><view class="boundary-text">云函数通过微信调用上下文确认用户标识；头像和昵称仅在用户主动选择、填写后保存。不读取手机号或通讯录。</view></view>
-    <view class="boundary-item"><view class="boundary-title">图片识别</view><view class="boundary-text">当前为固定候选的本地流程演示，不向识别服务上传图片。</view></view>
+    <view class="boundary-item"><view class="boundary-title">图片分析</view><view class="boundary-text">AI建议助手中由用户主动选择的图片，会在再次确认后临时上传至微信云存储并发送至阿里云百炼，回答后尝试删除。图片不用于医疗确诊或风险分级。</view></view>
     <view class="boundary-item"><view class="boundary-title">风险判断</view><view class="boundary-text">只使用所选症状和危险信号；照片、社区内容和识别候选不参与分级。</view></view>
     <view class="boundary-item"><view class="boundary-title">公共社群</view><view class="boundary-text">帖子、评论、点赞、收藏与举报通过云函数保存；作者权限由微信云身份确认，数据库不允许小程序客户端直接读写。</view></view>
     <view class="boundary-item"><view class="boundary-title">未来接入 Agent</view><view class="boundary-text">当前尚未把症状数据发送给 Agent。接入知识库或 Agent 前，需要另行说明使用的数据、用途和保存方式。</view></view>

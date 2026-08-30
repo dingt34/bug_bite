@@ -59,7 +59,7 @@
     <view class="attachment-row">
       <view class="attach-button" bindtap="chooseImage" data-kind="insect">🐛 虫体图片</view>
       <view class="attach-button" bindtap="chooseImage" data-kind="wound">🩹 伤口图片</view>
-      <view class="attachment-tip">发送后临时云图片会清理</view>
+      <view class="attachment-tip">图片会发送至阿里云分析，回答后清理临时文件</view>
     </view>
 
     <view class="input-row">

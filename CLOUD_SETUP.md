@@ -77,12 +77,19 @@
 
 ## AI 建议助手
 
-1. 在云开发控制台为 `cozeAgent` 云函数添加环境变量 `COZE_API_TOKEN`，值为扣子 API Token。不要把 Token 写入小程序代码、Git 或截图。
-2. 右键 `cloudfunctions/cozeAgent`，选择“上传并部署：云端安装依赖”。
-3. 云函数默认调用项目 `7678279631425994762` 的 HTTPS 接口。如需迁移，可通过云函数环境变量 `COZE_API_ENDPOINT` 和 `COZE_PROJECT_ID` 覆盖。
-4. 重新编译后进入“AI 建议助手”，发送不含个人信息的测试问题，确认页面显示“扣子 Agent”并正常回复。
-5. Agent 已设置为：不做虫种或疾病确诊，优先识别危险信号，严重情况建议立即呼叫 120 或就近急诊。
+`cozeAgent` 是为了不改动已部署的云函数名而保留的兼容名称；函数内部已改为调用阿里云百炼千问多模态模型。
 
-目前已部署的扣子 API 输入定义只确认支持文字，因此图片按钮暂不向 Agent 发送内容。发送个人记录时由用户勾选计划或事件，只发送所选记录及复查的文字摘要，不发送未选记录，也不自动发送历史图片。
+1. 在云开发控制台为 `cozeAgent` 新增三个环境变量：
+   - `DASHSCOPE_API_KEY`：百炼 API Key（只粘贴在 Value 中，不写入代码或截图）。
+   - `AI_MODEL`：`qwen3.7-flash`。
+   - `DASHSCOPE_BASE_URL`：百炼 API Key 页面显示的 OpenAI 兼容地址，例如 `https://<workspace-host>/compatible-mode/v1`。
+2. 暂时保留旧的 `COZE_API_TOKEN`，直到新版真机验收通过。通过后在扣子平台撤销旧 Token，并从云函数移除该变量。
+3. 右键 `cloudfunctions/cozeAgent`，选择“上传并部署：云端安装依赖”。
+4. 确认云函数超时为 30 秒，然后重新编译小程序。
+5. 进入“AI 建议助手”，先测试纯文字，再分别测试一张虫体图、一张伤口图和两张图片的顺序。
+
+图片会先临时上传至微信云存储，由云函数换成限时 HTTPS 地址后发送至阿里云百炼，回答结束后尝试删除。发送前会弹窗告知用户。图片只用于描述可见特征和给出不确定候选，不参与医疗确诊或风险分级。
+
+项目组知识库的 45 个候选名称以紧凑快照方式放在 `cloudfunctions/cozeAgent/knowledge-catalog.js`。原库全部为 `DRAFT`，其中候选图片资产为 `PENDING_LICENSE`，因此快照只约束模型的候选范围，不作为正式健康建议或识图训练数据。
 
 图片识别接入步骤、请求格式、安全要求和验收清单见 `docs/AI_IMAGE_RECOGNITION_GUIDE.md`。

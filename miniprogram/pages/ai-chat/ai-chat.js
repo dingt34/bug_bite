@@ -49,8 +49,8 @@ Page({
     this.setData({
       aiAvailable: status.available,
       imageAvailable: status.imageAvailable,
-      modeText: '扣子 Agent',
-      statusMessage: status.reason || '支持文字多轮对话；图片输入正在接入验证'
+      modeText: '千问多模态',
+      statusMessage: status.reason || '支持文字与图片；图片仅用于辅助描述可见特征'
     });
   },
 
@@ -169,8 +169,19 @@ Page({
     if (images.length && !this.data.imageAvailable) {
       wx.showModal({
         title: '图片聊天尚未配置',
-        content: '当前已部署的扣子 API 只确认支持文字输入。请先用文字描述虫体或伤口特征，图片能力会在接口验证后开放。',
+        content: '当前云环境未开放图片分析，请先用文字描述虫体或伤口特征。',
         showCancel: false
+      });
+      return;
+    }
+    if (images.length && !settings.imageConsentConfirmed) {
+      wx.showModal({
+        title: '发送图片前请确认',
+        content: '图片将临时上传到微信云存储，并发送至阿里云百炼进行分析；回答完成后会尝试删除临时图片。图片只用于描述可见特征，不用于医疗确诊或风险分级。',
+        confirmText: '同意并发送',
+        success: result => {
+          if (result.confirm) this.sendMessage(Object.assign({}, settings, { imageConsentConfirmed: true }));
+        }
       });
       return;
     }
@@ -201,13 +212,17 @@ Page({
     });
 
     let uploadedFileIds = [];
-    aiService.uploadTemporaryImages(wx, images, fileIds => { uploadedFileIds = fileIds; })
+    aiService.uploadTemporaryImages(wx, images, fileIds => {
+      uploadedFileIds = fileIds;
+      this.pendingFileIds = fileIds.slice();
+    })
       .then(fileIds => {
         uploadedFileIds = fileIds;
         return aiService.streamReply(wx, {
           message: requestText,
           history,
           fileIds,
+          imageKinds: images.map(item => item.kind),
           conversationId: this.conversationId,
           onText: text => {
             if (this.requestToken !== token) return;
@@ -231,7 +246,8 @@ Page({
         );
         this.setData({ sending: false });
       })
-      .then(() => aiService.deleteTemporaryImages(wx, uploadedFileIds));
+      .then(() => aiService.deleteTemporaryImages(wx, uploadedFileIds))
+      .then(() => { this.pendingFileIds = []; });
   },
 
   updateAssistantMessage(id, content, loading, error) {
@@ -253,5 +269,8 @@ Page({
 
   onUnload() {
     this.requestToken = (this.requestToken || 0) + 1;
+    const fileIds = (this.pendingFileIds || []).slice();
+    this.pendingFileIds = [];
+    if (fileIds.length) aiService.deleteTemporaryImages(wx, fileIds);
   }
 });

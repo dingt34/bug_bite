@@ -1,5 +1,5 @@
 {
-  "name": "coze-agent",
+  "name": "qwen-vision-agent",
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
