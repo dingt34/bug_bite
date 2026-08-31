@@ -1,38 +1,4 @@
-<view class="page">
-  <view class="notice">
-    <view class="notice-title">本机优先，可选微信云同步</view>
-    <view class="notice-text">计划与事件采用本机优先、个人云备份；公共帖子、评论与互动独立保存在云端社区，不再混入个人同步快照。</view>
-  </view>
-
-  <view class="card">
-    <view class="card-title">本机保存的数据</view>
-    <view class="data-row"><text>行程计划与离线卡</text><text>{{summary.plans}} 项计划</text></view>
-    <view class="data-row"><text>接触事件与症状复查</text><text>{{summary.events}} 条事件</text></view>
-    <view class="data-row"><text>云端社区参与</text><text>{{summary.posts}} 条发布 · {{summary.comments}} 条评论</text></view>
-    <view class="data-row"><text>本机事件及旧版帖子图片</text><text>{{summary.images}} 张</text></view>
-    <view class="data-row"><text>小程序缓存占用</text><text>约 {{storageSize}} KB</text></view>
-  </view>
-
-  <view class="card">
-    <view class="card-title">各功能的数据边界</view>
-    <view class="boundary-item"><view class="boundary-title">微信身份</view><view class="boundary-text">云函数通过微信调用上下文确认用户标识；头像和昵称仅在用户主动选择、填写后保存。不读取手机号或通讯录。</view></view>
-    <view class="boundary-item"><view class="boundary-title">图片识别</view><view class="boundary-text">当前为固定候选的本地流程演示，不向识别服务上传图片。</view></view>
-    <view class="boundary-item"><view class="boundary-title">风险判断</view><view class="boundary-text">只使用所选症状和危险信号；照片、社区内容和识别候选不参与分级。</view></view>
-    <view class="boundary-item"><view class="boundary-title">公共社群</view><view class="boundary-text">帖子、评论、点赞、收藏与举报通过云函数保存；作者权限由微信云身份确认，数据库不允许小程序客户端直接读写。</view></view>
-    <view class="boundary-item"><view class="boundary-title">未来接入 Agent</view><view class="boundary-text">当前尚未把症状数据发送给 Agent。接入知识库或 Agent 前，需要另行说明使用的数据、用途和保存方式。</view></view>
-  </view>
-
-  <view class="card danger-zone" wx:if="{{cloudUser}}">
-    <view class="card-title">微信云端数据</view>
-    <view class="danger-text">删除云端账户资料、同步快照、社区发布与互动和已上传图片；本机计划与事件仍保留。</view>
-    <button class="clear-button" disabled="{{deletingCloud}}" bindtap="deleteCloudData">{{deletingCloud ? '正在删除…' : '删除微信云端数据'}}</button>
-    <view class="cloud-message" wx:if="{{cloudMessage}}">{{cloudMessage}}</view>
-  </view>
-
-  <view class="card danger-zone">
-    <view class="card-title">本机数据管理</view>
-    <view class="danger-text">该操作只清除当前设备的数据。若已微信云登录，请先删除上方云端数据。</view>
-    <button class="clear-button" bindtap="clearAllData">清除全部本机数据</button>
-    <view class="cleared-tip" wx:if="{{cleared}}">已完成清除；返回“我的”后数据概览会同步更新。</view>
-  </view>
-</view>
+<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s24-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">隐私与数据</view><view class="top-title-sub">了解并控制数据保存位置</view></view></view>
+<view class="notice"><view class="circle circle-green" style="width:72rpx;height:72rpx"><image class="icon-svg large" src="/assets/figma/s24-imgIconPrivacyShield.svg" mode="aspectFit"/></view><view><view>健康记录默认仅本人可见</view><view class="tiny">社群、路线和 AI 内容均由你主动选择发送</view></view></view><view class="section-title">数据分类</view>
+<view class="stack gap-12"><view class="field"><view class="circle circle-green small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataLocal.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>本机缓存</view><view class="tiny">离线安全卡、未提交草稿</view></view><text class="muted" bindtap="clear">清除</text></view><view class="field"><view class="circle circle-green small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataCloud.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>个人云端</view><view class="tiny">档案、行程、事件与图片</view></view><text class="muted">管理</text></view><view class="field"><view class="circle circle-amber small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataCommunity.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>公共社群</view><view class="tiny">帖子、评论、互动与共享路线</view></view><text class="muted">查看</text></view><view class="field"><view class="circle" style="width:64rpx;height:64rpx;background:#ece9f6"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataAi.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>AI 临时数据</view><view class="tiny">本次对话附件，到期自动清理</view></view><text class="muted">说明</text></view></view>
+<view class="notice" style="margin-top:36rpx"><view class="circle circle-amber" style="width:64rpx;height:64rpx"><image class="figma-icon sm" src="/assets/figma/all/s24-imgVector.svg"/></view><view><view>社群路线不自动脱敏</view><view class="tiny">只有开启“公开完整轨迹”后才会显示精确路线</view></view></view><view class="section-title danger-text">删除与清理</view><view class="delete-grid"><button class="delete-btn" bindtap="clear">清除本机缓存</button><button class="delete-btn danger-text" bindtap="deletePosts">删除社群内容</button><button class="delete-btn danger-text" bindtap="deleteEvent">删除单条事件</button><button class="delete-btn delete-account" bindtap="deleteAccount">注销并删除账户</button></view><button class="danger-btn" style="margin-top:36rpx" bindtap="deleteAccount">删除前会说明影响范围并要求二次确认</button></view>

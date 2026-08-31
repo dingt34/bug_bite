@@ -1,37 +1,19 @@
 Component({
   data: {
     selected: 0,
-    color: '#9AA0A6',
-    selectedColor: '#2E7D5B',
     list: [
-      {
-        pagePath: '/pages/index/index',
-        text: '首页',
-        iconPath: '/images/home.png',
-        selectedIconPath: '/images/home-active.png'
-      },
-      {
-        pagePath: '/pages/community/community',
-        text: '社群',
-        iconPath: '/images/community.png',
-        selectedIconPath: '/images/community-active.png'
-      },
-      {
-        pagePath: '/pages/profile/profile',
-        text: '我的',
-        iconPath: '/images/mine.png',
-        selectedIconPath: '/images/mine-active.png'
-      }
+      { pagePath: '/pages/home/home', text: '首页', icon: '/assets/nav/home.svg' },
+      { pagePath: '/pages/ai/ai', text: 'AI', icon: '/assets/nav/ai.svg' },
+      { pagePath: '/pages/camera/camera', text: '识别', icon: '/assets/nav/camera.svg', center: true },
+      { pagePath: '/pages/community/community', text: '社群', icon: '/assets/nav/community.svg' },
+      { pagePath: '/pages/profile/profile', text: '我的', icon: '/assets/nav/profile.svg' }
     ]
   },
-
   methods: {
     switchTab(event) {
-      const index = Number(event.currentTarget.dataset.index);
-      const url = event.currentTarget.dataset.path;
+      const { path, index } = event.currentTarget.dataset;
       if (index === this.data.selected) return;
-      this.setData({ selected: index });
-      wx.switchTab({ url });
+      wx.switchTab({ url: path });
     }
   }
 });

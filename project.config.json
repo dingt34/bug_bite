@@ -1,5 +1,5 @@
 {
-  "description": "虫咬识途——节肢动物接触安全管理助手",
+  "description": "虫咬识途 V4 微信小程序",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -10,11 +10,7 @@
     "enhance": true,
     "postcss": true,
     "minified": true,
-    "babelSetting": {
-      "ignore": [],
-      "disablePlugins": [],
-      "outputPath": ""
-    },
+    "compileHotReLoad": true,
     "compileWorklet": false,
     "uglifyFileName": false,
     "uploadWithSourceMap": true,
@@ -25,19 +21,19 @@
     "localPlugins": false,
     "disableUseStrict": false,
     "useCompilerPlugins": false,
-    "condition": false
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
   "compileType": "miniprogram",
   "libVersion": "3.7.1",
   "appid": "wx1768a4ab35d8616e",
-  "projectname": "chongyaoshitu",
-  "condition": {},
-  "editorSetting": {
-    "tabIndent": "insertSpaces",
-    "tabSize": 2
-  },
+  "projectname": "虫咬识途-V4",
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
   "simulatorPluginLibVersion": {},
-  "isGameTourist": false
+  "editorSetting": {}
 }

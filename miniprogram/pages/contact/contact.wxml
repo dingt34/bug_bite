@@ -1,20 +1,7 @@
-<safety-nav current="2" bind:stepchange="onStepChange" />
 <view class="page">
-  <view class="head">
-    <view class="head-title">发生了哪类接触？</view>
-    <view class="head-sub">选择最接近的一项，不确定也可以继续</view>
-    <view class="recommend-tip" wx:if="{{recommendedKey}}">根据这条社群经历，建议先查看“{{recommendedName}}”；你仍可选择其他类型。</view>
-  </view>
-
-  <view class="type-card {{recommendedKey === item.key ? 'type-recommended' : ''}}" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
-    <view class="type-icon">{{item.icon}}</view>
-    <view class="type-body">
-      <view class="type-name">{{item.name}}</view>
-      <view class="type-desc">{{item.desc}}</view>
-    </view>
-    <view class="recommend-badge" wx:if="{{recommendedKey === item.key}}">建议</view>
-    <view class="type-arrow">→</view>
-  </view>
-
-  <view class="tip">接触类型用于选择后续问题，不代表虫种或疾病诊断。</view>
+  <view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s05-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">接触类型</view><view class="top-title-sub">第 2 步，共 4 步</view></view><view class="top-action" bindtap="save">保存草稿</view></view><view class="progress"><view class="progress-fill" style="width:50%"></view></view>
+  <view class="notice" style="margin-top:36rpx;background:#e3eee5;color:#71907f"><image class="figma-icon sm" src="/assets/figma/all/s05-imgEllipse2.svg"/>未发现危险信号，可以继续描述</view>
+  <view class="h2" style="margin-top:56rpx">你遇到的是哪种接触？</view><view style="margin:8rpx 0 30rpx">选择最接近的一项，稍后仍可修改</view>
+  <view class="contact-grid"><view wx:for="{{items}}" wx:key="id" class="card contact-card {{selected === item.id ? 'selected-card' : ''}} {{item.id === 'unknown' ? 'wide' : ''}}" data-id="{{item.id}}" bindtap="select"><view class="between"><view class="circle {{index % 2 ? 'circle-amber' : 'circle-green'}}" style="width:72rpx;height:72rpx"><image class="icon-svg" src="{{item.icon}}" mode="aspectFit"/></view><image wx:if="{{selected === item.id}}" class="figma-icon sm" src="/assets/figma/all/s05-imgEllipse3.svg" mode="aspectFit"/></view><view class="h3" style="margin-top:22rpx">{{item.title}}</view><view class="tiny">{{item.desc}}</view></view></view>
+  <view class="spacer"></view><view class="bottom-actions"><button class="primary-btn" bindtap="next">继续：描述症状</button><view class="safe-note" style="margin-top:22rpx">退出时可保留当前草稿</view></view>
 </view>

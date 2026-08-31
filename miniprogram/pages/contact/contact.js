@@ -1,41 +1,11 @@
-const mock = require('../../utils/mock.js');
-
+const store = require('../../utils/store'); const nav = require('../../utils/nav');
 Page({
-  data: {
-    types: mock.CONTACT_TYPES,
-    recommendedKey: '',
-    recommendedName: ''
-  },
-
-  onLoad(options) {
-    const app = getApp();
-    const sourcePostId = options && options.fromPost || '';
-    if (app && app.globalData) app.globalData.safetyReturnPostId = sourcePostId;
-    const recommendedKey = options && options.recommended || '';
-    const recommended = mock.CONTACT_TYPES.find(item => item.key === recommendedKey);
-    if (recommended) {
-      this.setData({ recommendedKey: recommended.key, recommendedName: recommended.name });
-    }
-  },
-
-  select(e) {
-    const key = e.currentTarget.dataset.key;
-    // 新建事件草稿，存入全局，供后续页面使用
-    const app = getApp();
-    const timestamp = Date.now();
-    const existing = app.globalData.draftEvent || {};
-    app.globalData.draftEvent = Object.assign({}, existing, {
-      id: existing.id || 'event_' + timestamp,
-      contactType: key,
-      contactTypeName: mock.CONTACT_TYPES.find(t => t.key === key).name,
-      createdAt: existing.createdAt || '刚刚',
-      createdAtTimestamp: existing.createdAtTimestamp || timestamp
-    });
-    wx.navigateTo({ url: '/pages/guide/guide?contactType=' + key });
-  },
-
-  onStepChange(e) {
-    const target = Number(e.detail.step);
-    if (target === 1) wx.navigateBack({ delta: 1 });
-  }
+  data: { selected: 'bite', items: [
+    { id:'bite', icon:'/assets/figma/s05-imgIconGeneratedIllustrated.svg', title:'叮咬', desc:'皮肤出现包、红点或瘙痒' }, { id:'sting', icon:'/assets/figma/s05-imgIconGeneratedIllustrated1.svg', title:'蜇伤', desc:'突然刺痛，可能见蜂或刺' },
+    { id:'attached', icon:'/assets/figma/s05-imgIconGeneratedIllustrated2.svg', title:'发现附着虫体', desc:'虫体仍附着或刚被移除' }, { id:'contact', icon:'/assets/figma/s05-imgIconGeneratedIllustrated3.svg', title:'接触或刺激', desc:'碰触后刺痒、灼热或起疹' },
+    { id:'unknown', icon:'/assets/figma/s05-imgIconGeneratedIllustrated4.svg', title:'不确定 / 没有看到虫体', desc:'可以继续通过环境、表现和变化完成判断' }
+  ]},
+  back(){nav.back();}, save(){store.set('safetyDraft',{step:2,contactType:this.data.selected});wx.showToast({title:'草稿已保存'});},
+  select(e){this.setData({selected:e.currentTarget.dataset.id});},
+  next(){store.set('safetyDraft',{step:3,contactType:this.data.selected});wx.navigateTo({url:`/pages/guide/guide?type=${this.data.selected}`});}
 });

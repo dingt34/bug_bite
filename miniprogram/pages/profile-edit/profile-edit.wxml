@@ -1,0 +1,22 @@
+<view class="page">
+  <view class="safe-top"></view>
+  <view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s02-imgFrame.svg"/></view><view class="top-title-main top-title">完善个人档案</view><view class="figma-menu profile-menu"><image src="/assets/figma/all/s02-imgEllipse1.svg"/><image src="/assets/figma/all/s02-imgEllipse1.svg"/><image src="/assets/figma/all/s02-imgEllipse1.svg"/></view></view>
+  <view class="notice card" style="margin-top:24rpx"><view class="circle circle-green" style="width:64rpx;height:64rpx"><image style="width: 45rpx; height: 79rpx; display: block; box-sizing: border-box" class="figma-icon sm" src="/assets/figma/all/s02-imgFrame1.svg"/></view><view><view class="muted">用于复查提醒和安全记录整理</view><view class="tiny">不会参与公开社群展示</view></view></view>
+  <view class="section-title basic-section-title"><text>基本资料</text><text class="aside">必填</text></view>
+  <button class="field profile-main-field" open-type="chooseAvatar" bindchooseavatar="chooseAvatar">
+    <image wx:if="{{avatar}}" class="circle" style="width:96rpx;height:96rpx" src="{{avatar}}" mode="aspectFill" />
+    <view wx:else class="circle circle-green" style="width:96rpx;height:96rpx;font-size:38rpx">林</view>
+    <view class="grow" style="margin-left:24rpx;text-align:left"><view class="tiny">微信昵称</view><input class="field-value" value="{{nickname}}" bindinput="changeName" /></view><text class="muted">更换</text>
+  </button>
+  <view class="tiny" style="margin:44rpx 0 14rpx">年龄范围</view><view class="field" bindtap="chooseAge"><text class="field-value">{{age}}</text><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view>
+  <view class="tiny" style="margin:44rpx 0 14rpx">常用地区</view><view class="field region-field" bindtap="chooseRegion"><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame3.svg"/><text class="field-value region-value">{{region}}</text><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view>
+  <scroll-view wx:if="{{showRegionList}}" class="region-list" scroll-y>
+    <view class="region-option {{region === '浙江省 · ' + item ? 'region-option-on' : ''}}" wx:for="{{regionOptions}}" wx:key="*this" bindtap="selectRegion" data-region="{{item}}">浙江省 · {{item}}</view>
+  </scroll-view>
+  <view class="section-title"><text>健康补充</text><text class="aside">选填，可稍后完善</text></view>
+  <view class="health-card card card-pad">
+    <view class="row health-summary"><view class="circle circle-amber" style="width:72rpx;height:72rpx"><image class="figma-icon md" src="/assets/figma/all/s02-img1.svg"/></view><view class="grow" style="margin-left:20rpx"><view>过敏史、长期用药与特殊情况</view><view class="tiny">补充信息只用于个人记录中的提醒说明</view></view></view>
+    <view class="health-actions"><input class="health-input muted" placeholder="添加健康信息" bindinput="changeHealth" /><view class="health-skip">暂不填写</view></view>
+  </view>
+  <view style="margin-top:64rpx"><button class="primary-btn" bindtap="save">保存并进入首页</button><view class="safe-note" style="margin-top:24rpx">之后可在“我的—个人档案”中修改</view></view>
+</view>

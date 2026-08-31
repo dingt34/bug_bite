@@ -1,6 +1,1 @@
-{
-  "navigationStyle": "custom",
-  "usingComponents": {
-    "safety-nav": "/components/safety-nav/safety-nav"
-  }
-}
+{"navigationStyle":"custom","navigationBarTitleText":"接触类型"}

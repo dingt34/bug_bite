@@ -1,48 +1,20 @@
-<view class="page">
-  <view class="brand">
-    <view class="logo">🕷️</view>
-    <view class="app-name">虫咬识途</view>
-    <view class="app-slogan">节肢动物接触安全管理助手</view>
-  </view>
-
-  <view class="login-area" wx:if="{{!loading}}">
-    <view class="cloud-card">
-      <view class="mode-head">
-        <view class="mode-title">微信云登录</view>
-        <view class="cloud-status {{cloudReady ? 'cloud-ready' : 'cloud-unready'}}">{{cloudReady ? '已连接' : '未配置'}}</view>
-      </view>
-      <view class="mode-desc">登录身份由微信云函数确认，可在不同设备恢复已同步的计划、事件和社区数据。</view>
-      <view class="profile-form">
-        <button class="avatar-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-          <image wx:if="{{avatarUrl}}" class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill" />
-          <view wx:else class="avatar-placeholder">选择头像</view>
-        </button>
-        <input class="nickname-input" type="nickname" maxlength="20" value="{{nickname}}" bindinput="onNicknameInput" placeholder="填写微信昵称" />
-      </view>
-      <button class="login-btn" bindtap="doLogin">微信云登录</button>
-      <view class="cloud-hint" wx:if="{{!cloudReady}}">{{cloudReason}}</view>
+<view class="login-page">
+  <view class="nature-hero">
+    <image class="login-figma-hero" src="/assets/figma/all/s01-imgFrame.svg" mode="aspectFill"/>
+        <view class="login-copy">
+      <view class="h1">欢迎使用虫咬识途</view>
+      <view class="login-sub">安心进入自然</view>
     </view>
-
-    <view class="divider-row"><view class="divider-line"></view><text>或</text><view class="divider-line"></view></view>
-
-    <view class="mode-card">
-      <view class="mode-title">仅本机体验</view>
-      <view class="mode-desc">不使用微信身份，也不上传数据；内容只保存在当前设备。</view>
-      <view class="understood" bindtap="toggleUnderstood">
-        <view class="check {{understood ? 'check-on' : ''}}">{{understood ? '✓' : ''}}</view>
-        <view class="understood-text">我已了解本地体验不会跨设备同步</view>
+  </view>
+  <view class="login-body">
+    <button class="primary-btn" bindtap="login"><image class="figma-icon md figma-inline" src="/assets/figma/all/s01-imgFrame1.svg"/>微信一键登录</button>
+    <view class="privacy-card row" bindtap="openPrivacy">
+      <view class="circle circle-green shield"><image class="figma-icon md" src="/assets/figma/all/s01-imgFrame2.svg"/></view>
+      <view class="grow">
+        <view>你的健康记录默认仅本人可见</view>
+        <view class="tiny">社区分享内容由你主动选择</view>
       </view>
-      <button class="local-button" disabled="{{!understood}}" bindtap="doLocalLogin">创建本地体验身份</button>
     </view>
-
-    <view class="error-message" wx:if="{{errorMessage}}">{{errorMessage}}</view>
-    <button class="skip-btn" bindtap="skipLogin">暂不登录，返回首页</button>
+    <view class="safe-note" bindtap="openPrivacy">登录即表示同意《用户协议》和《隐私政策》</view>
   </view>
-
-  <view class="loading-box" wx:else>
-    <view class="spinner"></view>
-    <view class="loading-text">{{loadingText || '正在处理…'}}</view>
-  </view>
-
-  <view class="footer-note">核心安全功能无需登录；云同步需要微信云开发环境</view>
 </view>

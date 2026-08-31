@@ -1,7 +1,6 @@
 {
-  "libVersion": "3.17.1",
-  "projectname": "%E8%99%AB%E5%92%AC%E8%AF%86%E9%80%94",
-  "condition": {},
+  "libVersion": "3.7.1",
+  "projectname": "%E8%99%AB%E5%92%AC%E8%AF%86%E9%80%94-V4",
   "setting": {
     "urlCheck": false,
     "coverView": false,
@@ -15,6 +14,7 @@
     "useLanDebug": false,
     "showES6CompileOption": false,
     "compileHotReLoad": true,
+    "useGlassEaselForWxml": false,
     "checkInvalidKey": true,
     "ignoreDevUnusedFiles": true,
     "bigPackageSizeSupport": false

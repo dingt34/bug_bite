@@ -1,36 +1,5 @@
-<view class="page">
-  <view class="section-title">离线安全卡</view>
-  <view class="offline-card" wx:if="{{offlineCard}}" bindtap="viewOfflineCard">
-    <view class="offline-main">
-      <view class="offline-name">💾 {{offlineCard.plan.destinationName || offlineCard.plan.regionCode}} · {{offlineCard.plan.month}}</view>
-      <view class="offline-meta">{{offlineCard.plan.activityType}} · 点击离线查看</view>
-    </view>
-    <view class="clear-offline" catchtap="clearOfflineCard">清除</view>
-  </view>
-  <view class="offline-empty" wx:else>尚未缓存离线安全卡，可在任一计划详情中缓存</view>
-
-  <view class="section-head">
-    <view class="section-title section-title-inline">行程计划</view>
-    <view class="create-link" bindtap="createPlan">＋ 新建计划</view>
-  </view>
-
-  <view class="plan-card" wx:for="{{plans}}" wx:key="id" bindtap="viewPlan" data-id="{{item.id}}">
-    <view class="plan-head">
-      <view class="plan-name">{{item.destinationName || item.regionCode}}</view>
-      <view class="plan-head-actions">
-        <view class="plan-status">{{item.status || '进行中'}}</view>
-        <view class="delete-plan" catchtap="deletePlan" data-id="{{item.id}}">删除</view>
-      </view>
-    </view>
-    <view class="plan-meta">{{item.month}} · {{item.activityType}}</view>
-    <view class="plan-tags">
-      <text class="tag" wx:for="{{item.riskTags}}" wx:key="*this">{{item}}</text>
-    </view>
-  </view>
-
-  <view wx:if="{{!plans.length}}" class="empty">
-    <view class="empty-icon">🎒</view>
-    <view class="empty-text">还没有行程计划</view>
-    <button class="btn-primary empty-btn" bindtap="createPlan">创建第一条计划</button>
-  </view>
-</view>
+<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s11-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">我的行程</view><view class="top-title-sub">{{plans.length}} 个计划</view></view><view class="figma-menu"><image src="/assets/figma/all/s11-imgEllipse1.svg"/><image src="/assets/figma/all/s11-imgEllipse1.svg"/><image src="/assets/figma/all/s11-imgEllipse1.svg"/></view></view>
+<view class="mode-tabs"><view wx:for="{{tabs}}" wx:key="*this" class="mode-tab {{tab===item?'active':''}}" data-tab="{{item}}" bindtap="setTab">{{item}}</view></view>
+<view class="section-title">即将出发</view><view class="card main-trip" bindtap="open"><view class="tiny">还有 5 天</view><view class="h2" style="margin-top:60rpx">丽水古堰画乡</view><view class="muted">8月18–20日 · 徒步露营</view><view class="mini-btn">查看行前清单</view><view class="trip-art"><view class="trip-road"></view><view class="circle circle-amber count">3</view></view></view>
+<view class="section-title">其他计划</view><view class="stack gap-12"><view wx:for="{{otherPlans}}" wx:key="id" class="field" bindtap="open"><view class="circle circle-green" style="width:72rpx;height:72rpx"><image class="figma-icon md" src="{{index===0?'/assets/figma/all/s11-img1.svg':'/assets/figma/all/s11-imgRidingFill1.svg'}}"/></view><view class="grow" style="margin-left:22rpx"><view class="field-value">{{item.title}}</view><view class="tiny">{{item.date}} · {{item.type}}</view></view><view class="chip">{{item.status}}</view></view></view>
+<button class="secondary-btn" style="margin-top:52rpx" bindtap="create">＋ 新建行前计划</button><view class="card between" style="padding:24rpx 30rpx;margin-top:24rpx"><view><view>离线安全卡</view><view class="tiny">最近更新：今天 09:20</view></view><text class="muted">2 份可用</text></view></view>

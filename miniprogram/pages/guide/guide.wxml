@@ -1,79 +1,10 @@
-<wxs src="./guide.wxs" module="g" />
-<safety-nav current="3" bind:stepchange="onStepChange" />
 <view class="page">
-  <view class="head">
-    <view class="head-title">记录当前症状与证据</view>
-    <view class="head-sub">这些信息用于规则分级，不用于疾病或虫种诊断</view>
-  </view>
-  <view class="completion-card">
-    <view class="completion-row">
-      <view><text class="required">*</text> 症状与接触情况均为必填项</view>
-      <view class="completion-count">已完成 {{answeredCount}} / {{questionCount}}</view>
-    </view>
-    <view class="completion-track"><view class="completion-value" style="width: {{completionPercent}}%;"></view></view>
-  </view>
-  <view class="validation-banner" wx:if="{{validationMessage}}">{{validationMessage}}</view>
-
-  <!-- 通用 + 条件追问 -->
-  <view class="card question-card" wx:for="{{questions}}" wx:key="key" wx:for-item="q">
-    <view class="question-meta"><text class="question-index">{{index + 1}}</text><text class="question-group">{{q.group}}</text></view>
-    <view class="card-title">{{q.label}} <text class="required">*</text></view>
-    <view class="question-help" wx:if="{{q.help}}">{{q.help}}</view>
-    <view class="chips">
-      <text
-        class="tag {{g.isSelected(answers[q.key], item) ? 'active' : ''}}"
-        wx:for="{{q.options}}"
-        wx:for-item="item"
-        wx:key="*this"
-        bindtap="onAnswer"
-        data-key="{{q.key}}"
-        data-v="{{item}}"
-        data-type="{{q.type}}"
-      >{{item}}</text>
-    </view>
-  </view>
-
-  <!-- 已采取措施 -->
-  <view class="card">
-    <view class="card-title">已采取措施 <text class="optional">选填</text></view>
-    <view class="action-help">仅记录已经完成的处理，可多选；这里不是操作建议，用药请遵循说明书或专业人员建议。</view>
-    <view class="chips">
-      <text class="tag {{g.isSelected(actionsTaken, item) ? 'active' : ''}}" wx:for="{{actionOptions}}" wx:key="*this" bindtap="onActionTap" data-v="{{item}}">{{item}}</text>
-    </view>
-  </view>
-
-  <!-- 可选证据：虫体与伤口图片分开记录 -->
-  <view class="card">
-    <view class="card-title">证据图片 <text class="optional">选填</text></view>
-    <view class="upload-grid">
-      <view class="upload-item">
-        <view class="upload-label">虫体照片</view>
-        <view class="upload" bindtap="chooseImage" data-type="insect">
-          <image wx:if="{{insectImage}}" src="{{insectImage}}" mode="aspectFill" class="preview" />
-          <view wx:else class="upload-placeholder">
-            <view class="upload-plus">＋</view>
-            <view>拍摄或选择虫体</view>
-          </view>
-        </view>
-        <view class="upload-help">尽量拍清整体与特征</view>
-      </view>
-      <view class="upload-item">
-        <view class="upload-label">伤口/皮肤表现</view>
-        <view class="upload" bindtap="chooseImage" data-type="wound">
-          <image wx:if="{{woundImage}}" src="{{woundImage}}" mode="aspectFill" class="preview" />
-          <view wx:else class="upload-placeholder">
-            <view class="upload-plus">＋</view>
-            <view>拍摄或选择伤口</view>
-          </view>
-        </view>
-        <view class="upload-help">保持清晰并包含周边皮肤</view>
-      </view>
-    </view>
-    <view class="tip">两类图片可任选或同时上传，仅用于记录；图片不会参与风险分级，也不用于疾病诊断。</view>
-  </view>
-
-  <!-- 提交 -->
-  <view class="submit-wrap">
-    <button class="btn-primary" disabled="{{savingImage}}" bindtap="submit">{{savingImage ? '正在保存图片…' : '查看分级建议'}}</button>
-  </view>
+  <view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s06-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">描述症状</view><view class="top-title-sub">第 3 步，共 4 步</view></view><view class="top-action" bindtap="save">保存草稿</view></view><view class="progress"><view class="progress-fill" style="width:75%"></view></view>
+  <view class="notice notice-red" style="margin-top:38rpx"><image class="figma-icon sm" src="/assets/figma/all/s06-imgFrame1.svg"/>出现呼吸困难等危险信号，立即中断并求助</view>
+  <view class="h2" style="margin-top:54rpx">现在主要有哪些表现？</view><view class="muted">可多选，选择当前实际出现的情况</view>
+  <view class="chip-row" style="margin-top:28rpx"><view wx:for="{{options}}" wx:key="label" class="chip {{item.selected?'active':''}}" data-value="{{item.label}}" bindtap="toggle">{{item.selected?'✓ ':''}}{{item.label}}</view></view>
+  <view class="section-title"><text>影响范围</text><text class="aside">单选</text></view><view class="choice-grid"><view wx:for="{{ranges}}" wx:key="*this" class="choice {{range===item?'active':''}}" data-value="{{item}}" bindtap="setRange">{{item}}</view></view>
+  <view class="section-title"><text>症状变化</text><text class="aside">与刚发生时相比</text></view><view class="choice-grid"><view wx:for="{{trends}}" wx:key="*this" class="choice {{trend===item?'active':''}} {{item==='逐渐加重'&&trend===item?'danger':''}}" data-value="{{item}}" bindtap="setTrend">{{item}}</view></view>
+  <view class="card card-pad row" style="margin-top:48rpx" bindtap="addPhoto"><image wx:if="{{photo}}" class="photo-thumb" src="{{photo}}" mode="aspectFill"/><view wx:else class="circle circle-green" style="width:80rpx;height:80rpx"><image class="figma-icon md" src="/assets/figma/all/s06-img1.svg"/></view><view class="grow" style="margin-left:24rpx"><view>添加现场或皮肤照片</view><view class="tiny">选填，仅用于记录变化，不进行疾病诊断</view></view><text class="muted">添加</text></view>
+  <button class="secondary-btn" style="margin-top:48rpx" bindtap="next">生成安全建议</button><button class="primary-btn" style="margin-top:20rpx" bindtap="save">已自动保存 · 离线可继续</button><view class="safe-note" style="margin-top:20rpx">返回时保留已填内容</view>
 </view>

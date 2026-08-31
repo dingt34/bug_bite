@@ -1,65 +1,19 @@
-const mock = require('../../utils/mock.js');
-const risk = require('../../utils/risk.js');
-
+const nav = require('../../utils/nav');
 Page({
   data: {
-    signals: mock.DANGER_SIGNALS,
-    selected: [],
-    hasDanger: false,
-    contactType: ''
+    items: [
+      { id: 'breathing', title: '呼吸困难或喉头发紧', desc: '喘不上气、说话困难', icon:'/assets/figma/s04-imgIconDangerBreathing.svg', selected:false },
+      { id: 'conscious', title: '意识异常、晕厥或极度虚弱', desc: '站立不稳、反应明显变慢', icon:'/assets/figma/s04-imgIconDangerConsciousness.svg', selected:false },
+      { id: 'swelling', title: '面部、舌头或嘴唇迅速肿胀', desc: '尤其伴随声音改变或吞咽困难', icon:'/assets/figma/s04-imgIconDangerSwelling.svg', selected:false },
+      { id: 'spread', title: '症状在短时间内快速扩散', desc: '红肿或全身不适迅速加重', icon:'/assets/figma/s04-imgIconDangerSpread.svg', selected:false }
+    ],
+    selected: []
   },
-
-  onLoad(options) {
-    const contactType = options.contactType || '';
-    this.setData({ contactType: contactType, signals: mock.DANGER_SIGNALS });
+  back() { nav.back(); },
+  toggle(event) {
+    const id = event.currentTarget.dataset.id; const selected = [...this.data.selected]; const index = selected.indexOf(id);
+    if (index >= 0) selected.splice(index, 1); else selected.push(id); const items=this.data.items.map(item=>({...item,selected:selected.includes(item.id)}));this.setData({ selected,items });
   },
-
-  toggle(e) {
-    const key = e.currentTarget.dataset.key;
-    const selected = this.data.selected;
-    const idx = selected.indexOf(key);
-    if (idx > -1) {
-      selected.splice(idx, 1);
-    } else {
-      selected.push(key);
-    }
-    this.setData({ selected: selected, hasDanger: selected.length > 0 });
-  },
-
-  call120() {
-    wx.makePhoneCall({ phoneNumber: '120', fail: () => {} });
-  },
-
-  ensureDraft() {
-    const app = getApp();
-    if (app.globalData.draftEvent && app.globalData.draftEvent.contactType) {
-      return app.globalData.draftEvent;
-    }
-    const type = mock.CONTACT_TYPES.find(item => item.key === this.data.contactType) || mock.CONTACT_TYPES.find(item => item.key === 'unknown');
-    const timestamp = Date.now();
-    app.globalData.draftEvent = {
-      id: 'event_' + timestamp,
-      contactType: type.key,
-      contactTypeName: type.name,
-      createdAt: '刚刚',
-      createdAtTimestamp: timestamp
-    };
-    return app.globalData.draftEvent;
-  },
-
-  goEmergency() {
-    const draft = this.ensureDraft();
-    draft.dangerSignals = this.data.selected.slice();
-    draft.matchedRules = this.data.selected.map(key => {
-      const signal = mock.DANGER_SIGNALS.find(item => item.key === key);
-      return { id: 'danger_' + key, text: signal ? signal.name : key };
-    });
-    draft.ruleVersion = risk.RULE_VERSION;
-    // 命中危险信号 → 紧急求助，跳过问答
-    wx.redirectTo({ url: '/pages/result/result?level=emergency&skipGuide=1' });
-  },
-
-  continueGuide() {
-    wx.navigateTo({ url: '/pages/contact/contact' });
-  }
+  emergency() { wx.redirectTo({ url: '/pages/result/result?level=emergency' }); },
+  continueFlow() { wx.navigateTo({ url: '/pages/contact/contact' }); }
 });

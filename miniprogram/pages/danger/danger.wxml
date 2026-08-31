@@ -1,33 +1,8 @@
-<wxs src="./danger.wxs" module="g" />
-<safety-nav current="1" />
 <view class="page">
-  <!-- 顶部说明 -->
-  <view class="head">
-    <view class="head-title">先确认是否有以下危险信号</view>
-    <view class="head-sub">出现任一项，请立即求助，不等待其他信息。</view>
-  </view>
-
-  <!-- 危险信号列表（多选） -->
-  <view class="signal {{g.has(selected, item.key) ? 'signal-on' : ''}}" wx:for="{{signals}}" wx:key="key" bindtap="toggle" data-key="{{item.key}}">
-    <view class="signal-check">{{g.has(selected, item.key) ? '✓' : ''}}</view>
-    <view class="signal-body">
-      <view class="signal-name">{{item.name}}</view>
-      <view class="signal-desc">{{item.desc}}</view>
-    </view>
-  </view>
-
-  <!-- 紧急求助提示（选中危险信号时出现） -->
-  <view class="emergency-banner" wx:if="{{hasDanger}}">
-    <view class="emergency-icon">🚨</view>
-    <view class="emergency-text">检测到危险信号，请立即联系急救服务</view>
-    <view class="emergency-call" bindtap="call120">拨打 120</view>
-  </view>
-
-  <!-- 底部操作 -->
-  <view class="action">
-    <button class="btn-danger" wx:if="{{hasDanger}}" bindtap="goEmergency">立即求助 · 中断问答</button>
-    <button class="btn-primary" wx:else bindtap="continueGuide">没有以上信号，选择接触类型</button>
-  </view>
-
-  <view class="tip">危险信号筛查优先于图片识别；即使没有危险信号，后续也可按症状获得分级建议。</view>
+  <view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s04-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">安全判断</view><view class="top-title-sub">第 1 步，共 4 步</view></view><view class="figma-menu"><image src="/assets/figma/all/s04-imgEllipse1.svg"/><image src="/assets/figma/all/s04-imgEllipse1.svg"/><image src="/assets/figma/all/s04-imgEllipse1.svg"/></view></view>
+  <view class="progress"><view class="progress-fill" style="width:25%"></view></view>
+  <view class="card card-pad" style="margin-top:50rpx;border:2rpx solid #ea4038"><view class="row"><view class="circle circle-red" style="width:92rpx;height:92rpx"><image class="figma-icon md" src="/assets/figma/all/s04-imgFrame1.svg"/></view><view style="margin-left:24rpx"><view class="h3">先确认有没有危险信号</view><view class="muted" style="margin-top:8rpx">如果存在，必须立即行动，不继续普通问答</view></view></view><view class="chip danger-active" style="margin:28rpx auto 0;width:340rpx">约 10 秒完成</view></view>
+  <view class="h2" style="margin-top:66rpx">现在是否出现以下任一情况？</view><view class="danger-text" style="margin:12rpx 0 28rpx">请按当前最严重的状态选择</view>
+  <view class="stack gap-12"><view wx:for="{{items}}" wx:key="id" class="field {{item.selected ? 'danger-selected' : ''}}" data-id="{{item.id}}" bindtap="toggle"><view class="circle circle-red" style="width:64rpx;height:64rpx"><image class="icon-svg" src="{{item.icon}}" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view class="field-value">{{item.title}}</view><view class="tiny">{{item.desc}}</view></view><image wx:if="{{item.selected}}" class="figma-icon sm" src="/assets/figma/all/s04-imgEllipse3.svg"/></view></view>
+  <view style="margin-top:60rpx"><button class="danger-btn" bindtap="emergency">有，立即进入紧急求助</button><button class="primary-btn" style="margin-top:20rpx" bindtap="continueFlow">没有以上情况，继续判断</button><view class="safe-note" style="margin-top:24rpx">不确定时请选择“有”，优先保障安全<text class="block-break"></text>本工具不替代医疗诊断</view></view>
 </view>
