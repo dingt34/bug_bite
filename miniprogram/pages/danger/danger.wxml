@@ -1,5 +1,5 @@
-<view class="page">
-  <view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s04-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">安全判断</view><view class="top-title-sub">第 1 步，共 4 步</view></view><view class="figma-menu"><image src="/assets/figma/all/s04-imgEllipse1.svg"/><image src="/assets/figma/all/s04-imgEllipse1.svg"/><image src="/assets/figma/all/s04-imgEllipse1.svg"/></view></view>
+<view class="page danger-page">
+  <view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s04-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">安全判断</view><view class="top-title-sub">第 1 步，共 4 步</view></view></view>
   <view class="progress"><view class="progress-fill" style="width:25%"></view></view>
   <view class="card card-pad" style="margin-top:50rpx;border:2rpx solid #ea4038"><view class="row"><view class="circle circle-red" style="width:92rpx;height:92rpx"><image class="figma-icon md" src="/assets/figma/all/s04-imgFrame1.svg"/></view><view style="margin-left:24rpx"><view class="h3">先确认有没有危险信号</view><view class="muted" style="margin-top:8rpx">如果存在，必须立即行动，不继续普通问答</view></view></view><view class="chip danger-active" style="margin:28rpx auto 0;width:340rpx">约 10 秒完成</view></view>
   <view class="h2" style="margin-top:66rpx">现在是否出现以下任一情况？</view><view class="danger-text" style="margin:12rpx 0 28rpx">请按当前最严重的状态选择</view>
