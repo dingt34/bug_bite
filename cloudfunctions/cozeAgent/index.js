@@ -3,16 +3,19 @@ const https = require('https');
 const {
   normalizeCloudFileIds,
   normalizeImageKinds,
+  buildCandidateAnalysisRequest,
+  parseCandidateAnalysis,
   buildQwenRequest,
   parseQwenResponse
 } = require('./domain.js');
-const knowledgeCatalog = require('./knowledge-catalog.js');
+const knowledgeRetrieval = require('./knowledge-retrieval.js');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 const DEFAULT_MODEL = 'qwen3.7-flash';
-const REQUEST_TIMEOUT_MS = 25000;
+const ANALYSIS_TIMEOUT_MS = 8000;
+const FINAL_TIMEOUT_MS = 18000;
 
 function chatEndpoint(baseUrl) {
   const base = String(baseUrl || DEFAULT_BASE_URL).trim().replace(/\/+$/, '');
@@ -35,16 +38,10 @@ async function resolveImages(fileIds, imageKinds) {
   });
 }
 
-function callQwen(options) {
+function requestQwen(options, requestBody, timeoutMs) {
   let endpoint;
   try { endpoint = chatEndpoint(options.baseUrl); } catch (error) { return Promise.reject(error); }
-  const body = JSON.stringify(buildQwenRequest({
-    model: options.model,
-    message: options.message,
-    history: options.history,
-    images: options.images,
-    catalog: { version: knowledgeCatalog.VERSION, text: knowledgeCatalog.asPromptText() }
-  }));
+  const body = JSON.stringify(requestBody);
 
   return new Promise((resolve, reject) => {
     const request = https.request({
@@ -59,7 +56,7 @@ function callQwen(options) {
         Accept: 'application/json',
         'Content-Length': Buffer.byteLength(body)
       },
-      timeout: REQUEST_TIMEOUT_MS
+      timeout: timeoutMs
     }, response => {
       response.setEncoding('utf8');
       let responseBody = '';
@@ -86,12 +83,62 @@ function callQwen(options) {
   });
 }
 
+function conversationText(message, history) {
+  return (Array.isArray(history) ? history : [])
+    .filter(item => item && item.role === 'user')
+    .map(item => String(item.content || ''))
+    .concat(String(message || ''))
+    .join('\n');
+}
+
+async function callQwen(options) {
+  const catalogText = knowledgeRetrieval.catalogPromptText();
+  const combinedText = conversationText(options.message, options.history);
+  let candidateAnalysis = { candidateIds: [], visibleFeatures: [], uncertainty: '' };
+
+  if (options.images && options.images.length) {
+    try {
+      const analysisText = await requestQwen(options, buildCandidateAnalysisRequest({
+        model: options.model,
+        message: options.message,
+        images: options.images,
+        catalogText
+      }), ANALYSIS_TIMEOUT_MS);
+      candidateAnalysis = parseCandidateAnalysis(analysisText);
+    } catch (error) {
+      console.warn('knowledge candidate analysis unavailable');
+    }
+  }
+
+  const facts = knowledgeRetrieval.extractSafetyFacts(combinedText);
+  const entries = knowledgeRetrieval.retrieve(candidateAnalysis.candidateIds, facts, combinedText);
+  const finalRequest = buildQwenRequest({
+    model: options.model,
+    message: options.message,
+    history: options.history,
+    images: options.images,
+    catalog: {
+      version: knowledgeRetrieval.VERSION,
+      text: catalogText,
+      knowledgeContext: knowledgeRetrieval.formatContext(entries)
+    }
+  });
+  const text = await requestQwen(options, finalRequest, FINAL_TIMEOUT_MS);
+  return {
+    text,
+    knowledgeObjectIds: entries.map(entry => entry.objectId),
+    actionLevels: entries.map(entry => ({ objectId: entry.objectId, level: entry.action.level })),
+    visibleFeatures: candidateAnalysis.visibleFeatures,
+    uncertainty: candidateAnalysis.uncertainty
+  };
+}
+
 exports.main = async event => {
   try {
     const apiKey = String(process.env.DASHSCOPE_API_KEY || '').trim();
     if (!apiKey) throw new Error('云函数尚未配置 DASHSCOPE_API_KEY');
     const images = await resolveImages(event && event.fileIds, event && event.imageKinds);
-    const text = await callQwen({
+    const result = await callQwen({
       apiKey,
       baseUrl: process.env.DASHSCOPE_BASE_URL || DEFAULT_BASE_URL,
       model: process.env.AI_MODEL || DEFAULT_MODEL,
@@ -101,11 +148,13 @@ exports.main = async event => {
     });
     return {
       ok: true,
-      text,
+      text: result.text,
       provider: 'qwen',
       model: process.env.AI_MODEL || DEFAULT_MODEL,
       imageCount: images.length,
-      knowledgeVersion: knowledgeCatalog.VERSION
+      knowledgeVersion: knowledgeRetrieval.VERSION,
+      knowledgeObjectIds: result.knowledgeObjectIds,
+      actionLevels: result.actionLevels
     };
   } catch (error) {
     console.error('ai agent failed:', error && error.message ? error.message : 'unknown error');
@@ -120,5 +169,6 @@ exports.main = async event => {
 };
 
 exports.callQwen = callQwen;
+exports.requestQwen = requestQwen;
 exports.chatEndpoint = chatEndpoint;
 exports.resolveImages = resolveImages;

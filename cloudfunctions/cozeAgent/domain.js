@@ -47,8 +47,8 @@ function normalizeResolvedImages(images) {
   });
 }
 
-function buildSystemPrompt(catalogText, catalogVersion) {
-  return [
+function buildSystemPrompt(catalogText, catalogVersion, knowledgeContext) {
+  const lines = [
     '你是“虫咬识途”的多模态安全建议助手。你不是医生，不做疾病、虫种或严重程度确诊。',
     '发现呼吸困难、意识异常、口唇/舌/喉肿胀、症状快速加重等危险信号时，先建议立即呼叫120或就近急诊。',
     '对虫体图片：只描述可见外形、足/翅/体节、颜色、大致尺寸和环境；最多给出1—3个候选类群并说明不确定性。',
@@ -59,24 +59,78 @@ function buildSystemPrompt(catalogText, catalogVersion) {
     '回答优先按“可见特征—可能类别与不确定性—现在怎么做—观察与何时求助—建议补拍”组织。',
     '下列是项目组知识库的候选名录（版本 ' + String(catalogVersion || 'draft') + '）。它仍为DRAFT，只能约束候选范围，不能作为医疗证据：',
     String(catalogText || '暂无名录')
-  ].join('\n');
+  ];
+  if (knowledgeContext) {
+    lines.push(
+      '以下内容是云函数按候选对象检索出的结构化知识包。只能把它作为草稿参考，不能声称已经完成医学审核：',
+      String(knowledgeContext),
+      '对象相关结论必须受知识包限制；知识包没有提供的内容不要补写。来源标题和链接不得虚构。',
+      '行动等级来自文字事实触发的本地规则。不得使用图片候选、图片置信度或病原体推测降低或提高行动等级。'
+    );
+  }
+  return lines.join('\n');
 }
 
-function buildQwenMessages(message, history, images, catalog) {
+function buildImageUserContent(message, images) {
   const safeMessage = normalizeMessage(message);
   if (!safeMessage) throw new Error('请输入要咨询的内容');
   const safeImages = normalizeResolvedImages(images);
-  const messages = [{ role: 'system', content: buildSystemPrompt(catalog && catalog.text, catalog && catalog.version) }]
-    .concat(normalizeHistory(history));
-  if (!safeImages.length) {
-    messages.push({ role: 'user', content: safeMessage });
-    return messages;
-  }
+  if (!safeImages.length) return safeMessage;
   const labels = safeImages.map((image, index) => '图片' + (index + 1) + '：' + image.label).join('；');
   const content = [{ type: 'text', text: safeMessage + '\n\n图片顺序：' + labels }];
   safeImages.forEach(image => content.push({ type: 'image_url', image_url: { url: image.url } }));
-  messages.push({ role: 'user', content });
+  return content;
+}
+
+function buildQwenMessages(message, history, images, catalog) {
+  const messages = [{ role: 'system', content: buildSystemPrompt(
+    catalog && catalog.text,
+    catalog && catalog.version,
+    catalog && catalog.knowledgeContext
+  ) }]
+    .concat(normalizeHistory(history));
+  messages.push({ role: 'user', content: buildImageUserContent(message, images) });
   return messages;
+}
+
+function buildCandidateAnalysisRequest(options) {
+  const catalogText = String(options.catalogText || '');
+  return {
+    model: String(options.model || 'qwen3.7-flash'),
+    messages: [
+      {
+        role: 'system',
+        content: [
+          '你是“虫咬识途”的视觉候选预处理器，只返回一个JSON对象，不要输出Markdown或解释。',
+          '图片只用于描述可见特征和生成最多3个候选objectId，不做医疗诊断、病原体判断或风险分级。',
+          '只有虫体或相关生物清晰可见时才返回候选；只有皮损/伤口时candidateIds必须为空。',
+          '候选只能来自下列名录，无法判断时返回空数组：',
+          catalogText,
+          'JSON格式：{"candidateIds":["object_id"],"visibleFeatures":["可见特征"],"uncertainty":"不确定性说明"}'
+        ].join('\n')
+      },
+      { role: 'user', content: buildImageUserContent(options.message, options.images) }
+    ],
+    stream: false,
+    temperature: 0,
+    max_tokens: 500
+  };
+}
+
+function parseCandidateAnalysis(content) {
+  const raw = String(content || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error('千问没有返回有效候选数据');
+  let payload;
+  try { payload = JSON.parse(raw.slice(start, end + 1)); } catch (error) { throw new Error('千问候选数据格式无效'); }
+  return {
+    candidateIds: (Array.isArray(payload.candidateIds) ? payload.candidateIds : [])
+      .map(value => String(value || '').trim()).filter(Boolean).slice(0, 3),
+    visibleFeatures: (Array.isArray(payload.visibleFeatures) ? payload.visibleFeatures : [])
+      .map(value => String(value || '').trim()).filter(Boolean).slice(0, 8),
+    uncertainty: String(payload.uncertainty || '').trim().slice(0, 500)
+  };
 }
 
 function buildQwenRequest(options) {
@@ -104,5 +158,6 @@ function parseQwenResponse(body) {
 module.exports = {
   MAX_MESSAGE_LENGTH, MAX_IMAGES, normalizeMessage, normalizeHistory, normalizeCloudFileIds,
   normalizeImageKinds, normalizeResolvedImages, buildSystemPrompt, buildQwenMessages,
+  buildImageUserContent, buildCandidateAnalysisRequest, parseCandidateAnalysis,
   buildQwenRequest, parseQwenResponse
 };
