@@ -6,7 +6,6 @@
         <view class="head-title">你遇到的是哪种接触？</view>
         <view class="head-sub">选择最接近的一项，稍后仍可修改</view>
       </view>
-      <view class="draft-state">自动保存</view>
     </view>
     <view class="recommend-tip" wx:if="{{recommendedKey}}">根据这条社群经历，建议先查看“{{recommendedName}}”；你仍可选择其他类型。</view>
   </view>

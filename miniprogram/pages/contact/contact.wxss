@@ -20,12 +20,6 @@
   color: #737D85;
   font-size: 24rpx;
 }
-.draft-state {
-  flex: none;
-  margin-top: 6rpx;
-  color: #7E8B84;
-  font-size: 22rpx;
-}
 .safe-state {
   margin: 0 0 22rpx;
   padding: 15rpx 20rpx;
