@@ -1,3 +1,5 @@
 .result-hero { padding:36rpx; display:flex; flex-direction:column; align-items:center; }
 .score-ring { width:220rpx;height:220rpx;border-radius:50%;border:28rpx solid #e99a1a;display:flex;align-items:center;justify-content:center;margin-bottom:20rpx; }
 .step { width:58rpx;height:58rpx;margin-right:22rpx; }
+.result-secondary { display:flex; flex-wrap:wrap; justify-content:center; gap:16rpx 30rpx; margin-top:24rpx; color:#47705c; font-size:24rpx; }
+.result-secondary text { padding:8rpx 0; }

@@ -1,5 +1,5 @@
 <view class="route-page">
-  <view class="route-map"><image class="route-map" src="/assets/figma/all/s09-imgFrame.svg" mode="aspectFill"/><view class="back route-back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s09-imgFrame1.svg"/></view><view class="figma-menu route-menu"><image src="/assets/figma/all/s09-imgEllipse1.svg"/><image src="/assets/figma/all/s09-imgEllipse1.svg"/><image src="/assets/figma/all/s09-imgEllipse1.svg"/></view></view>
+  <view class="route-map"><image class="route-map" src="/assets/figma/all/s09-imgFrame.svg" mode="aspectFill"/><view class="back route-back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s09-imgFrame1.svg"/></view></view>
   <view class="route-sheet">
     <view class="grabber"></view><view class="between"><view class="h2">丽水古堰画乡徒步路线</view><view class="chip active">推荐</view></view>
     <view class="card route-points"><view>●　{{start}} <text class="muted" style="float:right" bindtap="addWaypoint">＋添加途经点</text></view><view class="divider"></view><view>●　{{end}}</view></view>

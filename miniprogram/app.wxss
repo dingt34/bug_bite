@@ -16,8 +16,6 @@ view, text, image, button, input, textarea, scroll-view, camera { box-sizing: bo
 .figma-icon.lg { width: 72rpx; height: 72rpx; }
 .figma-icon.xl { width: 96rpx; height: 96rpx; }
 .figma-back { width:40rpx; height:40rpx; display:block; }
-.figma-menu { margin-left:auto; width:106rpx; height:56rpx; border-radius:28rpx; background:#fff; display:flex; align-items:center; justify-content:center; gap:14rpx; }
-.figma-menu image { width:12rpx; height:12rpx; display:block; }
 .figma-inline { display:inline-block; vertical-align:middle; margin-right:10rpx; }
 .block-break { display: block; height: 0; }
 button { padding: 0; margin: 0; line-height: normal; background: transparent; }

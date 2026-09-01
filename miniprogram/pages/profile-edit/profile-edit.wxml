@@ -1,6 +1,6 @@
 <view class="page">
   <view class="safe-top"></view>
-  <view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s02-imgFrame.svg"/></view><view class="top-title-main top-title">完善个人档案</view><view class="figma-menu profile-menu"><image src="/assets/figma/all/s02-imgEllipse1.svg"/><image src="/assets/figma/all/s02-imgEllipse1.svg"/><image src="/assets/figma/all/s02-imgEllipse1.svg"/></view></view>
+  <view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s02-imgFrame.svg"/></view><view class="top-title-main top-title">完善个人档案</view></view>
   <view class="notice card" style="margin-top:24rpx"><view class="circle circle-green" style="width:64rpx;height:64rpx"><image style="width: 45rpx; height: 45rpx; display: block; box-sizing: border-box" class="figma-icon sm" src="/assets/figma/all/s02-imgFrame1.svg"/></view><view><view class="muted">用于复查提醒和安全记录整理</view><view class="tiny">不会参与公开社群展示</view></view></view>
   <view class="section-title basic-section-title"><text>基本资料</text><text class="aside">必填</text></view>
   <view class="field profile-main-field">
@@ -14,7 +14,7 @@
       <view class="region-option region-option-on" bindtap="selectProvince">浙江省</view>
     </block>
     <block wx:else>
-      <view class="region-option region-back" bindtap="backToProvince">‹ 浙江省</view>
+      <view class="region-option region-back" bindtap="backToProvince">返回浙江省</view>
       <view class="region-option {{region === '浙江省 · ' + item ? 'region-option-on' : ''}}" wx:for="{{regionOptions}}" wx:key="*this" bindtap="selectRegion" data-region="{{item}}">浙江省 · {{item}}</view>
     </block>
   </scroll-view>
