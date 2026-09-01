@@ -5,6 +5,12 @@
 .head {
   padding: 8rpx 8rpx 4rpx;
 }
+.head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18rpx;
+}
 .head-title {
   color: #2B2F36;
   font-size: 34rpx;
@@ -14,6 +20,13 @@
   margin-top: 6rpx;
   color: #737D85;
   font-size: 24rpx;
+}
+.save-draft {
+  flex: none;
+  padding: 8rpx 0 16rpx 16rpx;
+  color: var(--primary);
+  font-size: 23rpx;
+  font-weight: 600;
 }
 
 .completion-card {
@@ -121,11 +134,21 @@
   font-size: 28rpx;
   font-weight: 700;
 }
+.section-label > view:first-child {
+  display: flex;
+  align-items: baseline;
+}
 .section-label text {
   margin-left: 12rpx;
   color: #8A9299;
   font-size: 21rpx;
   font-weight: 400;
+}
+.section-toggle {
+  margin-left: auto;
+  color: var(--primary);
+  font-size: 22rpx;
+  font-weight: 600;
 }
 .route-region-suggestion { display: flex; justify-content: space-between; gap: 16rpx; margin: 2rpx 0 16rpx; padding: 16rpx 18rpx; border-radius: 14rpx; background: var(--primary-light); color: #47705C; font-size: 22rpx; line-height: 1.5; }
 .route-region-suggestion text { flex: none; color: #2E7D5B; font-weight: 600; }

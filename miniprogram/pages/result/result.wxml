@@ -9,6 +9,8 @@
     <view class="banner-sub" wx:if="{{content.isEmergency}}">已触发危险信号，请优先联系急救服务</view>
   </view>
 
+  <view class="result-state" wx:if="{{eventId}}">事件已自动保存 · {{content.review}}</view>
+
   <!-- 下一步行动 -->
   <view class="card advice-card action-card">
     <view class="section-head">
@@ -62,9 +64,14 @@
     <view class="copy-btn" bindtap="copySummary">复制摘要</view>
   </view>
 
-  <!-- 底部操作 -->
+  <!-- 页面仅保留一个主操作，其余作为清晰的次级出口 -->
   <view class="action-bar">
-    <button class="btn-ghost" bindtap="goHome">返回首页</button>
-    <button class="btn-primary" bindtap="goEvent">查看事件记录</button>
+    <button class="btn-primary" bindtap="onPrimaryAction">{{primaryActionLabel}}</button>
+    <view class="secondary-actions">
+      <text wx:if="{{allowStepBack}}" bindtap="modifyAnswers">修改本次回答</text>
+      <text wx:if="{{level !== 'observe' && eventId}}" bindtap="goEvent">查看事件记录</text>
+      <text bindtap="goHome">返回首页</text>
+    </view>
   </view>
+  <view class="medical-disclaimer">结果为安全分流建议，不构成医疗诊断</view>
 </view>

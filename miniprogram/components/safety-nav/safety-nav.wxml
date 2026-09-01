@@ -2,14 +2,19 @@
   <view class="nav-row">
     <view class="home-action" bindtap="goHome" role="button" aria-label="返回{{returnLabel}}">
       <text class="home-arrow">‹</text>
-      <text class="home-label">{{returnLabel}}</text>
     </view>
-    <view class="nav-title">接触后安全判断</view>
+    <view class="nav-title">{{currentTitle}}</view>
     <view class="nav-placeholder"></view>
   </view>
 </view>
 
 <view class="safety-progress" aria-label="当前为第{{current}}步，共4步">
+  <view class="progress-meta">
+    <text>第 {{current}} 步，共 4 步</text>
+    <text>{{currentTitle}}</text>
+  </view>
+  <view class="progress-track"><view class="progress-value" style="width: {{progressPercent}}%;"></view></view>
+  <view class="progress-labels">
   <view
     wx:for="{{steps}}"
     wx:key="step"
@@ -17,7 +22,7 @@
     bindtap="onStepTap"
     data-step="{{item.step}}"
   >
-    <view class="step-dot">{{item.step < current ? '✓' : item.step}}</view>
     <view class="step-name">{{item.name}}</view>
+  </view>
   </view>
 </view>

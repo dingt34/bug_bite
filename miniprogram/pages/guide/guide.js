@@ -15,7 +15,8 @@ Page({
     persistedImages: { insect: false, wound: false },
     savingImage: false,
     contactType: '',
-    validationMessage: ''
+    validationMessage: '',
+    submitted: false
   },
 
   onLoad(options) {
@@ -27,13 +28,35 @@ Page({
     questions.forEach(q => {
       answers[q.key] = q.type === 'chips' ? [] : '';
     });
+    const app = typeof getApp === 'function' ? getApp() : null;
+    const eventDraft = app && app.globalData ? app.globalData.draftEvent : null;
+    const localDraft = wx.getStorageSync ? wx.getStorageSync('guideDraft') : null;
+    const restored = eventDraft && eventDraft.contactType === contactType && eventDraft.answers
+      ? eventDraft
+      : (localDraft && localDraft.contactType === contactType ? localDraft : null);
+    if (restored && restored.answers) {
+      questions.forEach(q => {
+        const value = restored.answers[q.key];
+        if (value !== undefined) answers[q.key] = Array.isArray(value) ? value.slice() : value;
+      });
+    }
+    const completion = this.getCompletion(questions, answers);
     this.setData({
       contactType: contactType,
       questions: questions,
       answers: answers,
       questionCount: questions.length,
-      actionOptions: this.buildActionOptions(contactType)
+      actionOptions: this.buildActionOptions(contactType),
+      answeredCount: completion.answeredCount,
+      completionPercent: completion.completionPercent,
+      actionsTaken: restored && Array.isArray(restored.actionsTaken) ? restored.actionsTaken.slice() : [],
+      insectImage: restored && restored.insectImageRef || '',
+      woundImage: restored && restored.woundImageRef || ''
     });
+  },
+
+  onUnload() {
+    if (!this.data.submitted) this.persistDraft(false);
   },
 
   buildActionOptions(contactType) {
@@ -89,6 +112,7 @@ Page({
       answeredCount: completion.answeredCount,
       completionPercent: completion.completionPercent
     });
+    this.persistDraft(false);
   },
 
   onActionTap(e) {
@@ -106,6 +130,7 @@ Page({
       }
     }
     this.setData({ actionsTaken: arr });
+    this.persistDraft(false);
   },
 
   chooseImage(e) {
@@ -118,8 +143,27 @@ Page({
         if (!path) return;
         const persistedImages = Object.assign({}, this.data.persistedImages, { [type]: false });
         this.setData({ [field]: path, persistedImages });
+        this.persistDraft(false);
       }
     });
+  },
+
+  saveDraft() {
+    this.persistDraft(true);
+  },
+
+  persistDraft(showToast) {
+    if (!wx.setStorageSync) return;
+    const draft = {
+      contactType: this.data.contactType,
+      answers: this.data.answers,
+      actionsTaken: this.data.actionsTaken,
+      insectImageRef: this.data.insectImage,
+      woundImageRef: this.data.woundImage,
+      updatedAtTimestamp: Date.now()
+    };
+    wx.setStorageSync('guideDraft', draft);
+    if (showToast && wx.showToast) wx.showToast({ title: '草稿已保存', icon: 'success' });
   },
 
   submit() {
@@ -156,9 +200,13 @@ Page({
     }
 
     this.setData({ savingImage: true });
+    let failedCount = 0;
     const saveNext = index => {
       if (index >= imageItems.length) {
         this.setData({ savingImage: false });
+        if (failedCount && wx.showToast) {
+          wx.showToast({ title: '图片未保存，仍可查看建议', icon: 'none' });
+        }
         done();
         return;
       }
@@ -171,12 +219,8 @@ Page({
           saveNext(index + 1);
         },
         fail: () => {
-          this.setData({ savingImage: false });
-          wx.showModal({
-            title: item.label + '保存失败',
-            content: '该图片尚未保存到事件记录，请重试或重新选择图片。',
-            showCancel: false
-          });
+          failedCount += 1;
+          saveNext(index + 1);
         }
       });
     };
@@ -200,6 +244,9 @@ Page({
     draft.matchedRules = assessment.matchedRules;
     draft.ruleVersion = assessment.ruleVersion;
     app.globalData.draftEvent = draft;
+    this.setData({ submitted: true });
+    if (wx.removeStorageSync) wx.removeStorageSync('guideDraft');
+    if (wx.removeStorageSync) wx.removeStorageSync('contactDraft');
     wx.navigateTo({ url: '/pages/result/result?level=' + assessment.level });
   }
 });

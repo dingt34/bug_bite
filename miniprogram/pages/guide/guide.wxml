@@ -2,9 +2,15 @@
 <safety-nav current="3" bind:stepchange="onStepChange" />
 <view class="page">
   <view class="head">
-    <view class="head-title">记录当前症状与证据</view>
-    <view class="head-sub">这些信息用于规则分级，不用于疾病或虫种诊断</view>
+    <view class="head-row">
+      <view>
+        <view class="head-title">现在主要有哪些表现？</view>
+        <view class="head-sub">按当前情况选择，图片与补充证据均可跳过</view>
+      </view>
+      <view class="save-draft" bindtap="saveDraft">保存草稿</view>
+    </view>
   </view>
+  <view class="danger-shortcut">出现呼吸困难、意识异常或面口咽肿胀？请立即中断并拨打 120</view>
   <view class="completion-card">
     <view class="completion-row">
       <view><text class="required">*</text> 症状与接触情况均为必填项</view>
@@ -74,6 +80,7 @@
 
   <!-- 提交 -->
   <view class="submit-wrap">
-    <button class="btn-primary" disabled="{{savingImage}}" bindtap="submit">{{savingImage ? '正在保存图片…' : '查看分级建议'}}</button>
+    <button class="btn-primary" disabled="{{savingImage}}" bindtap="submit">{{savingImage ? '正在整理记录…' : '查看行动建议'}}</button>
+    <view class="autosave-state">已自动保存 · 离线可继续</view>
   </view>
 </view>

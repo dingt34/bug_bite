@@ -4,7 +4,8 @@ Page({
   data: {
     types: mock.CONTACT_TYPES,
     recommendedKey: '',
-    recommendedName: ''
+    recommendedName: '',
+    selectedKey: ''
   },
 
   onLoad(options) {
@@ -13,8 +14,20 @@ Page({
     if (app && app.globalData) app.globalData.safetyReturnPostId = sourcePostId;
     const recommendedKey = options && options.recommended || '';
     const recommended = mock.CONTACT_TYPES.find(item => item.key === recommendedKey);
+    const storedDraft = wx.getStorageSync ? wx.getStorageSync('contactDraft') : null;
+    const existing = app && app.globalData
+      ? (app.globalData.draftEvent || storedDraft)
+      : storedDraft;
+    if (existing && app && app.globalData && !app.globalData.draftEvent) {
+      app.globalData.draftEvent = existing;
+    }
+    const selectedKey = existing && existing.contactType
+      ? existing.contactType
+      : (recommended ? recommended.key : '');
     if (recommended) {
-      this.setData({ recommendedKey: recommended.key, recommendedName: recommended.name });
+      this.setData({ recommendedKey: recommended.key, recommendedName: recommended.name, selectedKey });
+    } else if (selectedKey) {
+      this.setData({ selectedKey });
     }
   },
 
@@ -31,6 +44,16 @@ Page({
       createdAt: existing.createdAt || '刚刚',
       createdAtTimestamp: existing.createdAtTimestamp || timestamp
     });
+    this.setData({ selectedKey: key });
+    if (wx.setStorageSync) wx.setStorageSync('contactDraft', app.globalData.draftEvent);
+  },
+
+  continueToGuide() {
+    const key = this.data.selectedKey;
+    if (!key) {
+      wx.showToast({ title: '请选择一种接触类型', icon: 'none' });
+      return;
+    }
     wx.navigateTo({ url: '/pages/guide/guide?contactType=' + key });
   },
 

@@ -16,6 +16,9 @@ global.wx = {
   setStorageSync(key, value) {
     storage[key] = value;
   },
+  removeStorageSync(key) {
+    delete storage[key];
+  },
   navigateTo(options) {
     navigatedUrl = options.url;
   },
@@ -50,6 +53,9 @@ assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_杭州'
 assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_湖州'));
 assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_嘉兴'));
 assert.ok(navigatedUrl.includes('planId=' + storage.plans[0].id));
+assert.strictEqual(page.data.submitted, true);
+page.onUnload();
+assert.strictEqual(storage.precheckDraft, undefined);
 
 const progressPage = Object.assign({}, pageDefinition, {
   data: {

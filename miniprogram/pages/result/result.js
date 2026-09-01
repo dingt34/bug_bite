@@ -10,7 +10,8 @@ Page({
     summary: '',
     eventId: '',
     eventSnapshot: null,
-    allowStepBack: false
+    allowStepBack: false,
+    primaryActionLabel: '查看事件记录'
   },
 
   onLoad(options) {
@@ -25,7 +26,10 @@ Page({
       summary: summary,
       eventId: event ? event.id : '',
       eventSnapshot: event,
-      allowStepBack: level !== 'emergency' && !!event
+      allowStepBack: level !== 'emergency' && !!event,
+      primaryActionLabel: level === 'emergency'
+        ? '立即拨打 120'
+        : (level === 'consult' ? '复制就医沟通摘要' : '保存并查看事件记录')
     });
   },
 
@@ -127,6 +131,31 @@ Page({
       matchedRules: (snapshot.matchedRules || []).map(item => Object.assign({}, item))
     });
     wx.navigateBack({ delta: 4 - target });
+  },
+
+  modifyAnswers() {
+    if (!this.data.allowStepBack || !this.data.eventSnapshot) return;
+    const snapshot = this.data.eventSnapshot;
+    getApp().globalData.draftEvent = Object.assign({}, snapshot, {
+      answers: Object.assign({}, snapshot.answers || {}),
+      imageRefs: (snapshot.imageRefs || []).slice(),
+      imageRecords: (snapshot.imageRecords || []).map(item => Object.assign({}, item)),
+      actionsTaken: (snapshot.actionsTaken || []).slice(),
+      matchedRules: (snapshot.matchedRules || []).map(item => Object.assign({}, item))
+    });
+    wx.navigateBack({ delta: 1 });
+  },
+
+  onPrimaryAction() {
+    if (this.data.level === 'emergency') {
+      this.call120();
+      return;
+    }
+    if (this.data.level === 'consult') {
+      this.copySummary();
+      return;
+    }
+    this.goEvent();
   },
 
   goHome() {

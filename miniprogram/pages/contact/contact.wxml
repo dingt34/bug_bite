@@ -1,20 +1,33 @@
 <safety-nav current="2" bind:stepchange="onStepChange" />
 <view class="page">
   <view class="head">
-    <view class="head-title">发生了哪类接触？</view>
-    <view class="head-sub">选择最接近的一项，不确定也可以继续</view>
+    <view class="head-row">
+      <view>
+        <view class="head-title">你遇到的是哪种接触？</view>
+        <view class="head-sub">选择最接近的一项，稍后仍可修改</view>
+      </view>
+      <view class="draft-state">自动保存</view>
+    </view>
     <view class="recommend-tip" wx:if="{{recommendedKey}}">根据这条社群经历，建议先查看“{{recommendedName}}”；你仍可选择其他类型。</view>
   </view>
 
-  <view class="type-card {{recommendedKey === item.key ? 'type-recommended' : ''}}" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
+  <view class="safe-state">✓ 未发现危险信号，可以继续描述</view>
+
+  <view class="type-grid">
+  <view class="type-card {{recommendedKey === item.key ? 'type-recommended' : ''}} {{selectedKey === item.key ? 'type-selected' : ''}}" wx:for="{{types}}" wx:key="key" bindtap="select" data-key="{{item.key}}">
     <view class="type-icon">{{item.icon}}</view>
     <view class="type-body">
       <view class="type-name">{{item.name}}</view>
       <view class="type-desc">{{item.desc}}</view>
     </view>
     <view class="recommend-badge" wx:if="{{recommendedKey === item.key}}">建议</view>
-    <view class="type-arrow">→</view>
+    <view class="type-check" wx:if="{{selectedKey === item.key}}">✓</view>
+  </view>
   </view>
 
   <view class="tip">接触类型用于选择后续问题，不代表虫种或疾病诊断。</view>
+  <view class="submit-wrap">
+    <button class="btn-primary" disabled="{{!selectedKey}}" bindtap="continueToGuide">继续：描述症状</button>
+    <view class="draft-hint">退出时会保留当前草稿</view>
+  </view>
 </view>

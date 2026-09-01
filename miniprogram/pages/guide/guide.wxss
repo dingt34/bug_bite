@@ -5,6 +5,12 @@
 .head {
   padding: 8rpx 8rpx 4rpx;
 }
+.head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18rpx;
+}
 .head-title {
   color: #2B2F36;
   font-size: 34rpx;
@@ -14,6 +20,23 @@
   margin-top: 6rpx;
   color: #737D85;
   font-size: 24rpx;
+}
+.save-draft {
+  flex: none;
+  padding: 8rpx 0 16rpx 16rpx;
+  color: var(--primary);
+  font-size: 23rpx;
+  font-weight: 600;
+}
+.danger-shortcut {
+  margin: 16rpx 0 20rpx;
+  padding: 16rpx 20rpx;
+  border-left: 6rpx solid #E53935;
+  border-radius: 12rpx;
+  background: #FDECEA;
+  color: #B83B36;
+  font-size: 23rpx;
+  line-height: 1.55;
 }
 
 .completion-card {
@@ -160,4 +183,10 @@
 
 .submit-wrap {
   padding: 20rpx 0 0;
+}
+.autosave-state {
+  margin-top: 14rpx;
+  color: #7E8B84;
+  text-align: center;
+  font-size: 22rpx;
 }

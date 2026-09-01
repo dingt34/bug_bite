@@ -27,6 +27,9 @@ assert.strictEqual(app.globalData.safetyReturnPostId, 'cloud_post_1');
 page.select({ currentTarget: { dataset: { key: 'contact' } } });
 assert.strictEqual(app.globalData.draftEvent.contactType, 'contact');
 assert.strictEqual(app.globalData.draftEvent.contactTypeName, '毒毛、体液或皮肤接触');
+assert.strictEqual(page.data.selectedKey, 'contact');
+assert.strictEqual(navigatedUrl, '');
+page.continueToGuide();
 assert.strictEqual(navigatedUrl, '/pages/guide/guide?contactType=contact');
 
 page.onStepChange({ detail: { step: 1 } });

@@ -53,6 +53,12 @@
   font-size: 24rpx;
   opacity: 0.86;
 }
+.result-state {
+  margin: -8rpx 32rpx 24rpx;
+  color: #64736B;
+  text-align: center;
+  font-size: 22rpx;
+}
 
 .advice-card {
   border: 1rpx solid #D9E9E2;
@@ -226,20 +232,40 @@
 }
 
 .action-bar {
-  display: flex;
-  gap: 20rpx;
+  display: block;
   padding: 20rpx 24rpx 0;
 }
 .action-bar button {
-  flex: 1;
+  width: 100%;
   margin: 0;
-}
-.action-bar .btn-ghost {
-  border-width: 1rpx;
-  border-color: #43AE79;
-  color: #31825E;
 }
 .action-bar .btn-primary {
   background: #43AE79;
   box-shadow: 0 8rpx 22rpx rgba(48, 151, 104, 0.22);
+}
+.result-emergency .action-bar .btn-primary {
+  background: #E53935;
+  box-shadow: 0 8rpx 22rpx rgba(211, 65, 59, 0.22);
+}
+.result-consult .action-bar .btn-primary {
+  background: #F57C00;
+  box-shadow: 0 8rpx 22rpx rgba(245, 124, 0, 0.18);
+}
+.secondary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18rpx 28rpx;
+  margin-top: 22rpx;
+  color: #47705C;
+  font-size: 24rpx;
+}
+.secondary-actions text {
+  padding: 8rpx 0;
+}
+.medical-disclaimer {
+  padding: 20rpx 24rpx 0;
+  color: #9AA0A6;
+  text-align: center;
+  font-size: 21rpx;
 }

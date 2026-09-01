@@ -13,6 +13,9 @@ Page({
     gears: mock.GEARS,
     overnights: ['当日往返', '户外过夜', '室内住宿'],
     monthIndex: -1,
+    minDate: '',
+    optionalExpanded: false,
+    submitted: false,
     selectedRoute: null,
     selectedRoutePath: '',
     routeSuggestedRegions: [],
@@ -21,6 +24,7 @@ Page({
     completionPercent: 0,
     form: {
       regionCodes: [],
+      travelDate: '',
       month: '',
       activityType: '',
       habitatTags: [],
@@ -30,12 +34,36 @@ Page({
     }
   },
 
+  onLoad() {
+    const today = new Date();
+    const minDate = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'), String(today.getDate()).padStart(2, '0')].join('-');
+    const saved = wx.getStorageSync ? wx.getStorageSync('precheckDraft') : null;
+    if (!saved || !saved.form) {
+      this.setData({ minDate });
+      return;
+    }
+    const form = Object.assign({}, this.data.form, saved.form, {
+      regionCodes: (saved.form.regionCodes || []).slice(),
+      habitatTags: (saved.form.habitatTags || []).slice(),
+      companionTags: (saved.form.companionTags || []).slice(),
+      gearTags: (saved.form.gearTags || []).slice()
+    });
+    const optionalExpanded = !!(
+      form.habitatTags.length || form.overnight || form.companionTags.length || form.gearTags.length
+    );
+    this.setData({ minDate, form, optionalExpanded }, () => this.updateCompletion());
+  },
+
+  onUnload() {
+    if (!this.data.submitted) this.persistDraft(false);
+  },
+
   onRegionTap(e) {
     this.toggleArray('regionCodes', e.currentTarget.dataset.v, '', () => this.updateCompletion());
   },
 
   onShow() {
-    const selectedRoute = wx.getStorageSync('selectedRoutePlan') || null;
+    const selectedRoute = wx.getStorageSync('selectedRoutePlan') || this.data.selectedRoute || null;
     const suggested = selectedRoute && Array.isArray(selectedRoute.regions)
       ? selectedRoute.regions.filter(region => this.data.regions.indexOf(region) > -1)
       : [];
@@ -62,24 +90,53 @@ Page({
     }, () => this.updateCompletion());
   },
 
+  onDateChange(e) {
+    const travelDate = e.detail.value;
+    const monthNumber = Number((travelDate || '').slice(5, 7));
+    const month = monthNumber ? monthNumber + '月' : '';
+    this.setData({
+      monthIndex: monthNumber ? monthNumber - 1 : -1,
+      'form.travelDate': travelDate,
+      'form.month': month
+    }, () => this.updateCompletion());
+  },
+
   onActivityTap(e) {
     this.setData({ 'form.activityType': e.currentTarget.dataset.v }, () => this.updateCompletion());
   },
 
   onHabitatTap(e) {
-    this.toggleArray('habitatTags', e.currentTarget.dataset.v);
+    this.toggleArray('habitatTags', e.currentTarget.dataset.v, '', () => this.persistDraft(false));
   },
 
   onOvernightTap(e) {
-    this.setData({ 'form.overnight': e.currentTarget.dataset.v });
+    this.setData({ 'form.overnight': e.currentTarget.dataset.v }, () => this.persistDraft(false));
   },
 
   onCompanionTap(e) {
-    this.toggleArray('companionTags', e.currentTarget.dataset.v, '独自出行');
+    this.toggleArray('companionTags', e.currentTarget.dataset.v, '独自出行', () => this.persistDraft(false));
   },
 
   onGearTap(e) {
-    this.toggleArray('gearTags', e.currentTarget.dataset.v, '暂未准备');
+    this.toggleArray('gearTags', e.currentTarget.dataset.v, '暂未准备', () => this.persistDraft(false));
+  },
+
+  toggleOptional() {
+    this.setData({ optionalExpanded: !this.data.optionalExpanded });
+  },
+
+  saveDraft() {
+    this.persistDraft(true);
+  },
+
+  persistDraft(showToast) {
+    if (!wx.setStorageSync) return;
+    wx.setStorageSync('precheckDraft', {
+      form: this.data.form,
+      selectedRoute: this.data.selectedRoute,
+      updatedAtTimestamp: Date.now()
+    });
+    if (showToast && wx.showToast) wx.showToast({ title: '草稿已保存', icon: 'success' });
   },
 
   toggleArray(key, v, exclusiveValue, callback) {
@@ -109,13 +166,14 @@ Page({
       answeredCount,
       completionPercent: Math.round(answeredCount / this.data.requiredCount * 100)
     });
+    this.persistDraft(false);
   },
 
   onShareAppMessage() {},
 
   submit() {
     const form = this.data.form;
-    if (!form.regionCodes.length || !form.month || !form.activityType) {
+    if (!form.regionCodes.length || (!form.travelDate && !form.month) || !form.activityType) {
       wx.showToast({ title: '请完成必填项', icon: 'none' });
       return;
     }
@@ -159,6 +217,8 @@ Page({
     wx.setStorageSync('latestPlan', app.globalData.latestPlan);
     // 保留单计划键，兼容已生成的旧页面链接。
     wx.setStorageSync('plan_' + plan.id, plan);
+    this.data.submitted = true;
+    if (wx.removeStorageSync) wx.removeStorageSync('precheckDraft');
     cloudSync.queuePush(wx, app);
     wx.navigateTo({ url: '/pages/precheck-result/precheck-result?planId=' + plan.id });
   }

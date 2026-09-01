@@ -1,12 +1,14 @@
 Component({
   properties: {
-    current: { type: Number, value: 1 },
+    current: { type: Number, value: 1, observer() { this.updateView(); } },
     allowBack: { type: Boolean, value: true }
   },
 
   data: {
     statusBarHeight: 20,
     returnLabel: '首页',
+    currentTitle: '危险筛查',
+    progressPercent: 25,
     steps: [
       { step: 1, name: '危险筛查' },
       { step: 2, name: '接触类型' },
@@ -23,6 +25,7 @@ Component({
       } catch (e) {}
       this.setData({ statusBarHeight: info.statusBarHeight || 20 });
       this.syncReturnTarget();
+      this.updateView();
     }
   },
 
@@ -33,6 +36,15 @@ Component({
   },
 
   methods: {
+    updateView() {
+      const current = Number(this.data.current) || 1;
+      const step = (this.data.steps || []).find(item => item.step === current);
+      this.setData({
+        currentTitle: step ? step.name : '安全判断',
+        progressPercent: Math.max(25, Math.min(100, current * 25))
+      });
+    },
+
     syncReturnTarget() {
       const app = typeof getApp === 'function' ? getApp() : null;
       const postId = app && app.globalData && app.globalData.safetyReturnPostId;
