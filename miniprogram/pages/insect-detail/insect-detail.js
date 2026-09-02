@@ -1,2 +1,70 @@
-const nav=require('../../utils/nav');
-Page({data:{id:'tick',features:[{n:'1',t:'盾形背板',d:'身体扁平，附着吸血后明显膨大'},{n:'2',t:'八足成虫',d:'若虫与成虫足数和体型不同'},{n:'3',t:'缓慢爬行',d:'通常不会跳跃或飞行'}]},onLoad(q){this.setData({id:q.id||'tick'});},back(){nav.back();},compare(){wx.navigateTo({url:`/pages/compare/compare?ids=${this.data.id},mosquito`});},danger(){wx.navigateTo({url:'/pages/danger/danger?source=insect'});}});
+const nav = require('../../utils/nav');
+const store = require('../../utils/store');
+const species = require('../../utils/species');
+
+const SELECTION_KEY = 'compare_selection';
+
+Page({
+  data: {
+    id: '',
+    name: '',
+    latin: '',
+    typeLabel: '',
+    photo: '',
+    photoCredit: '',
+    features: [],
+    environments: [],
+    detailNote: '',
+    inCompare: false
+  },
+
+  onLoad(query) {
+    const item = species.getById(query.id);
+    const selected = species.sanitize(store.get(SELECTION_KEY, []));
+    this.setData({
+      id: item.id,
+      name: item.name,
+      latin: item.latin,
+      typeLabel: item.typeLabel,
+      photo: item.photo,
+      photoCredit: item.photoCredit,
+      features: item.features,
+      environments: item.environments,
+      detailNote: item.detailNote,
+      inCompare: selected.indexOf(item.id) >= 0
+    });
+    wx.setNavigationBarTitle({ title: item.name });
+  },
+
+  back() {
+    nav.back();
+  },
+
+  // 加入 / 移出对比清单，选择会保存下来，返回图鉴时保持一致
+  compare() {
+    const current = species.sanitize(store.get(SELECTION_KEY, []));
+    const result = species.toggle(current, this.data.id);
+    if (!result.ok) {
+      wx.showToast({ title: result.reason, icon: 'none' });
+      return;
+    }
+    store.set(SELECTION_KEY, result.ids);
+    const added = result.ids.indexOf(this.data.id) >= 0;
+    this.setData({ inCompare: added });
+    wx.showToast({ title: added ? '已加入对比' : '已移出对比', icon: 'none' });
+  },
+
+  // 直接查看对比结果；不足两种时先提示
+  openCompare() {
+    const selected = species.sanitize(store.get(SELECTION_KEY, []));
+    if (selected.length < 2) {
+      wx.showToast({ title: '再选一种才能对比', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({ url: `/pages/compare/compare?ids=${selected.join(',')}` });
+  },
+
+  danger() {
+    wx.navigateTo({ url: '/pages/danger/danger?source=insect' });
+  }
+});

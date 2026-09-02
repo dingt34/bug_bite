@@ -1,4 +1,54 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s20-imgEllipse.svg"/></view><view class="top-title"><view class="top-title-main">虫种对比</view><view class="top-title-sub">已选择 {{ids.length}} 种</view></view><view class="top-action">清空</view></view><view class="notice" style="justify-content:center">疑似候选，仅用于外形和环境对照，不构成确诊</view>
-<view class="compare-head"><view wx:for="{{species}}" wx:key="name" class="compare-spec"><view class="spec-image"><image class="species-svg" src="{{item.figmaIcon}}" mode="aspectFit"/></view><view>{{item.name}}</view><view class="tiny">{{item.type}}</view></view></view>
-<view class="compare-table"><view class="label">体型</view><view>芝麻至豆粒</view><view>细长、小型</view><view>较粗壮</view><view class="label">活动</view><view>缓慢爬行</view><view>飞行、叮咬</view><view>飞行、护巢</view><view class="label">环境</view><view>草地灌木</view><view>近水、居住区</view><view>林缘、屋檐</view><view class="label">接触</view><view>可持续附着</view><view>短暂吸血</view><view>刺蜇疼痛</view><view class="label">提示</view><view>检查附着时间</view><view>关注肿痒变化</view><view>远离蜂巢</view></view>
-<view class="notice" style="margin-top:38rpx"><view class="circle circle-green" style="width:62rpx;height:62rpx"><image class="figma-icon md" src="/assets/figma/all/s20-img2.svg"/></view><view>无法确认也没关系<text class="block-break"></text><text class="tiny">可返回问答，通过环境和症状继续判断</text></view></view><view class="detail-actions"><button class="secondary-btn" bindtap="back">返回图鉴</button><button class="primary-btn" bindtap="danger">发生接触，安全判断</button></view><view class="safe-note" style="margin-top:24rpx">虫种候选不会参与降低风险等级</view></view>
+<view class="page">
+  <view class="safe-top"></view>
+
+  <view class="topbar">
+    <view class="back" bindtap="back">
+      <image class="figma-back" src="/assets/figma/all/s20-imgEllipse.svg"/>
+    </view>
+    <view class="top-title">
+      <view class="top-title-main">虫种对比</view>
+      <view class="top-title-sub">已选择 {{ids.length}} 种</view>
+    </view>
+    <view class="top-action {{ids.length ? '' : 'action-off'}}" bindtap="clear">清空</view>
+  </view>
+
+  <view class="notice" style="justify-content:center">疑似候选，仅用于外形和环境对照，不构成确诊</view>
+
+  <block wx:if="{{species.length}}">
+    <view class="compare-head" style="{{headStyle}}">
+      <view wx:for="{{species}}" wx:key="id" class="compare-spec">
+        <view class="spec-image">
+          <image class="species-photo" src="{{item.photo}}" mode="aspectFill" lazy-load/>
+        </view>
+        <view>{{item.name}}</view>
+        <view class="tiny">{{item.typeLabel}}</view>
+      </view>
+    </view>
+
+    <view class="compare-table" style="{{tableStyle}}">
+      <block wx:for="{{rows}}" wx:key="label">
+        <view class="label">{{item.label}}</view>
+        <view wx:for="{{item.cells}}" wx:for-item="cell" wx:for-index="cellIndex" wx:key="cellIndex">{{cell}}</view>
+      </block>
+    </view>
+  </block>
+
+  <view wx:else class="card card-pad empty-state">
+    <view class="h3">还没有选择虫种</view>
+    <view class="tiny">回到图鉴选择 2–3 种再来对比</view>
+  </view>
+
+  <view class="notice" style="margin-top:38rpx">
+    <view class="circle circle-green" style="width:62rpx;height:62rpx">
+      <image class="figma-icon md" src="/assets/figma/all/s20-img2.svg"/>
+    </view>
+    <view>无法确认也没关系<text class="block-break"></text><text class="tiny">可返回问答，通过环境和症状继续判断</text></view>
+  </view>
+
+  <view class="detail-actions">
+    <button class="secondary-btn" bindtap="toGuidebook">返回图鉴</button>
+    <button class="primary-btn" bindtap="danger">发生接触，安全判断</button>
+  </view>
+
+  <view class="safe-note" style="margin-top:24rpx">虫种候选不会参与降低风险等级</view>
+</view>

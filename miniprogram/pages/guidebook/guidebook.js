@@ -1,2 +1,85 @@
-const nav=require('../../utils/nav');
-Page({data:{categories:['全部','叮咬','蜇伤','附着','接触'],category:'全部',selected:['tick','mosquito'],items:[{id:'tick',name:'中华硬蜱',meta:'草地 · 灌木 · 附着',figmaIcon:'/assets/figma/all/s18-imgEllipse1.svg',selected:true},{id:'mosquito',name:'白纹伊蚊',meta:'近水 · 夏季 · 叮咬',figmaIcon:'/assets/figma/all/s18-imgEllipse4.svg',selected:true},{id:'leech',name:'隐翅虫',meta:'灯光 · 夏秋 · 接触',figmaIcon:'/assets/figma/all/s18-imgEllipse5.svg',selected:false},{id:'bee',name:'胡蜂',meta:'林缘 · 蜂区 · 蜇伤',figmaIcon:'/assets/figma/all/s18-imgEllipse3.svg',selected:false}]},back(){nav.back();},setCategory(e){this.setData({category:e.currentTarget.dataset.v});},toggle(e){const id=e.currentTarget.dataset.id,a=[...this.data.selected],i=a.indexOf(id);i>=0?a.splice(i,1):a.length<3&&a.push(id);const items=this.data.items.map(item=>({...item,selected:a.includes(item.id)}));this.setData({selected:a,items});},detail(e){wx.navigateTo({url:`/pages/insect-detail/insect-detail?id=${e.currentTarget.dataset.id}`});},compare(){wx.navigateTo({url:`/pages/compare/compare?ids=${this.data.selected.join(',')}`});},danger(){wx.navigateTo({url:'/pages/danger/danger?source=guidebook'});}});
+const nav = require('../../utils/nav');
+const store = require('../../utils/store');
+const species = require('../../utils/species');
+
+const SELECTION_KEY = 'compare_selection';
+
+Page({
+  data: {
+    categories: species.CATEGORIES,
+    category: '全部',
+    keyword: '',
+    selected: [],
+    items: [],
+    total: 0
+  },
+
+  onLoad() {
+    const saved = species.sanitize(store.get(SELECTION_KEY, ['tick', 'mosquito']));
+    this.setData({ selected: saved, total: species.all().length });
+    this.refresh();
+  },
+
+  onShow() {
+    // 从详情页"加入对比"回来时，已选虫种可能已经变了
+    const saved = species.sanitize(store.get(SELECTION_KEY, this.data.selected));
+    this.setData({ selected: saved });
+    this.refresh();
+  },
+
+  // 按当前分类和关键词重新生成列表
+  refresh() {
+    const { category, keyword, selected } = this.data;
+    const items = species.filter({ category, keyword }).map(item => ({
+      id: item.id,
+      name: item.name,
+      meta: item.meta,
+      photo: item.photo,
+      selected: selected.indexOf(item.id) >= 0
+    }));
+    this.setData({ items });
+  },
+
+  back() {
+    nav.back();
+  },
+
+  setCategory(e) {
+    this.setData({ category: e.currentTarget.dataset.v }, () => this.refresh());
+  },
+
+  onKeyword(e) {
+    this.setData({ keyword: e.detail.value }, () => this.refresh());
+  },
+
+  clearKeyword() {
+    this.setData({ keyword: '' }, () => this.refresh());
+  },
+
+  toggle(e) {
+    const result = species.toggle(this.data.selected, e.currentTarget.dataset.id);
+    if (!result.ok) {
+      wx.showToast({ title: result.reason, icon: 'none' });
+      return;
+    }
+    store.set(SELECTION_KEY, result.ids);
+    this.setData({ selected: result.ids }, () => this.refresh());
+  },
+
+  detail(e) {
+    wx.navigateTo({ url: `/pages/insect-detail/insect-detail?id=${e.currentTarget.dataset.id}` });
+  },
+
+  compare() {
+    const { selected } = this.data;
+    if (selected.length < 2) {
+      wx.showToast({ title: '请先选择 2–3 种再对比', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({ url: `/pages/compare/compare?ids=${selected.join(',')}` });
+  },
+
+  danger() {
+    wx.navigateTo({ url: '/pages/danger/danger?source=guidebook' });
+  }
+});
