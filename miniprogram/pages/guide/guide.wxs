@@ -1,0 +1,14 @@
+// 判断选项是否被选中（单选为字符串，多选为数组）
+function isSelected(answer, item) {
+  if (answer === undefined || answer === null || answer === '') {
+    return false;
+  }
+  if (typeof answer === 'string') {
+    return answer === item;
+  }
+  return answer.indexOf(item) > -1;
+}
+
+module.exports = {
+  isSelected: isSelected
+};

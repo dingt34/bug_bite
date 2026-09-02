@@ -1,0 +1,11 @@
+<view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+  <view class="nav-row">
+    <view wx:if="{{showBack}}" class="back-action" bindtap="goBack" role="button" aria-label="{{backLabel}}">
+      <text class="back-arrow">‹</text>
+      <text class="back-label">{{backLabel}}</text>
+    </view>
+    <view wx:else class="nav-placeholder"></view>
+    <view class="nav-title">{{title}}</view>
+    <view class="nav-placeholder"></view>
+  </view>
+</view>

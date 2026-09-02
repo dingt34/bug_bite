@@ -35,12 +35,9 @@ function seed() {
       { id: 'event_bee', type: '蜂类蜇伤', level: '尽快咨询', place: '户外', body: '左手背', symptoms: ['疼痛'], trend: '已完成复查', createdAt: '8月3日', status: '历史' }
     ]);
   }
-  if (!get('posts', null)) {
-    set('posts', [
-      { id: 'post_1', author: '山野小路', region: '浙江丽水', type: '叮咬', stage: '观察完成', title: '草木路段后的两处红点', text: '穿过草木茂密路段后发现小腿有两处红点，先清洁并冷敷，按两小时提醒复查时没有继续扩大。', route: '古堰画乡环线 · 12.6 km', likes: 48, comments: 12, favorites: 21 },
-      { id: 'post_2', author: '湖边露营者', region: '浙江杭州', type: '不确定接触', stage: '观察中', title: '夜间整理帐篷后的刺痒', text: '没有看到虫体，通过环境与症状问答完成判断，准备两小时后复查。', likes: 17, comments: 5, favorites: 4 }
-    ]);
-  }
+  const posts = get('posts', []);
+  const withoutDemoPosts = Array.isArray(posts) ? posts.filter(item => item.id !== 'post_1' && item.id !== 'post_2') : [];
+  if (!Array.isArray(posts) || withoutDemoPosts.length !== posts.length) set('posts', withoutDemoPosts);
 }
 
 module.exports = { get, set, remove, id, seed };
