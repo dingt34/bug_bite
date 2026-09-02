@@ -1,0 +1,25 @@
+.page { padding: 24rpx 24rpx 60rpx; }
+.head { padding: 8rpx 6rpx 20rpx; }
+.head-title { color: var(--text-main); font-size: 36rpx; font-weight: 700; }
+.head-sub { margin-top: 6rpx; color: var(--text-sub); font-size: 23rpx; line-height: 1.5; }
+.disclaimer { padding: 18rpx 22rpx; border-radius: 16rpx; background: #FFF8E1; color: #7A5C00; font-size: 22rpx; line-height: 1.5; }
+.compare-scroll { width: 100%; margin-top: 20rpx; border: 1rpx solid #E1E7E4; border-radius: 22rpx; background: #FFFFFF; }
+.compare-table { min-width: 100%; }
+.columns-2 { width: 1120rpx; }
+.columns-3 { width: 1500rpx; }
+.table-row { display: flex; border-bottom: 1rpx solid #E8ECEA; }
+.table-row:last-child { border-bottom: none; }
+.label-cell { position: sticky; left: 0; z-index: 2; width: 170rpx; flex-shrink: 0; padding: 24rpx 20rpx; box-sizing: border-box; background: #F3F7F5; color: #435049; font-size: 22rpx; font-weight: 600; }
+.value-cell { flex: 1; min-width: 0; padding: 24rpx; border-left: 1rpx solid #E8ECEA; box-sizing: border-box; color: #5C6862; font-size: 22rpx; line-height: 1.55; }
+.table-head { background: #FAFCFB; }
+.head-label { display: flex; align-items: center; }
+.insect-head { text-align: center; }
+.head-image { width: 112rpx; height: 88rpx; display: block; margin: 0 auto; border-radius: 16rpx; background: #EDF2EF; }
+.head-name { margin-top: 10rpx; color: #2E3A34; font-size: 27rpx; font-weight: 700; }
+.head-scientific { margin-top: 3rpx; color: #617068; font-family: Georgia, 'Times New Roman', serif; font-size: 18rpx; font-style: italic; }
+.head-group { margin-top: 2rpx; color: #8C9792; font-size: 18rpx; }
+.compare-tip { margin-top: 20rpx; padding: 20rpx 22rpx; border: 1rpx solid #D8E7DF; border-radius: 18rpx; background: #F0F7F3; color: #5A6962; font-size: 22rpx; line-height: 1.5; }
+.actions { display: flex; gap: 18rpx; margin-top: 24rpx; }
+.action-button { flex: 1; margin: 0; font-size: 25rpx; }
+.error-card { margin-top: 30rpx; padding: 34rpx; border-radius: 22rpx; background: #FFFFFF; color: #65716B; font-size: 25rpx; text-align: center; }
+.error-button { margin-top: 24rpx; }

@@ -1,0 +1,2 @@
+.danger-page .progress { margin-top:30rpx; }
+.danger-selected { border:2rpx solid #ea4038; background:#fff8f7; }

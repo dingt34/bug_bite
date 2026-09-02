@@ -1,0 +1,158 @@
+<view class="detail-state" wx:if="{{loading && !post}}">
+  <view class="detail-spinner"></view>
+  <view>正在读取云端帖子…</view>
+</view>
+
+<view class="detail-state detail-error" wx:elif="{{loadError && !post}}">
+  <view class="detail-state-icon">☁️</view>
+  <view class="detail-state-title">帖子暂时无法加载</view>
+  <view class="detail-state-sub">{{loadError}}</view>
+  <button class="detail-retry" bindtap="retryLoad">重新加载</button>
+</view>
+
+<view class="page" wx:elif="{{post}}">
+  <view class="safe-top"></view>
+  <view class="topbar">
+    <view class="back" bindtap="back">‹</view>
+    <view class="top-title-main top-title">经历详情</view>
+  </view>
+  <view class="card post-card">
+    <view class="post-head">
+      <image wx:if="{{post.avatarUrl}}" class="post-avatar avatar-image" src="{{post.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="post-avatar">{{post.avatarText}}</view>
+      <view class="post-meta">
+        <view class="post-name">{{post.displayName}}</view>
+        <view class="post-time">{{post.time}}{{post.edited ? ' · 已编辑' : ''}}</view>
+      </view>
+    </view>
+    <view class="post-tags">
+      <text class="tag" wx:for="{{post.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="post-title" wx:if="{{post.title}}">{{post.title}}</view>
+    <view class="post-text">{{post.text}}</view>
+    <image
+      wx:for="{{post.imageRefs}}"
+      wx:key="*this"
+      src="{{item}}"
+      mode="widthFix"
+      class="post-img"
+      bindtap="previewImage"
+      data-src="{{item}}"
+    />
+    <view class="route-share-card" wx:if="{{post.routePlan}}">
+      <view class="route-share-badge">作者已共享完整路线</view>
+      <view class="route-share-path">
+        <text>{{post.routePlan.startName}}</text>
+        <block wx:for="{{post.routePlan.waypointNames}}" wx:key="*this" wx:for-item="stop">
+          <text class="route-arrow">→</text><text>{{stop}}</text>
+        </block>
+        <text class="route-arrow">→</text><text>{{post.routePlan.endName}}</text>
+      </view>
+      <view class="route-share-meta">{{post.routePlan.routeName}} · {{post.routePlan.distanceText}} · {{post.routePlan.durationText}}</view>
+    </view>
+    <view class="post-actions">
+      <view class="action {{post.liked ? 'action-on' : ''}}" bindtap="toggleLike">
+        <image class="action-image" src="{{post.liked ? '/assets/community/like-filled.svg' : '/assets/community/like.svg'}}" mode="aspectFit"/>
+        <text class="action-num">{{post.likeCount || 0}}</text>
+      </view>
+      <view class="action" bindtap="focusComments">
+        <image class="action-image" src="/assets/community/comment.svg" mode="aspectFit"/>
+        <text class="action-num">{{post.commentCount || 0}}</text>
+      </view>
+      <view class="action {{post.collected ? 'action-collected' : ''}}" bindtap="toggleCollect">
+        <image class="action-image" src="{{post.collected ? '/assets/community/star-filled.svg' : '/assets/community/star.svg'}}" mode="aspectFit"/>
+        <text class="action-num">{{post.collectCount || 0}}</text>
+      </view>
+    </view>
+    <view class="owner-actions" wx:if="{{canDelete}}">
+      <text class="delete-own" bindtap="deletePost">删除分享</text>
+    </view>
+  </view>
+
+  <button class="safety-card" bindtap="goSafety">类似情况？先进行安全判断，不照搬他人处理</button>
+
+  <view class="card comment-card">
+    <view class="comment-heading">
+      <view class="comment-title">评论 <text class="comment-count">{{commentCount}}</text></view>
+      <view class="comment-sorts">
+        <text class="comment-sort {{commentSort === 'latest' ? 'comment-sort-on' : ''}}" bindtap="setCommentSort" data-mode="latest">最新</text>
+        <text class="comment-sort {{commentSort === 'liked' ? 'comment-sort-on' : ''}}" bindtap="setCommentSort" data-mode="liked">最赞</text>
+      </view>
+    </view>
+    <view class="reply-context" wx:if="{{replyingTo}}">
+      <text>正在回复 {{replyingTo.displayName}}</text>
+      <text class="reply-cancel" bindtap="cancelReply">取消</text>
+    </view>
+    <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+      <image wx:if="{{item.avatarUrl}}" class="comment-avatar avatar-image" src="{{item.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="comment-avatar">{{item.avatarText}}</view>
+      <view class="comment-body">
+        <view class="comment-meta"><text class="comment-name">{{item.displayName}}</text></view>
+        <view class="comment-text">{{item.text}}</view>
+        <view class="comment-footer">
+          <view class="comment-footer-main">
+            <text class="comment-time">{{item.time}}</text>
+            <view class="comment-vote {{item.liked ? 'comment-vote-up' : ''}} {{commentVoteBusy === item.id ? 'comment-vote-busy' : ''}}" wx:if="{{!item.deleted}}" bindtap="toggleCommentVote" data-id="{{item.id}}" data-vote="up">
+              <image class="comment-vote-icon" src="{{item.liked ? '/assets/icons/comment-like-filled.svg' : '/assets/icons/comment-like-outline.svg'}}" mode="aspectFit" />
+              <text wx:if="{{item.likeCount}}">{{item.likeCount}}</text>
+            </view>
+            <view class="comment-vote {{item.disliked ? 'comment-vote-down' : ''}} {{commentVoteBusy === item.id ? 'comment-vote-busy' : ''}}" wx:if="{{!item.deleted}}" bindtap="toggleCommentVote" data-id="{{item.id}}" data-vote="down">
+              <image class="comment-vote-icon" src="{{item.disliked ? '/assets/icons/comment-dislike-filled.svg' : '/assets/icons/comment-dislike-outline.svg'}}" mode="aspectFit" />
+              <text wx:if="{{item.dislikeCount}}">{{item.dislikeCount}}</text>
+            </view>
+            <view class="comment-reply-action" wx:if="{{!item.deleted}}" bindtap="startReply" data-id="{{item.id}}" data-root="{{item.id}}" data-name="{{item.displayName}}"><text class="comment-reply-icon">↩</text></view>
+          </view>
+          <text class="comment-delete" wx:if="{{!item.deleted && item.canDelete}}" bindtap="deleteComment" data-id="{{item.id}}">删除</text>
+          <view class="comment-more" wx:elif="{{!item.deleted}}" bindtap="openCommentMenu" data-id="{{item.id}}" data-can-delete="{{item.canDelete}}">⋮</view>
+        </view>
+        <view class="reply-toggle" wx:if="{{item.replies.length}}" bindtap="toggleReplies" data-id="{{item.id}}">
+          <text wx:if="{{item.repliesExpanded}}">收起回复</text>
+          <text wx:else>共 {{item.replies.length}} 条回复，点击查看</text>
+        </view>
+        <view class="reply-list" wx:if="{{item.repliesExpanded}}">
+          <view class="comment-item comment-reply" wx:for="{{item.replies}}" wx:for-item="reply" wx:key="id">
+            <image wx:if="{{reply.avatarUrl}}" class="comment-avatar reply-avatar avatar-image" src="{{reply.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="comment-avatar reply-avatar">{{reply.avatarText}}</view>
+            <view class="comment-body">
+              <view class="comment-meta">
+                <text class="comment-name">{{reply.displayName}}</text>
+                <text class="reply-to" wx:if="{{reply.replyToDisplayName}}">回复 @{{reply.replyToDisplayName}}</text>
+              </view>
+              <view class="comment-text">{{reply.text}}</view>
+              <view class="comment-footer">
+                <view class="comment-footer-main">
+                  <text class="comment-time">{{reply.time}}</text>
+                  <view class="comment-vote {{reply.liked ? 'comment-vote-up' : ''}} {{commentVoteBusy === reply.id ? 'comment-vote-busy' : ''}}" wx:if="{{!reply.deleted}}" bindtap="toggleCommentVote" data-id="{{reply.id}}" data-vote="up">
+                    <image class="comment-vote-icon" src="{{reply.liked ? '/assets/icons/comment-like-filled.svg' : '/assets/icons/comment-like-outline.svg'}}" mode="aspectFit" />
+                    <text wx:if="{{reply.likeCount}}">{{reply.likeCount}}</text>
+                  </view>
+                  <view class="comment-vote {{reply.disliked ? 'comment-vote-down' : ''}} {{commentVoteBusy === reply.id ? 'comment-vote-busy' : ''}}" wx:if="{{!reply.deleted}}" bindtap="toggleCommentVote" data-id="{{reply.id}}" data-vote="down">
+                    <image class="comment-vote-icon" src="{{reply.disliked ? '/assets/icons/comment-dislike-filled.svg' : '/assets/icons/comment-dislike-outline.svg'}}" mode="aspectFit" />
+                    <text wx:if="{{reply.dislikeCount}}">{{reply.dislikeCount}}</text>
+                  </view>
+                  <view class="comment-reply-action" wx:if="{{!reply.deleted}}" bindtap="startReply" data-id="{{reply.id}}" data-root="{{item.id}}" data-name="{{reply.displayName}}"><text class="comment-reply-icon">↩</text></view>
+                </view>
+                <text class="comment-delete" wx:if="{{!reply.deleted && reply.canDelete}}" bindtap="deleteComment" data-id="{{reply.id}}">删除</text>
+                <view class="comment-more" wx:elif="{{!reply.deleted}}" bindtap="openCommentMenu" data-id="{{reply.id}}" data-can-delete="{{reply.canDelete}}">⋮</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="comment-empty" wx:if="{{!comments.length}}">还没有讨论，欢迎提供有帮助的补充信息</view>
+    <view class="comment-composer {{replyingTo ? 'comment-composer-reply' : ''}}">
+      <input class="comment-input" maxlength="200" value="{{commentText}}" focus="{{commentInputFocus}}" bindinput="onCommentInput" placeholder="{{replyingTo ? '回复对方…' : '友善地分享经验…'}}" confirm-type="send" bindconfirm="submitComment" />
+      <button class="comment-send" disabled="{{commentSubmitting}}" bindtap="submitComment" aria-label="发布评论">
+        <image class="comment-send-icon" src="/assets/icons/comment-send.svg" mode="aspectFit" />
+      </button>
+    </view>
+  </view>
+
+  <view class="report {{reported ? 'reported' : ''}}" bindtap="report">
+    <text class="report-icon">!</text>
+    <text>{{reported ? '已提交云端审核' : '举报不当内容'}}</text>
+  </view>
+
+  <view class="notice"><text class="notice-icon">i</text>个人经历分享，不构成医疗诊断。安全判断请以症状与危险信号为准。</view>
+</view>

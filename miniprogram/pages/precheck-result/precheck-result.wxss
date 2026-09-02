@@ -1,0 +1,1 @@
+.result-banner{position:relative;overflow:hidden;padding:32rpx;min-height:260rpx}.banner-map{position:absolute;right:-40rpx;top:-60rpx;width:260rpx;height:320rpx;background:#a9ccb1;border-radius:50% 0 0 50%;transform:rotate(10deg)}

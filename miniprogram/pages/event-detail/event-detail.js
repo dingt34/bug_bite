@@ -1,0 +1,2 @@
+const store=require('../../utils/store');const nav=require('../../utils/nav');
+Page({data:{event:{}},onLoad(q){const list=store.get('events',[]);const event=list.find(x=>x.id===q.id)||list[0]||{};this.setData({event:{...event,symptomsText:(event.symptoms||[]).join('、')}});},back(){nav.back();},review(){wx.navigateTo({url:`/pages/review/review?id=${this.data.event.id}`});},summary(){wx.setClipboardData({data:`${this.data.event.type}，${this.data.event.createdAt}，${this.data.event.symptomsText||''}，当前${this.data.event.trend}`});}});
