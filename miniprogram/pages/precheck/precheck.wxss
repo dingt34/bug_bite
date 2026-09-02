@@ -1,2 +1,21 @@
 .precheck-hero { position:relative; overflow:hidden; min-height:184rpx; padding:32rpx; }
 .route-art { position:absolute; right:-30rpx; top:-20rpx; width:210rpx;height:220rpx;background:#a9ccb1;transform:rotate(8deg);border-radius:50% 0 0 50%; }
+.precheck-page .precheck-hero { min-height:160rpx; margin-top:24rpx; }
+.hero-copy { position:relative; z-index:1; padding-right:80rpx; overflow-wrap:anywhere; }
+.precheck-page .route-art { opacity:.35; pointer-events:none; }
+.precheck-page .muted { color:#566b5e; font-size:24rpx; margin-top:16rpx; }
+.precheck-page .tiny { color:#69736e; line-height:1.7; }
+.precheck-page .field-label { width:140rpx; flex-shrink:0; color:#69736e; }
+.precheck-page .field-value { min-width:0; font-size:28rpx; }
+.destination-card { border-radius:34rpx; }
+.destination-card .field { box-shadow:none; }
+.precheck-page .text-button { padding:18rpx 12rpx; min-height:76rpx; font-size:24rpx; color:#2f7d5b; }
+.precheck-page .map-button { text-align:left; margin-left:28rpx; padding-top:0; min-height:60rpx; }
+.environment-copy { margin:0 20rpx; }
+.environment-options { margin-top:24rpx; }
+.precheck-page .chip { color:#59645e; min-height:76rpx; }
+.route-card { margin-top:28rpx; }
+.route-warning { margin-top:16rpx; }
+.precheck-page .form-footer { margin-top:36rpx; padding-bottom:env(safe-area-inset-bottom); }
+.precheck-page .safe-note { margin-top:20rpx; color:#69736e; }
+.precheck-page .safe-top { min-height:104rpx; }

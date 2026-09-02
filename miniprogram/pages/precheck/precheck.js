@@ -1,97 +1,110 @@
 const store = require('../../utils/store');
 const nav = require('../../utils/nav');
-
-function standardDate(value) {
-  const direct = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (direct) return direct[0];
-  const match = String(value || '').match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-  return match ? `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}` : '';
+const environments = ['林地', '草地', '近水', '过夜', '夜间活动', '携带宠物', '儿童同行'];
+function today() {
+  const d = new Date();
+  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
 }
-
-function displayDate(value) {
-  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  return match ? `${match[1]}年${Number(match[2])}月${Number(match[3])}日` : value;
+function validDate(value) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+  if (!m) return false;
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return d.getFullYear() === +m[1] && d.getMonth() === +m[2] - 1 && d.getDate() === +m[3];
 }
-
+function displayDate(value) { return validDate(value) ? value.replace('-', '年').replace('-', '月') + '日' : ''; }
 Page({
-  data: {
-    destination: '浙江省 · 丽水市',
-    date: '',
-    dateValue: '',
-    minDate: '',
-    activity: '徒步露营',
-    environment: ['林地', '近水', '过夜'],
-    environmentText: '林地 · 近水 · 过夜',
-    route: null
-  },
+  data: { destination: '', date: '', dateValue: '', minDate: '', activity: '', environment: [],
+    environmentOptions: [], environmentText: '未选择', expanded: false, route: null, submitting: false,
+    saveStatus: '填写三项信息即可生成，不需要定位或照片' },
   onLoad() {
-    const now = new Date();
-    const minDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
-    const saved = store.get('precheckDraft', null);
-    if (saved) {
-      const dateValue = standardDate(saved.dateValue || saved.date);
-      const environment = Array.isArray(saved.environment) ? saved.environment : this.data.environment;
-      this.setData({ ...saved, minDate, dateValue, date: displayDate(dateValue), environment, environmentText: environment.join(' · ') });
-      return;
-    }
-    this.setData({ minDate, dateValue: minDate, date: displayDate(minDate) });
+    const saved = store.get('precheckDraft', {}) || {};
+    this.planId = saved.planId || '';
+    const environment = Array.isArray(saved.environment) ? saved.environment.filter(v => environments.includes(v)) : [];
+    const dateValue = validDate(saved.dateValue) ? saved.dateValue : '';
+    this.setData({ destination: saved.destination || '', dateValue, date: displayDate(dateValue), minDate: today(),
+      activity: saved.activity || '', environment, environmentText: environment.join(' · ') || '未选择',
+      environmentOptions: environments.map(value => ({ value, selected: environment.includes(value) })),
+      route: saved.route || null });
   },
   onShow() {
+    this.setData({ submitting: false, minDate: today() });
+    if (!this.awaitingRoute) return;
+    this.awaitingRoute = false;
     const route = store.get('routeDraft', null);
-    if (route) this.setData({ route }, () => this.persist(false));
+    if (route) { this.change({ route }); store.remove('routeDraft'); }
   },
-  onUnload() { this.persist(false); },
+  onUnload() { if (!this.completed) this.persist(false); },
   back() { nav.back(); },
+  change(values) { this.completed = false; this.setData(values, () => this.persist(false)); },
+  inputDestination(event) { this.change({ destination: event.detail.value }); },
   chooseDestination() {
-    wx.chooseLocation({ success: result => this.setData({ destination: result.name || result.address }, () => this.persist(false)) });
+    wx.chooseLocation({ success: result => this.change({ destination: result.name || result.address || '' }),
+      fail: error => {
+        if (!/cancel/.test(error.errMsg || '')) wx.showToast({ title: '可直接在目的地栏手动输入', icon: 'none' });
+      } });
   },
-  chooseDate(event) {
-    const dateValue = event.detail.value;
-    this.setData({ dateValue, date: displayDate(dateValue) }, () => this.persist(false));
-  },
+  chooseDate(event) { const dateValue = event.detail.value; this.change({ dateValue, date: displayDate(dateValue) }); },
   chooseActivity() {
-    const values = ['徒步露营', '公园步行', '骑行', '亲子活动'];
-    wx.showActionSheet({ itemList: values, success: result => this.setData({ activity: values[result.tapIndex] }, () => this.persist(false)) });
+    const values = ['徒步露营', '公园步行', '骑行', '亲子活动', '其他户外活动'];
+    wx.showActionSheet({ itemList: values, success: r => { if (values[r.tapIndex]) this.change({ activity: values[r.tapIndex] }); } });
   },
-  editEnvironment() {
-    const values = ['林地', '草地', '近水', '过夜', '携带宠物'];
-    wx.showActionSheet({ itemList: values, success: result => {
-      const selected = values[result.tapIndex];
-      const environment = [...this.data.environment];
-      const index = environment.indexOf(selected);
-      if (index >= 0) environment.splice(index, 1); else environment.push(selected);
-      this.setData({ environment, environmentText: environment.length ? environment.join(' · ') : '未选择' }, () => this.persist(false));
-    } });
+  editEnvironment() { this.setData({ expanded: !this.data.expanded }); },
+  toggleEnvironment(event) {
+    const value = event.currentTarget.dataset.value;
+    if (!environments.includes(value)) return;
+    const environment = this.data.environment.includes(value) ? this.data.environment.filter(v => v !== value) : [...this.data.environment, value];
+    this.change({ environment, environmentText: environment.join(' · ') || '未选择',
+      environmentOptions: environments.map(value => ({ value, selected: environment.includes(value) })) });
   },
-  route() { wx.navigateTo({ url: '/pages/route/route' }); },
+  route() {
+    // 只消费本次路线页返回的结果，避免将上一份行程路线带入新计划。
+    store.remove('routeDraft'); this.awaitingRoute = true;
+    wx.navigateTo({ url: '/pages/route/route', fail: () => { this.awaitingRoute = false; } });
+  },
+  removeRoute() { this.change({ route: null }); },
   persist(showToast) {
-    store.set('precheckDraft', {
-      destination: this.data.destination,
-      date: this.data.date,
-      dateValue: this.data.dateValue,
-      activity: this.data.activity,
-      environment: this.data.environment,
-      environmentText: this.data.environmentText,
-      route: this.data.route
-    });
-    if (showToast) wx.showToast({ title: '草稿已保存' });
+    if (this.completed) return true;
+    try {
+      store.set('precheckDraft', { planId: this.planId, destination: this.data.destination,
+        dateValue: this.data.dateValue, activity: this.data.activity, environment: this.data.environment, route: this.data.route });
+      this.setData({ saveStatus: '草稿已保存到本机 · 可离线继续' });
+      if (showToast) wx.showToast({ title: '草稿已保存' });
+      return true;
+    } catch (_) {
+      this.setData({ saveStatus: '草稿保存失败，请释放存储后重试' });
+      wx.showToast({ title: '本地保存失败，请重试', icon: 'none' }); return false;
+    }
   },
   save() { this.persist(true); },
   generate() {
-    if (!this.data.destination || !this.data.dateValue || !this.data.activity) {
-      wx.showToast({ title: '请完成三项必填信息', icon: 'none' });
-      return;
+    if (this.data.submitting) return;
+    const destination = this.data.destination.trim();
+    if (!destination || !this.data.dateValue || !this.data.activity) {
+      wx.showToast({ title: '请完成目的地、日期和活动', icon: 'none' }); return;
     }
-    const plans = store.get('plans', []);
-    const plan = {
-      id: store.id('trip'), title: this.data.destination.replace('浙江省 · ', ''),
-      date: this.data.date.replace(/^\d{4}年/, ''), startAt: this.data.dateValue,
-      type: this.data.activity, status: '新计划', distance: this.data.route && this.data.route.distance || ''
-    };
-    plans.unshift(plan);
-    store.set('plans', plans);
-    store.set('currentPlan', { ...this.data, id: plan.id });
-    store.remove('precheckDraft');
-    wx.navigateTo({ url: '/pages/precheck-result/precheck-result' });
+    if (!validDate(this.data.dateValue) || this.data.dateValue < today()) {
+      wx.showToast({ title: '请选择今天或之后的有效日期', icon: 'none' }); return;
+    }
+    this.setData({ submitting: true });
+    try {
+      const plans = store.get('plans', []);
+      this.planId = this.planId || store.id('trip');
+      // 现有 route 页是静态演示。未经实际规划验证的距离不能当作真实路线保存。
+      const route = this.data.route && this.data.route.verified === true ? this.data.route : null;
+      const plan = { id: this.planId, title: destination, destination, date: this.data.date,
+        dateValue: this.data.dateValue, startAt: this.data.dateValue, activity: this.data.activity, type: this.data.activity,
+        environment: this.data.environment, route, distance: route ? route.distance || '' : '',
+        status: '新计划', syncStatus: 'local', updatedAt: Date.now() };
+      const index = plans.findIndex(p => p.id === plan.id);
+      if (index >= 0) plans[index] = { ...plans[index], ...plan }; else plans.unshift(plan);
+      store.set('plans', plans); store.set('currentPlan', plan);
+      store.remove('precheckDraft'); this.completed = true;
+      wx.navigateTo({ url: '/pages/precheck-result/precheck-result', fail: () => {
+        this.setData({ submitting: false }); wx.showToast({ title: '计划已保存，可再次点击查看', icon: 'none' });
+      } });
+    } catch (_) {
+      this.setData({ submitting: false }); this.persist(false);
+      wx.showToast({ title: '计划未完整保存，请重试', icon: 'none' });
+    }
   }
 });
