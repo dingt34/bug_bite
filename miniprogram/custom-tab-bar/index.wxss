@@ -10,3 +10,7 @@
 .tab-center .tab-icon { width:48rpx; height:48rpx; filter:none; }
 .tab-center .tab-label { margin-top:2rpx; }
 .safe-bottom { position:absolute; left:0; right:0; top:100%; height:env(safe-area-inset-bottom); background:#fff; }
+.figma-community-tabs .center-disc { width:44rpx; height:44rpx; border:0; background:transparent; box-shadow:none; }
+.figma-community-tabs .tab-center { margin-top:0; }
+.figma-tab-marker { width:24rpx; height:24rpx; border:2rpx solid #1e2021; border-radius:50%; }
+.figma-tab-active { background:#1e2021; }
