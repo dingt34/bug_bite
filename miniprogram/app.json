@@ -23,6 +23,7 @@
     "pages/community/community",
     "pages/post-detail/post-detail",
     "pages/publish/publish",
+    "pages/privacy-social-delete/privacy-social-delete",
     "pages/privacy/privacy"
   ],
   "window": {

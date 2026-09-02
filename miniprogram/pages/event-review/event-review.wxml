@@ -1,0 +1,66 @@
+<wxs src="../guide/guide.wxs" module="g" />
+
+<view class="page" wx:if="{{event}}">
+  <view class="head">
+    <view class="head-title">更新当前症状与处理情况</view>
+    <view class="head-sub">先检查危险信号；出现任一项时可直接保存复查并升级求助。</view>
+  </view>
+
+  <view class="card danger-card">
+    <view class="card-title">危险信号</view>
+    <view
+      class="danger-option {{g.isSelected(selectedDanger, item.key) ? 'danger-option-on' : ''}}"
+      wx:for="{{signals}}"
+      wx:key="key"
+      bindtap="toggleDanger"
+      data-key="{{item.key}}"
+    >
+      <view class="danger-check">{{g.isSelected(selectedDanger, item.key) ? '✓' : ''}}</view>
+      <view class="danger-body">
+        <view class="danger-name">{{item.name}}</view>
+        <view class="danger-desc">{{item.desc}}</view>
+      </view>
+    </view>
+    <view class="emergency-tip" wx:if="{{selectedDanger.length}}">已选择危险信号，无需完成下方普通问题即可保存并升级为紧急求助。</view>
+  </view>
+
+  <view class="validation-banner" wx:if="{{validationMessage}}">{{validationMessage}}</view>
+
+  <view class="card" wx:for="{{questions}}" wx:key="key" wx:for-item="q">
+    <view class="card-title">{{q.label}} <text class="required">*</text></view>
+    <view class="question-help" wx:if="{{q.help}}">{{q.help}}</view>
+    <view class="chips">
+      <text
+        class="tag {{g.isSelected(answers[q.key], item) ? 'active' : ''}}"
+        wx:for="{{q.options}}"
+        wx:for-item="item"
+        wx:key="*this"
+        bindtap="onAnswer"
+        data-key="{{q.key}}"
+        data-v="{{item}}"
+        data-type="{{q.type}}"
+      >{{item}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">本次采取措施 <text class="optional">选填</text></view>
+    <view class="question-help">仅记录已经采取的措施，可多选；用药请遵循说明书或专业人员建议。</view>
+    <view class="chips">
+      <text class="tag {{g.isSelected(actionsTaken, item) ? 'active' : ''}}" wx:for="{{actionOptions}}" wx:key="*this" bindtap="onActionTap" data-v="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">新增记录图片 <text class="optional">选填</text></view>
+    <view class="upload" bindtap="chooseImage">
+      <image wx:if="{{previewImage}}" src="{{previewImage}}" mode="aspectFill" class="preview" />
+      <view wx:else class="upload-placeholder">＋ 添加当前症状图片</view>
+    </view>
+    <view class="tip">图片将追加到原事件，不会覆盖之前的记录。</view>
+  </view>
+
+  <view class="submit-wrap">
+    <button class="btn-primary" disabled="{{savingImage}}" bindtap="submit">{{savingImage ? '正在保存图片…' : '保存复查结果'}}</button>
+  </view>
+</view>

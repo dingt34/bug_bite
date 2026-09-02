@@ -1,0 +1,12 @@
+# Dependencies and generated local files
+node_modules/
+.DS_Store
+*.log
+
+# Local WeChat developer-tool preferences
+project.private.config.json
+
+# Environment secrets
+.env
+.env.*
+!.env.example
