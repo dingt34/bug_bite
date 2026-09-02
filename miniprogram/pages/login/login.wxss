@@ -1,0 +1,233 @@
+/* pages/login/login.wxss */
+
+/* ===== 原有样式保留 ===== */
+.login-page { min-height:100vh; background:linear-gradient(180deg,#f7f8fb 0%,#f4f6f8 100%); }
+.nature-hero { position:relative; height:63vh; min-height:950rpx; overflow:hidden; background:#edf4ed; }
+.login-figma-hero { position:absolute; inset:0; width:100%; height:100%; }
+.login-copy { position:absolute; left:52rpx; bottom:285rpx; z-index:4; }
+.login-copy .h1 { font-size:60rpx; text-shadow:0 2rpx 8rpx rgba(30,32,33,.08); }
+.login-sub { margin-top:18rpx; font-size:32rpx; font-weight:600; }
+.login-body { padding:92rpx 72rpx 60rpx; }
+
+/* ===== 新增样式 ===== */
+
+/* 紧急安全入口（始终可见） */
+.emergency-entry {
+  position: absolute;
+  right: 32rpx;
+  top: 120rpx;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 28rpx;
+  background: rgba(255, 235, 235, 0.92);
+  border: 2rpx solid #e53935;
+  border-radius: 40rpx;
+  backdrop-filter: blur(8rpx);
+}
+.emergency-icon { font-size: 32rpx; }
+.emergency-text { font-size: 24rpx; color: #c62828; font-weight: 600; }
+
+/* 表单区域 */
+.form-group {
+  margin-bottom: 32rpx;
+}
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+.form-input {
+  height: 88rpx;
+  padding: 0 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 2rpx solid #e8eaed;
+  font-size: 30rpx;
+}
+.form-input:focus {
+  border-color: #2f875f;
+}
+
+/* 头像区域 */
+.avatar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+.form-avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: #e8eaed;
+  overflow: hidden;
+  border: 4rpx solid #2f875f;
+}
+.form-avatar.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  border-style: dashed;
+}
+.avatar-placeholder-icon { font-size: 56rpx; }
+.avatar-hint {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 选择器（年龄段/地区） */
+.form-picker {
+  height: 88rpx;
+  padding: 0 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 2rpx solid #e8eaed;
+  font-size: 30rpx;
+  line-height: 88rpx;
+  color: #333;
+}
+.form-picker:empty::before {
+  content: attr(data-placeholder);
+  color: #bbb;
+}
+
+/* 隐私同意 */
+.privacy-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  margin: 24rpx 0 40rpx;
+}
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 4rpx;
+  transition: all 0.2s;
+}
+.checkbox.checked {
+  background: #2f875f;
+  border-color: #2f875f;
+}
+.privacy-agree-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+.privacy-agree-text .link {
+  color: #2f875f;
+  text-decoration: underline;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  margin-top: 16rpx;
+}
+.primary-btn {
+  width: 100%;
+  height: 108rpx;
+  border-radius: 54rpx;
+  background: linear-gradient(135deg, #25292a 0%, #171a1b 100%);
+  box-shadow: 0 14rpx 28rpx rgba(24, 31, 29, 0.18);
+  letter-spacing: 1rpx;
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  border: none;
+}
+.primary-btn:active { opacity: .88; transform: scale(.985); }
+.primary-btn[disabled] {
+  opacity: 0.5;
+  transform: none;
+}
+
+/* 首次进入：先进行安全判断 */
+.safe-action-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 0 16rpx;
+  color: #2f875f;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-bottom: 2rpx dashed #d5e4d8;
+}
+.safe-action-sub {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: 400;
+  margin-top: 8rpx;
+}
+
+/* 非首次：引导补全档案 */
+.supplement-guide {
+  margin: 32rpx 0 16rpx;
+  padding: 28rpx;
+  background: #f8faf8;
+  border-radius: 24rpx;
+  border: 2rpx solid #e8eee8;
+}
+.supplement-hint {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 20rpx;
+}
+.hint-icon { font-size: 28rpx; }
+.supplement-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.supplement-tag {
+  padding: 12rpx 24rpx;
+  background: #fff;
+  border-radius: 30rpx;
+  border: 2rpx solid #d5e4d8;
+  font-size: 24rpx;
+  color: #2f875f;
+}
+.supplement-tag:active {
+  background: #2f875f;
+  color: #fff;
+}
+.supplement-skip {
+  text-align: right;
+  font-size: 26rpx;
+  color: #999;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #e8eee8;
+}
+
+/* 隐私卡片（复用原有） */
+.privacy-card {
+  margin: 56rpx 0 72rpx;
+  padding: 18rpx 40rpx;
+  min-height: 110rpx;
+  background: rgba(255, 255, 255, .96);
+  border: 1rpx solid #e2e3e5;
+  border-radius: 56rpx;
+  box-shadow: 0 10rpx 24rpx rgba(31, 42, 37, .06);
+}
+.shield { width: 72rpx; height: 72rpx; margin-right: 24rpx; font-size: 34rpx; }
+.privacy-card .grow { text-align: center; transform: translateX(-25rpx); line-height: 1.45; }
+.privacy-card .tiny { margin-top: 6rpx; }

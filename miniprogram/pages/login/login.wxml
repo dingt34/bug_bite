@@ -1,0 +1,101 @@
+<!-- pages/login/login.wxml -->
+<view class="login-page">
+  <!-- ===== 顶部插画区域 ===== -->
+  <view class="nature-hero">
+    <image class="login-figma-hero" src="/assets/figma/all/s01-imgFrame.svg" mode="aspectFill" />
+    <view class="login-copy">
+      <view class="h1">欢迎使用虫咬识途</view>
+      <view class="login-sub">安心进入自然</view>
+    </view>
+    <!-- 紧急安全入口（始终可见，不阻碍紧急处置） -->
+    <view class="emergency-entry" bindtap="goToEmergency">
+      <text class="emergency-icon">🆘</text>
+      <text class="emergency-text">紧急安全判断</text>
+    </view>
+  </view>
+
+  <!-- ===== 登录表单区域 ===== -->
+  <view class="login-body">
+    <!-- 微信头像 -->
+    <view class="form-group avatar-group" bindtap="chooseAvatar">
+      <image wx:if="{{userInfo.avatarUrl}}" class="form-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="form-avatar placeholder">
+        <text class="avatar-placeholder-icon">📷</text>
+      </view>
+      <view class="avatar-hint">{{userInfo.avatarUrl ? '点击更换头像' : '点击获取微信头像'}}</view>
+    </view>
+
+    <!-- 昵称 -->
+    <view class="form-group">
+      <view class="form-label">昵称</view>
+      <input class="form-input" type="nickname" placeholder="请输入昵称" value="{{userInfo.nickName}}" bindinput="onNicknameInput" />
+    </view>
+
+    <!-- 年龄段 -->
+    <view class="form-group">
+      <view class="form-label">年龄段</view>
+      <picker mode="selector" range="{{ageRange}}" bindchange="onAgeChange">
+        <view class="form-picker">{{userInfo.ageGroup || '请选择年龄段'}}</view>
+      </picker>
+    </view>
+
+    <!-- 常住地区 -->
+    <view class="form-group">
+      <view class="form-label">常住地区</view>
+      <picker mode="region" bindchange="onRegionChange">
+        <view class="form-picker">{{userInfo.region || '请选择常住地区'}}</view>
+      </picker>
+    </view>
+
+    <!-- 隐私同意（建档内容） -->
+    <view class="privacy-agreement" bindtap="togglePrivacyAgree">
+      <view class="checkbox {{privacyAgreed ? 'checked' : ''}}">
+        <text wx:if="{{privacyAgreed}}">✓</text>
+      </view>
+      <view class="privacy-agree-text">
+        我已阅读并同意 <text class="link" bindtap="openPrivacy" catchtap>《用户协议》和《隐私政策》</text>
+      </view>
+    </view>
+
+    <!-- ===== 操作按钮区 ===== -->
+    <view class="action-buttons">
+      <!-- 主要按钮：建档登录 -->
+      <button class="primary-btn" bindtap="handleLogin" disabled="{{!privacyAgreed || !formValid}}">
+        <image class="figma-icon md figma-inline" src="/assets/figma/all/s01-imgFrame1.svg" />
+        {{isFirstTime ? '建立档案并登录' : '确认登录'}}
+      </button>
+
+      <!-- 首次进入专用：先进行安全判断（不阻塞紧急处置） -->
+      <view wx:if="{{isFirstTime}}" class="safe-action-link" bindtap="goToSafetyFirst">
+        <text>🔍 先进行安全判断</text>
+        <text class="safe-action-sub">无需登录，快速评估风险</text>
+      </view>
+
+      <!-- 非首次：引导补全档案 -->
+      <view wx:else class="supplement-guide">
+        <view class="supplement-hint">
+          <text class="hint-icon">📋</text>
+          <text>档案历史仅作提示，不替代当次安全问答</text>
+        </view>
+        <view class="supplement-tags">
+          <view class="supplement-tag" bindtap="goToSupplement" data-type="allergy">过敏史</view>
+          <view class="supplement-tag" bindtap="goToSupplement" data-type="reaction">既往严重反应</view>
+          <view class="supplement-tag" bindtap="goToSupplement" data-type="activity">常见活动</view>
+          <view class="supplement-tag" bindtap="goToSupplement" data-type="contact">紧急联系人</view>
+        </view>
+        <view class="supplement-skip" bindtap="skipSupplement">稍后补全 →</view>
+      </view>
+    </view>
+
+    <!-- 隐私卡片（信息说明） -->
+    <view class="privacy-card row" bindtap="openPrivacy">
+      <view class="circle circle-green shield">
+        <image class="figma-icon md" src="/assets/figma/all/s01-imgFrame2.svg" />
+      </view>
+      <view class="grow">
+        <view>你的健康记录默认仅本人可见</view>
+        <view class="tiny">社区分享内容由你主动选择</view>
+      </view>
+    </view>
+  </view>
+</view>

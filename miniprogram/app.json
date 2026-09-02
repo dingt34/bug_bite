@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/profile-edit/profile-edit",
+    "pages/home/home",
+    "pages/danger/danger",
+    "pages/contact/contact",
+    "pages/guide/guide",
+    "pages/result/result",
+    "pages/precheck/precheck",
+    "pages/route/route",
+    "pages/precheck-result/precheck-result",
+    "pages/my-plans/my-plans",
+    "pages/profile/profile",
+    "pages/events/events",
+    "pages/event-detail/event-detail",
+    "pages/review/review",
+    "pages/ai/ai",
+    "pages/camera/camera",
+    "pages/guidebook/guidebook",
+    "pages/insect-detail/insect-detail",
+    "pages/compare/compare",
+    "pages/community/community",
+    "pages/post-detail/post-detail",
+    "pages/publish/publish",
+    "pages/privacy/privacy"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#F7F7FB",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "permission": {
+    "scope.userLocation": { "desc": "用于选择户外行程地点并生成地区化提示" }
+  },
+  "requiredPrivateInfos": ["chooseLocation"],
+  "tabBar": {
+    "custom": true,
+    "color": "#8C8F96",
+    "selectedColor": "#1E2021",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "首页" },
+      { "pagePath": "pages/ai/ai", "text": "AI" },
+      { "pagePath": "pages/camera/camera", "text": "识别" },
+      { "pagePath": "pages/community/community", "text": "社群" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

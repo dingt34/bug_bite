@@ -1,0 +1,141 @@
+<!-- pages/profile/profile.wxml -->
+<view class="page with-tab">
+  <!-- 安全区域 -->
+  <view class="safe-top"></view>
+
+  <!-- 顶部导航 -->
+  <view class="between" style="height:96rpx">
+    <view class="top-title-main">我的</view>
+    <view class="figma-menu">
+      <image src="/assets/figma/all/s12-imgEllipse.svg" />
+      <image src="/assets/figma/all/s12-imgEllipse.svg" />
+      <image src="/assets/figma/all/s12-imgEllipse.svg" />
+    </view>
+  </view>
+
+  <!-- ===== 1. 用户信息卡片 ===== -->
+  <view class="card card-pad row" bindtap="goToEditProfile">
+    <!-- 头像：有则显示图片，无则显示首字母占位 -->
+    <image wx:if="{{user.avatar}}" class="avatar" src="{{user.avatar}}" mode="aspectFill" />
+    <view wx:else class="circle circle-green avatar">林</view>
+
+    <!-- 用户信息 -->
+    <view class="grow" style="margin-left:26rpx">
+      <view class="h2">{{user.nickname || '未登录'}}</view>
+      <view class="tiny">{{user.region || '请选择常住地区'}}</view>
+      <!-- 编辑入口 -->
+      <view class="mini-btn" bindtap="goToEditProfile" catchtap>编辑个人档案</view>
+    </view>
+
+    <!-- 档案完整度环形进度条 -->
+    <view class="profile-ring" bindtap="goToEditProfile" catchtap>
+      {{profileComplete}}%
+    </view>
+  </view>
+
+  <!-- ===== 2. 待处理区域（待复查优先显示） ===== -->
+  <view class="section-title">待处理</view>
+  <view class="status-grid">
+    <!-- 待复查卡片 -->
+    <view class="card card-pad" bindtap="goToEvents">
+      <view class="tiny">待复查</view>
+      <view class="h3">{{pendingReview.title || '暂无'}}</view>
+      <view class="tiny status-tag" wx:if="{{pendingReview.urgency}}">
+        {{pendingReview.urgency}}
+      </view>
+      <view class="tiny" wx:else>{{pendingReview.time || '请尽快处理'}}</view>
+    </view>
+
+    <!-- 近期行程卡片 -->
+    <view class="card card-pad" bindtap="goToMyPlans">
+      <view class="tiny">近期行程</view>
+      <view class="h3">{{upcomingPlan.title || '暂无'}}</view>
+      <view class="tiny">{{upcomingPlan.daysLeft || '点击新建'}}</view>
+    </view>
+  </view>
+
+  <!-- ===== 3. 记录与计划（含待同步状态） ===== -->
+  <view class="section-title">记录与计划</view>
+  <view class="stack gap-8">
+    <!-- 我的事件 -->
+    <view class="field" bindtap="goToEvents">
+      <view class="circle circle-green small-icon">
+        <image class="figma-icon sm" src="/assets/figma/all/s12-img2.svg" />
+      </view>
+      <view class="grow" style="margin-left:22rpx">
+        <view>我的事件</view>
+        <view class="tiny">{{eventSummary}}</view>
+      </view>
+      <image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg" />
+    </view>
+
+    <!-- 我的行程 -->
+    <view class="field" bindtap="goToMyPlans">
+      <view class="circle circle-green small-icon">
+        <image class="figma-icon sm" src="/assets/figma/all/s12-img12.svg" />
+      </view>
+      <view class="grow" style="margin-left:22rpx">
+        <view>我的行程</view>
+        <view class="tiny">{{planSummary}}</view>
+      </view>
+      <image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg" />
+    </view>
+
+    <!-- ===== 待同步状态（✅ 使用 ⟳ 符号） ===== -->
+    <view class="field" bindtap="syncData">
+      <view class="circle circle-green small-icon" style="background:{{syncStatus === '已同步' ? '#e8f5e9' : '#fff3e0'}};font-size:32rpx;color:#2f875f;font-weight:600;">
+        ⟳
+      </view>
+      <view class="grow" style="margin-left:22rpx">
+        <view>待同步</view>
+        <view class="tiny">{{syncStatus || '等待同步'}}</view>
+      </view>
+      <!-- 同步状态指示器 -->
+      <view wx:if="{{syncStatus === '已同步'}}" class="sync-dot green"></view>
+      <view wx:elif="{{syncStatus === '同步中'}}" class="sync-dot orange"></view>
+      <view wx:else class="sync-dot red"></view>
+      <image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg" />
+    </view>
+
+    <!-- 提醒设置 -->
+    <view class="field" bindtap="goToReminder">
+      <view class="circle circle-green small-icon">
+        <image class="figma-icon sm" src="/assets/figma/all/s12-img3.svg" />
+      </view>
+      <view class="grow" style="margin-left:22rpx">
+        <view>提醒设置</view>
+        <view class="tiny">订阅消息与复查提醒</view>
+      </view>
+      <image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg" />
+    </view>
+  </view>
+
+  <!-- ===== 4. 账户与数据 ===== -->
+  <view class="section-title">账户与数据</view>
+
+  <!-- 隐私与数据 -->
+  <view class="field" bindtap="goToPrivacy">
+    <view class="circle" style="width:64rpx;height:64rpx;background:#ecefea">
+      <image class="figma-icon sm" src="/assets/figma/all/s12-img1.svg" />
+    </view>
+    <view class="grow" style="margin-left:22rpx">
+      <view>隐私与数据</view>
+      <view class="tiny">本机、云端、社群与 AI 数据</view>
+    </view>
+    <image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg" />
+  </view>
+
+  <!-- ===== 社群统计切换（✅ 使用 👥 符号） ===== -->
+  <view class="field" bindtap="goToCommunity">
+    <view class="circle" style="width:64rpx;height:64rpx;background:#e3f0fc;font-size:32rpx;color:#2f875f;display:flex;align-items:center;justify-content:center;">
+      👥
+    </view>
+    <view class="grow" style="margin-left:22rpx">
+      <view>社群统计</view>
+      <view class="tiny">查看社群风险趋势与统计</view>
+    </view>
+    <view class="switch-toggle" bindtap="toggleCommunity" catchtap>
+      <view class="switch-thumb {{communityEnabled ? 'on' : ''}}"></view>
+    </view>
+  </view>
+</view>

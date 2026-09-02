@@ -1,0 +1,150 @@
+<!-- pages/events/events.wxml -->
+<view class="page">
+  <view class="safe-top"></view>
+
+  <!-- ===== 顶部导航 ===== -->
+  <view class="topbar">
+    <view class="back" bindtap="back">
+      <image class="figma-back" src="/assets/figma/all/s13-imgFrame.svg" />
+    </view>
+    <view class="top-title">
+      <view class="top-title-main">我的事件</view>
+      <view class="top-title-sub">{{totalCount}} 条记录</view>
+    </view>
+    <view class="figma-menu">
+      <image src="/assets/figma/all/s13-imgEllipse1.svg" />
+      <image src="/assets/figma/all/s13-imgEllipse1.svg" />
+      <image src="/assets/figma/all/s13-imgEllipse1.svg" />
+    </view>
+  </view>
+
+  <!-- ===== Tab切换：待复查 / 全部记录 ===== -->
+  <view class="mode-tabs">
+    <view wx:for="{{tabs}}" wx:key="*this" class="mode-tab {{tab === item ? 'active' : ''}}" data-tab="{{item}}" bindtap="setTab">
+      {{item}} {{index === 0 ? ' (' + pendingCount + ')' : ''}}
+    </view>
+  </view>
+
+  <!-- ===== 搜索栏 ===== -->
+  <view class="field" style="margin-top:32rpx">
+    <image class="figma-icon sm" src="/assets/figma/all/s13-imgFrame1.svg" />
+    <input class="search-input" placeholder="搜索时间、类型或地点" value="{{searchKeyword}}" bindinput="onSearchInput" />
+    <text class="muted" style="margin-left:auto" bindtap="toggleFilter">筛选</text>
+  </view>
+
+  <!-- ===== 事件列表 ===== -->
+  <!-- 空状态 -->
+  <view wx:if="{{filteredEvents.length === 0}}" class="empty-state">
+    <image class="empty-icon" src="/assets/figma/all/s13-img1.svg" mode="aspectFit" />
+    <view class="empty-title">{{tab === '待复查' ? '暂无待复查事件' : '暂无历史记录'}}</view>
+    <view class="empty-desc">返回首页进行安全判断，记录每一次接触</view>
+    <button class="primary-btn" bindtap="goHome">🏠 回首页开始安全判断</button>
+  </view>
+
+  <!-- 有待复查事件 -->
+  <view wx:else>
+    <!-- ===== 待复查区域（置顶） ===== -->
+    <view wx:if="{{pendingEvents.length > 0 && (tab === '待复查' || tab === '全部记录')}}" class="section-title">
+      需要复查
+      <text class="section-badge">{{pendingEvents.length}} 条待处理</text>
+    </view>
+
+    <view wx:for="{{pendingEvents}}" wx:key="id" wx:if="{{tab === '待复查' || tab === '全部记录'}}" class="card event-card" data-id="{{item.id}}" bindtap="open">
+      <view class="row">
+        <!-- 风险等级图标 -->
+        <view class="circle event-icon {{item.level === '高风险' ? 'circle-red' : item.level === '中风险' ? 'circle-amber' : 'circle-green'}}">
+          <image class="figma-icon md" src="{{item.level === '高风险' ? '/assets/figma/all/s13-img3.svg' : '/assets/figma/all/s13-img2.svg'}}" />
+        </view>
+        <view class="grow" style="margin-left:22rpx">
+          <view class="h3">{{item.type}}</view>
+          <view class="tiny">{{item.createdAt}} · {{item.body || '未知部位'}} · {{item.place || '未知地点'}}</view>
+        </view>
+        <!-- 风险等级标签 -->
+        <view class="chip {{item.level === '高风险' ? 'chip-danger' : item.level === '中风险' ? 'chip-warning' : 'chip-safe'}}">
+          {{item.level || '待评估'}}
+        </view>
+      </view>
+
+      <!-- 症状描述 + 变化趋势 -->
+      <view class="muted" style="margin-top:26rpx">
+        {{item.symptomsText || '暂无症状描述'}} 
+        <text wx:if="{{item.trend}}" class="trend {{item.trend === '加重' ? 'trend-up' : item.trend === '好转' ? 'trend-down' : 'trend-stable'}}">
+          · {{item.trend}}
+        </text>
+      </view>
+
+      <!-- 复查入口 + 同步状态 -->
+      <view class="between" style="margin-top:20rpx">
+        <view class="mini-btn review-btn" catchtap="goToReview" data-id="{{item.id}}">
+          {{item.reviewAt || '尽快'}} 进行复查
+        </view>
+        <view class="sync-status">
+          <text class="sync-dot {{item.synced ? 'green' : 'orange'}}"></text>
+          <text class="tiny">{{item.synced ? '已同步' : '待同步'}}</text>
+          <image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg" />
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 历史记录区域 ===== -->
+    <view wx:if="{{historyEvents.length > 0 && tab === '全部记录'}}" class="section-title">历史记录</view>
+
+    <view wx:for="{{historyEvents}}" wx:key="id" wx:if="{{tab === '全部记录'}}" class="field" data-id="{{item.id}}" bindtap="open">
+      <view class="circle {{item.level === '高风险' ? 'circle-red' : item.level === '中风险' ? 'circle-amber' : 'circle-green'}}" style="width:72rpx;height:72rpx">
+        <image class="figma-icon md" src="{{index % 2 ? '/assets/figma/all/s13-img1.svg' : '/assets/figma/all/s13-img2.svg'}}" />
+      </view>
+      <view class="grow" style="margin-left:22rpx">
+        <view class="field-value">{{item.type}}</view>
+        <view class="tiny">{{item.createdAt}} · {{item.body || '未知部位'}} 
+          <text wx:if="{{item.trend}}" class="trend-text">{{item.trend}}</text>
+        </view>
+      </view>
+      <!-- 状态标签 -->
+      <view class="chip {{item.level === '高风险' ? 'chip-danger' : item.level === '中风险' ? 'chip-warning' : 'chip-safe'}}">
+        {{item.status === '待复查' ? '待复查' : item.level || '已处理'}}
+      </view>
+      <!-- 同步状态 -->
+      <text class="sync-icon {{item.synced ? 'synced' : 'unsynced'}}" style="margin-left:12rpx">
+        {{item.synced ? '✓' : '⟳'}}
+      </text>
+    </view>
+  </view>
+
+  <!-- ===== 底部操作栏 ===== -->
+  <view class="bottom-actions">
+    <!-- 同步状态 -->
+    <view class="notice" style="margin-top:38rpx">
+      <text class="notice-icon">✓</text>
+      <text>所有记录{{syncAllStatus ? '已同步' : '同步中...'}}</text>
+      <text class="muted" style="margin-left:auto" bindtap="manualSync">手动同步</text>
+    </view>
+
+    <!-- 新建按钮 -->
+    <button class="primary-btn" style="margin-top:38rpx" bindtap="create">
+      ＋ 新建安全判断
+    </button>
+
+    <!-- 提示：不导向社群或AI -->
+    <view class="safety-note">
+      <text class="safety-note-icon">ℹ️</text>
+      <text class="safety-note-text">事件复查请以专业医疗为准，不替代当次安全问答</text>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 筛选弹窗 ===== -->
+<view wx:if="{{showFilter}}" class="modal-mask" bindtap="closeFilter">
+  <view class="filter-modal" catchtap="stopPropagation">
+    <view class="filter-title">筛选</view>
+    <view class="filter-options">
+      <view class="filter-option {{filterLevel === 'all' ? 'active' : ''}}" bindtap="setFilter" data-level="all">全部</view>
+      <view class="filter-option {{filterLevel === '高风险' ? 'active' : ''}}" bindtap="setFilter" data-level="高风险">高风险</view>
+      <view class="filter-option {{filterLevel === '中风险' ? 'active' : ''}}" bindtap="setFilter" data-level="中风险">中风险</view>
+      <view class="filter-option {{filterLevel === '低风险' ? 'active' : ''}}" bindtap="setFilter" data-level="低风险">低风险</view>
+    </view>
+    <view class="filter-actions">
+      <view class="filter-btn reset" bindtap="resetFilter">重置</view>
+      <view class="filter-btn confirm" bindtap="closeFilter">确定</view>
+    </view>
+  </view>
+</view>
