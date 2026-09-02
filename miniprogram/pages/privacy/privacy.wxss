@@ -1,1 +1,2 @@
-.small{width:64rpx;height:64rpx}.delete-grid{display:grid;grid-template-columns:1fr 1fr;gap:20rpx}.delete-btn{height:104rpx;border-radius:32rpx;background:#fff;color:#8c8f96;display:flex;align-items:center;justify-content:center}.delete-account{background:#fde8e4;color:#ea4038}
+.small{width:64rpx;height:64rpx}.delete-grid{display:grid;grid-template-columns:1fr 1fr;gap:20rpx}.delete-btn{height:104rpx;border-radius:32rpx;background:#fff;color:#8c8f96;font-size:20rpx;display:flex;align-items:center;justify-content:center}.delete-account{background:#fde8e4}.danger-action{color:#ea4038}
+.privacy-notice-title{font-size:28rpx;font-weight:600}.privacy-primary{color:#8c8f96;font-size:24rpx;font-weight:400}.privacy-action{color:#8c8f96;font-size:20rpx;font-weight:400}

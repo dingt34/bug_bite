@@ -1,7 +1,8 @@
-<view class="tab-shell">
+<view class="tab-shell {{selected === 3 ? 'figma-community-tabs' : ''}}">
   <view wx:for="{{list}}" wx:key="pagePath" class="tab-item {{item.center ? 'tab-center' : ''}} {{selected === index ? 'selected' : ''}}" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
     <view class="icon-wrap {{item.center ? 'center-disc' : ''}}">
-      <image class="tab-icon" src="{{item.icon}}" mode="aspectFit" />
+      <view wx:if="{{selected === 3}}" class="figma-tab-marker {{selected === index ? 'figma-tab-active' : ''}}"></view>
+      <image wx:else class="tab-icon" src="{{item.icon}}" mode="aspectFit" />
     </view>
     <text class="tab-label">{{item.text}}</text>
   </view>

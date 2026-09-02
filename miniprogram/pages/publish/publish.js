@@ -3,7 +3,9 @@ const nav = require('../../utils/nav');
 const cloud = require('../../utils/cloud');
 
 Page({
-  data: { region: '浙江丽水', type: '叮咬', stage: '观察完成', text: '', images: [], route: true },
+  data: {
+    region: '浙江丽水', type: '叮咬', stage: '观察完成', text: '', images: [], route: false,
+  },
   onLoad() {
     const draft = store.get('postDraft', null);
     if (draft) this.setData(draft);
