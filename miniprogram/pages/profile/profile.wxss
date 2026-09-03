@@ -1,0 +1,17 @@
+.avatar{width:108rpx;height:108rpx;font-size:40rpx;border-radius:50%;overflow:hidden;flex:none}
+.mini-btn{display:inline-flex;margin-top:22rpx;padding:12rpx 34rpx;border-radius:32rpx;background:#f1f2f4;color:#a0a3a9;font-size:22rpx}
+.profile-ring{position:relative;width:88rpx;height:88rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;background:#ecefea}
+.profile-ring::before{content:'';position:absolute;top:8rpx;left:8rpx;right:8rpx;bottom:8rpx;border-radius:50%;background:#fff}
+.profile-ring-num{position:relative;z-index:1;font-size:20rpx;color:#8c8f96;font-weight:600}
+.status-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;gap:20rpx}
+.status-card{width:100%;height:196rpx;box-sizing:border-box;padding:24rpx 22rpx;border-radius:36rpx;box-shadow:0 10rpx 28rpx rgba(31,42,37,.06);display:grid;grid-template-columns:94rpx minmax(0,1fr);align-items:center;column-gap:20rpx}
+.status-left{width:94rpx;display:flex;flex-direction:column;align-items:center;flex:none}
+.status-icon{width:82rpx;height:82rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.status-icon-green{background:#dceee4}
+.status-icon-amber{background:#f8e8c5}
+.status-icon .figma-icon{width:50rpx;height:50rpx}
+.status-copy{min-width:0;align-self:center}
+.status-copy .tiny{display:block;transform:translateY(-8rpx)}
+.status-card .h3{margin:14rpx 0 0;font-size:28rpx;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-date{width:124rpx;margin-top:18rpx;text-align:center;white-space:nowrap;transform:scale(.86)}
+.small-icon{width:64rpx;height:64rpx}

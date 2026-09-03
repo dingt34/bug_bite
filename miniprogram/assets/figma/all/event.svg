@@ -1,0 +1,27 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="24" cy="24" r="20" fill="#4CAF50"/>
+  
+  <!-- 日历主体 -->
+  <rect x="12" y="10" width="24" height="24" rx="3" fill="white"/>
+  
+  <!-- 日历顶部条 -->
+  <rect x="12" y="10" width="24" height="6" fill="#388E3C"/>
+  
+  <!-- 日历装订线 -->
+  <line x1="18" y1="10" x2="18" y2="34" stroke="#C8E6C9" stroke-width="1"/>
+  <line x1="24" y1="10" x2="24" y2="34" stroke="#C8E6C9" stroke-width="1"/>
+  <line x1="30" y1="10" x2="30" y2="34" stroke="#C8E6C9" stroke-width="1"/>
+  
+  <!-- 事件标记点1 -->
+  <circle cx="18" cy="20" r="2" fill="#FF9800"/>
+  <circle cx="18" cy="26" r="2" fill="#2196F3"/>
+  
+  <!-- 事件标记点2 -->
+  <circle cx="24" cy="20" r="2" fill="#9C27B0"/>
+  <circle cx="24" cy="26" r="2" fill="#F44336"/>
+  
+  <!-- 事件标记点3 -->
+  <circle cx="30" cy="20" r="2" fill="#FF5722"/>
+  <circle cx="30" cy="26" r="2" fill="#607D8B"/>
+</svg>

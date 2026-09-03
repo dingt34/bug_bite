@@ -1,0 +1,145 @@
+.page {
+  padding: 24rpx 24rpx 60rpx;
+}
+
+.loading-page {
+  padding: 220rpx 40rpx;
+  color: #7C8983;
+  font-size: 26rpx;
+  text-align: center;
+}
+.draft-banner {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  padding: 18rpx 22rpx;
+  border-radius: 14rpx;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 23rpx;
+}
+.draft-clear {
+  font-weight: 600;
+}
+.event-import {
+  display: flex;
+  align-items: center;
+  margin: 0 24rpx 20rpx;
+  padding: 20rpx 22rpx;
+  border: 1rpx solid #D8E6DF;
+  border-radius: 18rpx;
+  background: #F3F8F5;
+}
+.route-import { border-color: #BFDCCF; background: #F3FAF6; }
+.route-remove { flex: none; padding: 16rpx; color: #A06A54; font-size: 22rpx; }
+.event-import-icon {
+  flex-shrink: 0;
+  width: 50rpx;
+  height: 50rpx;
+  margin-right: 16rpx;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 50rpx;
+  text-align: center;
+}
+.event-import-copy {
+  flex: 1;
+  min-width: 0;
+}
+.event-import-title {
+  color: #2F463B;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.event-import-sub {
+  margin-top: 2rpx;
+  overflow: hidden;
+  color: #7E8D86;
+  font-size: 21rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.event-import-arrow {
+  margin-left: 14rpx;
+  color: #7C968A;
+  font-size: 38rpx;
+}
+
+.optional {
+  font-size: 22rpx;
+  color: #B7C0C7;
+  margin-left: 8rpx;
+  font-weight: 400;
+}
+
+.editor {
+  width: 100%;
+  height: 240rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+.char-count {
+  color: #A3ABB1;
+  font-size: 22rpx;
+  text-align: right;
+}
+.validation-banner {
+  margin: 0 24rpx 20rpx;
+  padding: 16rpx 20rpx;
+  border: 2rpx solid #F4B7B4;
+  border-radius: 12rpx;
+  background: var(--danger-light);
+  color: var(--danger);
+  font-size: 24rpx;
+}
+.required {
+  color: var(--danger);
+}
+.field-help {
+  margin: 8rpx 0 16rpx;
+  color: #87918C;
+  font-size: 22rpx;
+}
+
+.upload {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed #C8D8D0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.upload-placeholder {
+  font-size: 48rpx;
+  color: #B7C0C7;
+}
+.preview {
+  width: 100%;
+  height: 100%;
+}
+.image-actions {
+  display: flex;
+  margin-top: 16rpx;
+  color: var(--primary);
+  font-size: 24rpx;
+}
+.image-actions text {
+  margin-right: 32rpx;
+}
+.image-remove {
+  color: var(--danger);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.submit-wrap {
+  padding: 20rpx 0 0;
+}

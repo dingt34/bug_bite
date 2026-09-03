@@ -1,0 +1,25 @@
+<view class="page guide-page">
+  <view class="safe-top"></view>
+  <view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s06-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">描述症状</view><view class="top-title-sub">第 3 步，共 4 步 · {{typeName}}</view></view><view class="top-action" bindtap="save">保存草稿</view></view>
+  <view class="progress"><view class="progress-fill" style="width:75%"></view></view>
+  <view class="notice notice-red urgent-entry" bindtap="emergency"><image class="figma-icon sm" src="/assets/figma/all/s06-img1.svg"/><view class="grow">出现呼吸困难等危险信号？<view class="tiny">点击中断问答，进入紧急求助</view></view></view>
+  <view class="h2 section-heading">现在主要有哪些表现？</view><view class="muted">可多选；没有症状也可以如实选择</view>
+  <view class="chip-row answer-chips"><view wx:for="{{options}}" wx:key="label" class="chip {{item.selected?'active':''}}" data-value="{{item.label}}" bindtap="toggle">{{item.selected?'✓ ':''}}{{item.label}}</view></view>
+  <view class="section-title"><text>影响范围</text><text class="aside">单选</text></view>
+  <view class="choice-grid"><view wx:for="{{ranges}}" wx:key="*this" class="choice {{range===item?'active':''}}" data-value="{{item}}" bindtap="setRange">{{item}}</view></view>
+  <view class="section-title"><text>症状变化</text><text class="aside">与刚发生时相比</text></view>
+  <view class="choice-grid"><view wx:for="{{trends}}" wx:key="*this" class="choice {{trend===item?'active':''}} {{item==='逐渐加重'&&trend===item?'danger':''}}" data-value="{{item}}" bindtap="setTrend">{{item}}</view></view>
+  <view class="card card-pad branch-card">
+    <view class="h3">补充 {{typeName}} 的情况</view><view class="tiny">只描述事实；不清楚时可选“不确定”</view>
+    <view wx:for="{{questions}}" wx:for-item="question" wx:key="key" class="branch-question">
+      <view class="question-label">{{question.title}}</view>
+      <view class="chip-row"><view wx:for="{{question.options}}" wx:for-item="option" wx:key="value" class="chip {{option.selected?'active':''}}" data-key="{{question.key}}" data-value="{{option.value}}" bindtap="answer">{{option.value}}</view></view>
+    </view>
+  </view>
+  <view class="card card-pad photo-card">
+    <view class="row" bindtap="addPhoto"><image wx:if="{{photo}}" class="photo-thumb" src="{{photo}}" mode="aspectFill"/><image wx:else class="figma-icon md" src="/assets/figma/all/s06-imgFrame1.svg"/>
+      <view class="grow photo-copy"><view>现场或皮肤照片</view><view class="tiny">选填，仅保存本机；不用于疾病诊断</view></view><text class="green-text">{{photoSaving?'保存中':photo?'更换':'添加'}}</text></view>
+    <button wx:if="{{photo}}" class="text-button" bindtap="removePhoto">移除本次照片</button>
+  </view>
+  <view class="form-footer"><button class="primary-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="next">查看行动建议</button><view class="safe-note">{{saveStatus}}<text class="block-break"></text>照片未添加或保存失败，不影响继续</view></view>
+</view>

@@ -1,0 +1,103 @@
+<view class="page">
+  <view class="safe-top"></view>
+  <view class="topbar">
+    <view class="back" bindtap="back">
+      <image class="figma-back" src="/assets/figma/all/s11-imgFrame.svg"/>
+    </view>
+    <view class="top-title">
+      <view class="top-title-main">我的行程</view>
+      <!-- 根据当前tab显示不同的数量 -->
+      <view class="top-title-sub" wx:if="{{tab === '历史'}}">{{historyPlans.length}} 个历史行程</view>
+      <view class="top-title-sub" wx:elif="{{tab === '草稿'}}">{{draftPlans.length}} 个行前计划</view>
+    </view>
+  </view>
+  
+  <!-- 选项卡 -->
+  <view class="mode-tabs">
+    <view wx:for="{{tabs}}" wx:key="*this" class="mode-tab {{tab===item?'active':''}}" data-tab="{{item}}" bindtap="setTab">{{item}}</view>
+  </view>
+  
+  <!-- 历史行程界面 -->
+  <view wx:if="{{tab === '历史'}}">
+    <view wx:if="{{historyPlans.length}}" class="stack gap-12">
+      <view wx:for="{{historyPlans}}" wx:key="id" class="card field" bindtap="open" data-id="{{item.id}}">
+        <view class="circle circle-blue" style="width:72rpx;height:72rpx">
+          <image class="figma-icon md" src="/assets/figma/all/s11-imgHistory.svg"/>
+        </view>
+        <view class="grow" style="margin-left:22rpx">
+          <view class="field-value">{{item.title || '已完成的行程'}}</view>
+          <view class="tiny">{{item.date || '已完成'}} · {{item.type || '行程'}}</view>
+          <view class="tiny" style="margin-top:4rpx">完成时间：{{item.completedAt || '--'}}</view>
+        </view>
+        <view class="chip chip-success">已完成</view>
+      </view>
+    </view>
+    
+    <view wx:else class="empty">
+      <view class="empty-icon">📋</view>
+      <view class="empty-text">还没有历史行程记录</view>
+      <view class="empty-tip">完成的行程会出现在这里</view>
+    </view>
+  </view>
+  
+  <!-- 草稿计划界面 -->
+  <view wx:elif="{{tab === '草稿'}}">
+    <!-- 即将出发的草稿（如果有的话） -->
+    <view wx:if="{{upcomingDraft}}">
+      <view class="section-title">即将出发</view>
+      <view class="card main-trip">
+        <view class="tiny" style="display:flex;justify-content:space-between;align-items:center">
+          <text>还有 {{upcomingDraft.daysLeft || 5}} 天</text>
+          <view class="delete-btn small" bindtap="deletePlan" data-id="{{upcomingDraft.id}}">
+            <text style="font-size:24rpx;color:#999;">删除</text>
+          </view>
+        </view>
+        <view class="h2" style="margin-top:60rpx" bindtap="open" data-id="{{upcomingDraft.id}}">{{upcomingDraft.title || '行程计划'}}</view>
+        <view class="muted" bindtap="open" data-id="{{upcomingDraft.id}}">{{upcomingDraft.date || '8月18–20日'}} · {{upcomingDraft.type || '徒步露营'}}</view>
+        <view class="mini-btn" bindtap="open" data-id="{{upcomingDraft.id}}">查看行前清单</view>
+        <view class="trip-art">
+          <view class="trip-road"></view>
+          <view class="circle circle-amber count">{{upcomingDraft.checklistCount || 3}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 其他草稿计划 -->
+    <view wx:if="{{otherDrafts.length > 0}}">
+      <view class="section-title">其他计划</view>
+      <view class="stack gap-12">
+        <view wx:for="{{otherDrafts}}" wx:key="id" class="field">
+          <view class="circle circle-green" style="width:72rpx;height:72rpx">
+            <image class="figma-icon md" src="{{index===0?'/assets/figma/all/s11-img1.svg':'/assets/figma/all/s11-imgRidingFill1.svg'}}"/>
+          </view>
+          <view class="grow" style="margin-left:22rpx" bindtap="open" data-id="{{item.id}}">
+            <view class="field-value">{{item.title}}</view>
+            <view class="tiny">{{item.date}} · {{item.type}}</view>
+          </view>
+          <view class="chip chip-draft">草稿</view>
+          <view class="delete-btn" bindtap="deletePlan" data-id="{{item.id}}" style="margin-left:16rpx;">
+            <text style="font-size:24rpx;color:#999;padding:8rpx 16rpx;">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view wx:if="{{draftPlans.length === 0}}" class="empty">
+      <view class="empty-icon">📝</view>
+      <view class="empty-text">还没有行前计划</view>
+      <button class="primary-btn" style="margin-top:32rpx" bindtap="create">创建第一个计划</button>
+    </view>
+  </view>
+  
+  <!-- 创建新计划按钮（在草稿界面显示） -->
+  <button wx:if="{{tab === '草稿'}}" class="secondary-btn" style="margin-top:52rpx" bindtap="create">＋ 新建行前计划</button>
+  
+  <!-- 离线安全卡 -->
+  <view class="card between" style="padding:24rpx 30rpx;margin-top:24rpx" bindtap="openSafetyCard">
+    <view>
+      <view>离线安全卡</view>
+      <view class="tiny">最近更新：今天 09:20</view>
+    </view>
+    <text class="muted">2 份可用</text>
+  </view>
+</view>

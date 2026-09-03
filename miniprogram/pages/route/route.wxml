@@ -1,0 +1,11 @@
+<view class="route-page">
+  <view class="route-map"><image class="route-map" src="/assets/figma/all/s09-imgFrame.svg" mode="aspectFill"/><view class="back route-back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s09-imgFrame1.svg"/></view></view>
+  <view class="route-sheet">
+    <view class="grabber"></view><view class="between"><view class="h2">丽水古堰画乡徒步路线</view><view class="chip active">推荐</view></view>
+    <view class="card route-points"><view>●　{{start}} <text class="muted" style="float:right" bindtap="addWaypoint">＋添加途经点</text></view><view class="divider"></view><view>●　{{end}}</view></view>
+    <view class="mode-row"><view wx:for="{{modes}}" wx:key="id" class="mode {{mode===item.id?'active':''}}" data-id="{{item.id}}" bindtap="setMode">{{item.text}}</view></view>
+    <view class="card metrics"><view><view class="h2">{{distance}}</view><view class="tiny">距离</view></view><view><view class="h3">{{duration}}</view><view class="tiny">预计耗时</view></view><view><view class="h3">爬升 {{climb}}</view><view class="tiny">累计爬升</view></view></view>
+    <view style="margin-top:30rpx">沿途环境</view><view class="chip-row" style="margin-top:16rpx"><view class="chip active">林地</view><view class="chip">近水</view><view class="chip">草木茂密</view></view>
+    <button class="primary-btn" style="margin-top:42rpx" bindtap="confirm">{{fromPost ? '返回经历详情' : (fromPublish ? '确认路线并返回发布' : '确认路线并返回计划')}}</button><view class="safe-note">路线由 openrouteservice 计算</view>
+  </view>
+</view>

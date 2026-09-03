@@ -1,0 +1,17 @@
+.result-hero { padding:36rpx; display:flex; flex-direction:column; align-items:center; }
+.score-ring { width:220rpx;height:220rpx;border-radius:50%;border:28rpx solid #e99a1a;display:flex;align-items:center;justify-content:center;margin-bottom:20rpx; }
+.step { width:58rpx;height:58rpx;margin-right:22rpx; }
+.result-secondary { display:flex; flex-wrap:wrap; justify-content:center; gap:16rpx 30rpx; margin-top:24rpx; color:#47705c; font-size:24rpx; }
+.result-secondary text { padding:8rpx 0; }
+.result-page .result-hero { display:block; padding:28rpx; border-top:8rpx solid; margin-top:24rpx; }
+.result-page .score-ring { width:88rpx; height:88rpx; border-width:8rpx; margin:0 24rpx 0 0; flex-shrink:0; }
+.result-page .muted { font-size:24rpx; line-height:1.6; margin-top:8rpx; color:#626e67; }
+.immediate-action { font-size:30rpx; line-height:1.7; margin:24rpx 0; font-weight:600; }
+.result-page .tiny { line-height:1.8; color:#69736e; margin-top:8rpx; }
+.escalation, .review-card { margin-top:24rpx; }
+.result-page .section-title { margin-top:32rpx; }
+.rationale { font-size:26rpx; line-height:1.8; }
+.result-page .text-button { padding:18rpx 10rpx; color:#2f7d5b; font-size:24rpx; min-height:76rpx; }
+.result-page .result-secondary { gap:8rpx 20rpx; margin-top:20rpx; }
+.result-page .safe-note { color:#69736e; margin-top:14rpx; }
+.result-page .safe-top { min-height:104rpx; }

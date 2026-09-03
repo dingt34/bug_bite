@@ -1,0 +1,21 @@
+<view class="page result-page">
+  <view class="safe-top"></view>
+  <view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s07-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">安全建议</view><view class="top-title-sub">第 4 步，共 4 步</view></view></view>
+  <view class="card result-hero" style="border-color:{{info.color}}">
+    <view class="row"><view class="score-ring" style="border-color:{{info.color}}"><image wx:if="{{level==='observe'}}" class="figma-icon md" src="/assets/figma/all/s07-imgFrame1.svg"/><image wx:else class="figma-icon md" src="/assets/figma/all/s06-img1.svg"/></view><view class="grow"><view class="h2" style="color:{{info.color}}">{{info.title}}</view><view class="muted">{{info.sub}}</view></view></view>
+    <view class="immediate-action">{{info.action}}</view>
+    <button class="{{level==='emergency'?'danger-btn':'primary-btn'}}" bindtap="primaryAction">{{primaryActionLabel}}</button>
+    <view class="tiny" wx:if="{{level==='emergency'}}">请让身边的人协助；不要自行驾车就医。</view>
+  </view>
+  <view wx:if="{{level!=='emergency'}}" class="notice notice-red escalation" bindtap="emergency"><image class="figma-icon sm" src="/assets/figma/all/s07-img1.svg"/><view>呼吸困难、意识异常、面口咽肿胀或快速扩散<view class="tiny">立即求助，不必等待复查 · 点击重新筛查</view></view></view>
+  <view class="section-title">本次判断依据</view>
+  <view class="card card-pad rationale"><view wx:for="{{rules}}" wx:key="id">{{item.text}}</view><view wx:if="{{!rules.length}}">根据本次填写的表现和变化，暂未触发升级规则。这不代表已经排除疾病或后续风险。</view><view class="tiny">图片候选和他人经历不参与降低风险级别。</view></view>
+  <block wx:if="{{steps.length}}">
+    <view class="section-title">接下来怎么做</view>
+    <view class="stack gap-8"><view wx:for="{{steps}}" wx:key="title" class="card card-pad row"><view class="circle circle-green step">{{index+1}}</view><view class="grow"><view>{{item.title}}</view><view class="tiny">{{item.detail}}</view></view></view></view>
+  </block>
+  <view wx:if="{{level==='observe'}}" class="card card-pad review-card"><view class="between"><view class="h3">本地复查记录</view><button class="text-button" disabled="{{!saved}}" bindtap="adjustReview">调整时间</button></view><view>{{reviewLabel || '保存后可设置'}}</view><view class="tiny">仅记录时间，尚未开启微信通知。有新症状请立即重新判断，不等提醒。</view></view>
+  <view class="result-secondary"><button class="text-button" bindtap="copySummary">复制就医摘要</button><button wx:if="{{allowStepBack}}" class="text-button" bindtap="modifyAnswers">修改本次回答</button><button wx:if="{{level!=='observe'}}" class="text-button" bindtap="events">查看本次记录</button><button class="text-button" bindtap="home">返回首页</button></view>
+  <view class="safe-note">{{saved?'事件已保存到本机，尚未同步云端':'记录未保存，不影响查看建议或拨打 120'}}</view><button wx:if="{{!saved}}" class="text-button" bindtap="saveEvent">重试保存记录</button>
+  <view class="safe-note">结果为课程演示的安全分流，不构成医疗诊断。</view>
+</view>
