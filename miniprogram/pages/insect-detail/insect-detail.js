@@ -14,6 +14,8 @@ Page({
     photoCredit: '',
     features: [],
     environments: [],
+    summary: '',
+    compareClues: '',
     detailNote: '',
     inCompare: false
   },
@@ -28,8 +30,12 @@ Page({
       typeLabel: item.typeLabel,
       photo: item.photo,
       photoCredit: item.photoCredit,
-      features: item.features,
-      environments: item.environments,
+      // 已整理过的虫种显示关键特征和环境标签；
+      // 其余用知识库里的概述与对比要点，不留空页
+      features: item.features || [],
+      environments: item.environments || [],
+      summary: item.summary,
+      compareClues: item.compareClues,
       detailNote: item.detailNote,
       inCompare: selected.indexOf(item.id) >= 0
     });

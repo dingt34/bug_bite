@@ -3,7 +3,7 @@
 
   <view class="topbar">
     <view class="back" bindtap="back">
-      <image class="figma-back" src="/assets/figma/all/s19-imgFrame.svg"/>
+      <image class="figma-back" src="/assets/figma/all/s18-icon-back.svg"/>
     </view>
     <view class="top-title-main top-title">虫种详情</view>
     <view class="top-action" bindtap="openCompare">查看对比</view>
@@ -22,19 +22,36 @@
 
   <view class="notice" style="margin-top:28rpx;text-align:center;justify-content:center">外形和环境信息仅供对照，不构成虫种确诊</view>
 
-  <view class="section-title">关键特征</view>
-  <view class="stack gap-12">
-    <view wx:for="{{features}}" wx:key="n" class="field">
-      <view class="circle circle-green" style="width:56rpx;height:56rpx">{{item.n}}</view>
-      <view class="grow" style="margin-left:22rpx">{{item.t}}</view>
-      <text class="muted">{{item.d}}</text>
+  <block wx:if="{{features.length}}">
+    <view class="section-title">关键特征</view>
+    <view class="stack gap-12">
+      <view wx:for="{{features}}" wx:key="n" class="feature-row">
+        <view class="circle circle-green feature-no">{{item.n}}</view>
+        <view class="feature-body">
+          <view class="feature-title">{{item.t}}</view>
+          <view class="feature-desc">{{item.d}}</view>
+        </view>
+      </view>
     </view>
-  </view>
+  </block>
 
-  <view class="section-title">常见环境</view>
-  <view class="chip-row">
-    <view wx:for="{{environments}}" wx:key="name" class="chip {{item.active ? 'active' : ''}}">{{item.name}}</view>
-  </view>
+  <!-- 还没逐条整理关键特征的虫种，显示知识库里的概述，页面不留空 -->
+  <block wx:elif="{{summary}}">
+    <view class="section-title">虫种概述</view>
+    <view class="card card-pad prose">{{summary}}</view>
+  </block>
+
+  <block wx:if="{{compareClues}}">
+    <view class="section-title">对比要点</view>
+    <view class="card card-pad prose">{{compareClues}}</view>
+  </block>
+
+  <block wx:if="{{environments.length}}">
+    <view class="section-title">常见环境</view>
+    <view class="chip-row">
+      <view wx:for="{{environments}}" wx:key="name" class="chip {{item.active ? 'active' : ''}}">{{item.name}}</view>
+    </view>
+  </block>
 
   <view class="detail-actions">
     <button class="secondary-btn" bindtap="compare">{{inCompare ? '移出对比' : '加入对比'}}</button>

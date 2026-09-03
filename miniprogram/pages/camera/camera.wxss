@@ -1,24 +1,33 @@
-.camera-page{min-height:100vh;background:#163f2d}
-.camera-stage{position:relative;height:62vh;min-height:940rpx;background:#163f2d;overflow:hidden}
+/* 取景区占满剩余空间，下方面板只占内容高度 — 底部不留白 */
+.camera-page{height:100vh;overflow:hidden;background:#f7f7fb;display:flex;flex-direction:column}
+.camera-stage{position:relative;flex:1;min-height:46vh;background:#163f2d;overflow:hidden}
 .camera-native{position:absolute;inset:0;width:100%;height:100%}
 .camera-overlay{position:absolute;inset:0;background:rgba(12,55,35,.28);padding:44rpx 36rpx}
-.camera-head{position:relative;z-index:3}
-.focus-box{position:absolute;left:176rpx;top:260rpx;width:400rpx;height:400rpx}
+/* navigationStyle 是 custom，标题要自己让出状态栏和胶囊按钮 */
+.camera-head{position:relative;z-index:3;padding-top:calc(env(safe-area-inset-top) + 76rpx)}
+.focus-box{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:400rpx;height:400rpx}
 .focus-frame{position:absolute;inset:0;width:100%;height:100%}
+/* 剪影居中于取景框内，比框略小一圈 */
+.focus-bug{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:236rpx;height:218rpx}
 .camera-error{position:absolute;left:0;right:0;top:150rpx;text-align:center;color:#fff}
-.camera-copy{position:absolute;left:0;right:0;bottom:210rpx;text-align:center;color:#fff;font-weight:700}
-.shutter-row{position:absolute;left:70rpx;right:70rpx;bottom:50rpx;display:flex;align-items:center;justify-content:space-between}
+.camera-copy{position:absolute;left:0;right:0;bottom:200rpx;text-align:center;color:#fff;font-weight:700}
+.shutter-row{position:absolute;left:70rpx;right:70rpx;bottom:44rpx;display:flex;align-items:center;justify-content:space-between}
 .round-action{width:110rpx;height:110rpx;border-radius:50%;background:#fff;color:#2f7d5b;display:flex;align-items:center;justify-content:center;flex-direction:column}
 .round-action text{position:absolute;margin-top:150rpx;color:#b9c8c1;font-size:20rpx}
 .shutter{width:154rpx;height:154rpx;position:relative;display:flex;align-items:center;justify-content:center}
 .shutter-outer{position:absolute;inset:0;width:100%;height:100%}
 .shutter-inner{position:absolute;width:120rpx;height:120rpx}
-.camera-sheet{position:relative;margin-top:-2rpx;min-height:38vh;background:#f7f7fb;border-radius:46rpx 46rpx 0 0;padding:22rpx 36rpx 180rpx}
+/* 本页隐藏 tabBar，底部只留安全区 */
+.camera-sheet{position:relative;flex:0 0 auto;margin-top:-2rpx;background:#f7f7fb;border-radius:46rpx 46rpx 0 0;padding:20rpx 36rpx calc(24rpx + env(safe-area-inset-bottom));display:flex;flex-direction:column}
 .grabber{width:80rpx;height:8rpx;border-radius:4rpx;background:#c8cbc8;margin:0 auto 30rpx}
-.camera-choices{display:grid;grid-template-columns:1fr 1fr;gap:24rpx;margin:34rpx 0}
-.camera-choices .card{padding:24rpx}
-/* 图标在上、文字在下，与 Figma 第 17 页一致 */
-.choice{display:flex;flex-direction:column;align-items:flex-start;gap:14rpx}
-.choice .h3{font-size:30rpx}
-.candidate-card{margin-bottom:34rpx}
-.candidate-row{padding:12rpx 0;color:#2f7d5b}
+.camera-choices{display:grid;grid-template-columns:1fr 1fr;gap:22rpx;margin:24rpx 0}
+.camera-choices .card{padding:24rpx 22rpx}
+/* 图标在左、文字在右，与 Figma 第 17 页一致 */
+.choice{display:flex;align-items:center}
+.choice-icon{width:64rpx;height:64rpx;margin-right:18rpx}
+.choice-text{flex:1;min-width:0}
+.choice-title{font-size:28rpx;font-weight:700;line-height:1.3}
+.choice-text .tiny{margin-top:4rpx;font-size:20rpx;line-height:1.4}
+.candidate-card{grid-column:1/3}
+.candidate-row{padding:10rpx 0;color:#2f7d5b}
+.result-features{margin-top:14rpx;line-height:1.6}

@@ -3,7 +3,7 @@
 
   <view class="topbar">
     <view class="back" bindtap="back">
-      <image class="figma-back" src="/assets/figma/all/s18-imgEllipse.svg"/>
+      <image class="figma-back" src="/assets/figma/all/s18-icon-back.svg"/>
     </view>
     <view class="top-title">
       <view class="top-title-main">虫种图鉴</view>
@@ -41,7 +41,7 @@
     <view wx:for="{{items}}" wx:key="id" class="card insect-card" data-id="{{item.id}}" bindtap="detail">
       <view class="insect-image">
         <image class="species-photo" src="{{item.photo}}" mode="aspectFill" lazy-load/>
-        <image wx:if="{{item.selected}}" class="figma-icon sm check" src="/assets/figma/all/s18-imgEllipse2.svg"/>
+        <image wx:if="{{item.selected}}" class="figma-icon sm check" src="/assets/figma/all/s18-icon-check.svg"/>
         <view class="select-hit" data-id="{{item.id}}" catchtap="toggle"></view>
       </view>
       <view class="h3" style="margin-top:18rpx">{{item.name}}</view>

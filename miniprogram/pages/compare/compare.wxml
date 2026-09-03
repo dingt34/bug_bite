@@ -3,7 +3,7 @@
 
   <view class="topbar">
     <view class="back" bindtap="back">
-      <image class="figma-back" src="/assets/figma/all/s20-imgEllipse.svg"/>
+      <image class="figma-back" src="/assets/figma/all/s18-icon-back.svg"/>
     </view>
     <view class="top-title">
       <view class="top-title-main">虫种对比</view>

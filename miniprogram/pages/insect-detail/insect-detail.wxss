@@ -7,3 +7,19 @@
 .hero-text{color:#fff}
 .photo-credit{position:absolute;right:28rpx;bottom:16rpx;z-index:2;color:rgba(255,255,255,.7);font-size:18rpx}
 .detail-actions{display:grid;grid-template-columns:1fr 1.6fr;gap:20rpx;margin-top:46rpx}
+
+/* navigationStyle 是 custom，顶部要自己让出状态栏和胶囊按钮的高度 */
+.safe-top{height:calc(env(safe-area-inset-top) + 60rpx);min-height:150rpx}
+.prose{line-height:1.72;color:#4e574f;font-size:26rpx}
+
+/* 关键特征：不论描述长短，三行结构完全一致 */
+.feature-row{display:flex;align-items:flex-start;background:#fff;border-radius:34rpx;padding:26rpx 28rpx;box-shadow:0 10rpx 30rpx rgba(31,42,37,.06)}
+.feature-no{width:52rpx;height:52rpx;flex:none;font-size:26rpx;font-weight:700}
+.feature-body{flex:1;min-width:0;margin-left:22rpx}
+.feature-title{font-size:28rpx;font-weight:700;line-height:1.4}
+.feature-desc{margin-top:8rpx;color:#8c8f96;font-size:24rpx;line-height:1.6}
+/* доод зайг багасгах */
+.page{padding-bottom:calc(32rpx + env(safe-area-inset-bottom))}
+
+/* 返回按钮：白底圆形 + 柔和阴影，与参考图一致 */
+.back{box-shadow:0 6rpx 20rpx rgba(31,42,37,.10)}

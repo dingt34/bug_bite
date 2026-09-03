@@ -1,15 +1,18 @@
 <view class="camera-page">
   <view class="camera-stage">
-    <camera wx:if="{{!photo}}" class="camera-native" device-position="back" flash="{{flash}}" binderror="error"></camera>
-    <image wx:else class="camera-native" src="{{photo}}" mode="aspectFill"/>
+    <image wx:if="{{photo}}" class="camera-native" src="{{photo}}" mode="aspectFill"/>
+    <!-- 模拟器 / 摄像头不可用时显示设计稿的自然主题插画 -->
+    <image wx:elif="{{usePlaceholder}}" class="camera-native" src="/assets/figma/all/s17-bg-nature.svg" mode="aspectFill"/>
+    <camera wx:else class="camera-native" device-position="back" flash="{{flash}}" binderror="error"></camera>
 
     <view class="camera-overlay">
-      <!-- 右上角三个点已删除：微信原生胶囊按钮就在这个位置，重复会遮挡 -->
-      <view class="camera-head">
+      <view class="between camera-head">
         <view class="h2" style="color:#fff">识别</view>
       </view>
 
       <view class="focus-box">
+        <!-- 虫体剪影单独放在取景框内，不随背景缩放跑位 -->
+        <image wx:if="{{usePlaceholder && !photo}}" class="focus-bug" src="/assets/figma/all/s17-bug-silhouette.svg" mode="aspectFit"/>
         <image class="focus-frame" src="/assets/figma/all/s17-imgFrame1.svg" mode="aspectFill"/>
         <view wx:if="{{error}}" class="camera-error">{{error}}<text class="block-break"></text>请在设置中允许摄像头权限</view>
       </view>
@@ -21,7 +24,7 @@
 
       <view class="shutter-row">
         <view class="round-action" bindtap="guidebook">
-          <image class="icon-svg" src="/assets/figma/all/s17-imgBug1.svg" mode="aspectFit"/>
+          <image class="icon-svg large" src="/assets/figma/all/s17-icon-guidebook.svg" mode="aspectFit"/>
           <text>图鉴</text>
         </view>
         <view class="shutter" bindtap="shutter">
@@ -43,29 +46,34 @@
 
     <view class="camera-choices">
       <view class="card card-pad choice" bindtap="identify">
-        <view class="circle circle-green" style="width:72rpx;height:72rpx">
-          <image class="icon-svg" src="/assets/figma/all/s17-imgBug1.svg" mode="aspectFit"/>
+        <view class="circle circle-green choice-icon">
+          <image class="icon-svg small" src="/assets/figma/all/s17-icon-bug.svg" mode="aspectFit"/>
         </view>
-        <view class="h3">{{identifying ? '正在识别…' : '虫体识别'}}</view>
-        <view class="tiny">候选与图鉴对比</view>
+        <view class="choice-text">
+          <view class="choice-title">{{identifying ? '正在识别…' : '虫体识别'}}</view>
+          <view class="tiny">千问多模态 · 45 项知识库对比</view>
+        </view>
       </view>
 
       <view class="card card-pad choice" bindtap="record">
-        <view class="circle circle-red" style="width:72rpx;height:72rpx">
-          <image class="icon-svg" src="/assets/figma/all/s17-img3.svg" mode="aspectFit"/>
+        <view class="circle circle-red choice-icon">
+          <image class="icon-svg small" src="/assets/figma/all/s17-img3.svg" mode="aspectFit"/>
         </view>
-        <view class="h3">皮损安全记录</view>
-        <view class="tiny">不做疾病诊断</view>
+        <view class="choice-text">
+          <view class="choice-title">皮损安全记录</view>
+          <view class="tiny">不做疾病诊断</view>
+        </view>
       </view>
-    </view>
 
-    <!-- 候选结果单独一行，不占用上面两列的位置 -->
-    <view wx:if="{{candidates.length}}" class="card card-pad candidate-card">
-      <view class="h3">候选结果</view>
-      <view class="tiny candidate-row" wx:for="{{candidates}}" wx:key="name" data-id="{{item.id}}" bindtap="openCandidate">
-        {{index + 1}}. {{item.name}} · {{item.score}}%
+      <view wx:if="{{candidates.length || visibleFeatures.length || uncertainty}}" class="card card-pad candidate-card">
+        <view class="h3">候选结果</view>
+        <view class="tiny candidate-row" wx:for="{{candidates}}" wx:key="objectId" data-id="{{item.objectId}}" bindtap="openCandidate">
+          {{index + 1}}. {{item.name}}<text wx:if="{{item.scientificName}}"> · {{item.scientificName}}</text>
+        </view>
+        <view wx:if="{{visibleFeatures.length}}" class="tiny result-features">可见特征：{{visibleFeaturesText}}</view>
+        <view wx:if="{{uncertainty}}" class="tiny result-features">{{uncertainty}}</view>
+        <view class="safe-note">仅作为图鉴线索，不用于确诊或安全分级</view>
       </view>
-      <view class="safe-note">仅作为图鉴线索，不用于确诊</view>
     </view>
 
     <button class="danger-btn" bindtap="danger">症状正在快速加重？直接进入安全判断</button>
