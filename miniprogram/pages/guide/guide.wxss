@@ -3,3 +3,20 @@
 .choice.active { background:#e3eee7; color:#2f7d5b; border:2rpx solid #2f7d5b; }
 .choice.danger { background:#fff1ef; color:#ea4038; border-color:#ea4038; }
 .photo-thumb { width:80rpx;height:80rpx;border-radius:24rpx; }
+.guide-page .choice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.guide-page .choice { min-height:88rpx; height:auto; padding:20rpx 14rpx; color:#59645e; border:2rpx solid transparent; text-align:center; }
+.guide-page .choice.active { border-color:#2f7d5b; }
+.guide-page .choice.danger { border-color:#ea4038; }
+.urgent-entry { margin-top:28rpx; }
+.section-heading { margin:36rpx 0 12rpx; }
+.answer-chips { margin-top:24rpx; }
+.branch-card, .photo-card { margin-top:32rpx; }
+.branch-question { margin-top:28rpx; }
+.question-label { margin-bottom:18rpx; font-weight:600; }
+.photo-copy { margin:0 18rpx; }
+.guide-page .tiny { color:#69736e; line-height:1.7; }
+.guide-page .chip { color:#59645e; min-height:76rpx; }
+.guide-page .text-button { padding:20rpx; color:#2f7d5b; font-size:24rpx; }
+.form-footer { margin-top:36rpx; padding-bottom:env(safe-area-inset-bottom); }
+.form-footer .safe-note { margin-top:20rpx; color:#69736e; }
+.guide-page .safe-top { min-height:104rpx; }

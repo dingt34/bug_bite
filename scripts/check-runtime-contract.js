@@ -75,7 +75,7 @@ for (const name of requiredFunctions) {
 const projectConfig = JSON.parse(fs.readFileSync(path.join(root, 'project.config.json'), 'utf8'));
 if (projectConfig.cloudfunctionRoot !== 'cloudfunctions/') errors.push('project.config.json 未正确配置 cloudfunctionRoot。');
 const clientCode = fs.readdirSync(path.join(mini, 'utils')).filter(name => name.endsWith('.js')).map(name => fs.readFileSync(path.join(mini, 'utils', name), 'utf8')).join('\n');
-if (/BAIDU_(?:API|SECRET)_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode) || /COZE_API_TOKEN\s*[:=]\s*['"][^'"]+/.test(clientCode)) errors.push('小程序端不得包含服务密钥。');
+if (/BAIDU_(?:API|SECRET)_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode) || /COZE_API_TOKEN\s*[:=]\s*['"][^'"]+/.test(clientCode) || /DASHSCOPE_API_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode)) errors.push('小程序端不得包含服务密钥。');
 
 if (errors.length) {
   console.error(errors.join('\n'));
