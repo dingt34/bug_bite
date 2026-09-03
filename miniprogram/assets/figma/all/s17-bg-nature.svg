@@ -1,0 +1,39 @@
+<svg width="750" height="940" viewBox="0 0 750 940" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22553C"/>
+      <stop offset="1" stop-color="#153C29"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0" y1="430" x2="750" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2E6A4B"/>
+      <stop offset="1" stop-color="#245741"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="750" height="940" fill="url(#ground)"/>
+
+  <!-- доод талын налуу дов -->
+  <path d="M0 560C120 500 250 620 400 596C520 577 640 480 750 512V940H0V560Z" fill="url(#hill)"/>
+  <path d="M0 742C140 690 280 786 430 764C560 745 660 690 750 706V940H0V742Z" fill="#1E4C36" opacity=".55"/>
+
+  <!-- зүүн дээд навч -->
+  <g opacity=".9">
+    <path d="M96 92C168 96 224 152 228 224C156 220 100 164 96 92Z" fill="#43855F"/>
+    <path d="M100 96L226 222" stroke="#6FAE87" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g opacity=".75">
+    <path d="M262 44C316 78 334 148 302 204C248 170 230 100 262 44Z" fill="#356F4E"/>
+    <path d="M264 50L301 200" stroke="#5C9E77" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- баруун дээд навч -->
+  <g opacity=".85">
+    <path d="M660 128C606 156 582 222 606 278C660 250 684 184 660 128Z" fill="#43855F"/>
+    <path d="M657 134L607 274" stroke="#6FAE87" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- иш -->
+  <path d="M228 226C300 268 342 330 360 400" stroke="#2F6B4C" stroke-width="7" stroke-linecap="round" opacity=".7"/>
+  <path d="M606 280C540 322 500 372 476 430" stroke="#2F6B4C" stroke-width="6" stroke-linecap="round" opacity=".55"/>
+
+</svg>
