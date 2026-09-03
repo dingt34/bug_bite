@@ -1,9 +1,22 @@
 // 虫种数据模块（图鉴 18 / 详情 19 / 对比 20 三页共用）
 //
-// 新增虫种：在 SPECIES 数组里追加一条即可，三个页面会自动生效，
-// 不需要再改页面代码。字段说明见下方第一条注释。
+// 数据来源是仓库里已有的 utils/insect-guide.js（29 种，含实拍图与来源署名），
+// 所以图鉴页顶部的"29 种"是按实际条数显示的，不是写死的数字。
+//
+// DETAILS 里是逐条整理过的详细内容（关键特征 / 常见环境 / 对比表）。
+// 没整理到的虫种会用知识库里的 summary 和 compareClues 兜底，不编造内容。
+
+const guide = require('./insect-guide');
 
 const CATEGORIES = ['全部', '叮咬', '蜇伤', '附着', '接触'];
+
+// insect-guide 的分组 → 图鉴页的分类标签
+const GROUP_TO_CATEGORY = {
+  吸血叮咬: '叮咬',
+  蜇刺类: '蜇伤',
+  附着类: '附着',
+  接触刺激: '接触'
+};
 
 // 对比表的行顺序与表头文案
 const COMPARE_ROWS = [
@@ -16,19 +29,13 @@ const COMPARE_ROWS = [
 
 const MAX_COMPARE = 3;
 
-const SPECIES = [
-  {
-    id: 'tick',
-    name: '长角血蜱',
-    latin: 'Haemaphysalis longicornis',
-    category: '附着',          // 必须是 CATEGORIES 里的一项（不含"全部"）
-    typeLabel: '附着类',        // 对比页卡片下方的小字
-    meta: '草地 · 灌木 · 附着', // 图鉴卡片下方的小字
-    aliases: ['蜱虫', '硬蜱', '草爬子'], // 搜索关键词
-    photo: '/images/insect-guide/haemaphysalis-longicornis/01-overview.webp',
+const DEFAULT_CREDIT = '图片来自 Wikimedia Commons，署名见仓库 ATTRIBUTION.md';
+
+// 已逐条整理的虫种；其余虫种走知识库兜底
+const DETAILS = {
+  tick: {
+    meta: '草地 · 灌木 · 附着',
     photoCredit: 'James Gathany, CDC · Public domain',
-    guideIcon: '/assets/figma/all/s18-imgEllipse1.svg',
-    compareIcon: '/assets/figma/all/s20-imgEllipse1.svg',
     features: [
       { n: '1', t: '盾形背板', d: '身体扁平，附着吸血后明显膨大' },
       { n: '2', t: '八足成虫', d: '若虫与成虫足数和体型不同' },
@@ -49,18 +56,10 @@ const SPECIES = [
     },
     detailNote: '不要仅依据图片自行移除附着物'
   },
-  {
-    id: 'mosquito',
-    name: '白纹伊蚊',
-    latin: 'Aedes albopictus',
-    category: '叮咬',
-    typeLabel: '叮咬类',
+
+  mosquito: {
     meta: '近水 · 夏季 · 叮咬',
-    aliases: ['伊蚊', '花蚊子', '亚洲虎蚊', '蚊子'],
-    photo: '/images/insect-guide/aedes-albopictus/01-overview.webp',
     photoCredit: 'Sixto E. Picones Puebla · CC BY-SA 4.0',
-    guideIcon: '/assets/figma/all/s18-imgEllipse4.svg',
-    compareIcon: '/assets/figma/all/s20-imgEllipse4.svg',
     features: [
       { n: '1', t: '胸背白线', d: '胸部背面有一条明显的纵向白色条纹' },
       { n: '2', t: '腿部白环', d: '足上有黑白相间的环状斑纹' },
@@ -81,18 +80,10 @@ const SPECIES = [
     },
     detailNote: '叮咬包的形状不能用来判断蚊种'
   },
-  {
-    id: 'rove_beetle',
-    name: '隐翅虫',
-    latin: 'Paederus fuscipes',
-    category: '接触',
-    typeLabel: '接触类',
+
+  rove_beetle: {
     meta: '灯光 · 夏秋 · 接触',
-    aliases: ['毒隐翅虫', '青腰虫', '梭毒隐翅虫'],
-    photo: '/images/insect-guide/paederus-fuscipes/01-overview.webp',
     photoCredit: 'Kyu3a · CC BY-SA 4.0',
-    guideIcon: '/assets/figma/all/s18-imgEllipse5.svg',
-    compareIcon: '/assets/figma/all/s20-imgEllipse5.svg',
     features: [
       { n: '1', t: '黑橙相间', d: '细长虫体，头尾偏黑、腹部橙红' },
       { n: '2', t: '短鞘翅', d: '鞘翅很短，腹部大部分露在外面' },
@@ -113,18 +104,10 @@ const SPECIES = [
     },
     detailNote: '发现停在皮肤上时轻轻吹走，不要拍打'
   },
-  {
-    id: 'bee',
-    name: '胡蜂',
-    latin: 'Vespa velutina',
-    category: '蜇伤',
-    typeLabel: '蜇伤类',
+
+  bee_wasp: {
     meta: '林缘 · 蜂区 · 蜇伤',
-    aliases: ['马蜂', '黄脚胡蜂', '虎头蜂', '蜂'],
-    photo: '/images/insect-guide/vespa-velutina/01-overview.webp',
     photoCredit: 'Charles J. Sharp · CC BY-SA 4.0',
-    guideIcon: '/assets/figma/all/s18-imgEllipse3.svg',
-    compareIcon: '/assets/figma/all/s20-imgEllipse5.svg',
     features: [
       { n: '1', t: '体色偏深', d: '整体颜色较深，足端偏黄' },
       { n: '2', t: '体表近无毛', d: '与多毛的蜜蜂不同，可反复蜇刺' },
@@ -145,7 +128,32 @@ const SPECIES = [
     },
     detailNote: '被多处蜇伤或出现全身症状时立即就医'
   }
-];
+};
+
+function build() {
+  return guide.list().map(item => {
+    const extra = DETAILS[item.id] || {};
+    return {
+      id: item.id,
+      name: item.name,
+      latin: item.scientificName,
+      category: GROUP_TO_CATEGORY[item.groupName] || '叮咬',
+      typeLabel: item.groupName,
+      meta: extra.meta || `${item.commonCategory} · ${item.groupName}`,
+      aliases: item.aliases || [],
+      photo: item.coverImage,
+      photoCredit: extra.photoCredit || DEFAULT_CREDIT,
+      summary: item.summary || '',
+      compareClues: item.compareClues || '',
+      features: extra.features || null,
+      environments: extra.environments || null,
+      compare: extra.compare || null,
+      detailNote: extra.detailNote || '外形信息仅供对照，判断以症状为准'
+    };
+  });
+}
+
+const SPECIES = build();
 
 function all() {
   return SPECIES;
@@ -155,14 +163,14 @@ function getById(id) {
   return SPECIES.find(item => item.id === id) || SPECIES[0];
 }
 
-// 图鉴页的筛选：分类 + 关键词（名称 / 学名 / 别名 / 环境描述）
+// 图鉴页的筛选：分类 + 关键词（名称 / 学名 / 别名 / 分类 / 概述）
 function filter({ category = '全部', keyword = '' } = {}) {
   const word = String(keyword).trim().toLowerCase();
   return SPECIES.filter(item => {
     if (category !== '全部' && item.category !== category) return false;
     if (!word) return true;
-    const haystack = [item.name, item.latin, item.meta, item.typeLabel]
-      .concat(item.aliases || [])
+    const haystack = [item.name, item.latin, item.meta, item.typeLabel, item.summary]
+      .concat(item.aliases)
       .join(' ')
       .toLowerCase();
     return haystack.indexOf(word) >= 0;
@@ -195,11 +203,17 @@ function toggle(ids, id) {
 }
 
 // 对比页的表格数据：列 = 虫种，行 = COMPARE_ROWS
+// 没整理过对比内容的虫种，"提示"行用知识库的 compareClues 兜底，其余留"—"
 function buildCompare(ids) {
   const picked = sanitize(ids).map(getById);
   const rows = COMPARE_ROWS.map(row => ({
     label: row.label,
-    cells: picked.map(item => (item.compare && item.compare[row.key]) || '—')
+    cells: picked.map(item => {
+      const value = item.compare && item.compare[row.key];
+      if (value) return value;
+      if (row.key === 'tip' && item.compareClues) return item.compareClues;
+      return '—';
+    })
   }));
   return { species: picked, rows };
 }
