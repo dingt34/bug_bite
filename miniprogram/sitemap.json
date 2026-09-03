@@ -1,0 +1,1 @@
+{ "desc": "虫咬识途页面索引", "rules": [{ "action": "allow", "page": "*" }] }

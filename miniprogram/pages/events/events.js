@@ -1,0 +1,2 @@
+const store=require('../../utils/store');const nav=require('../../utils/nav');
+Page({data:{events:[],tabs:['待复查','全部记录'],tab:'待复查'},onShow(){const events=store.get('events',[]).map(item=>({...item,symptomsText:(item.symptoms||[]).join('、')}));this.setData({events});},back(){nav.back();},setTab(e){this.setData({tab:e.currentTarget.dataset.tab});},open(e){wx.navigateTo({url:`/pages/event-detail/event-detail?id=${e.currentTarget.dataset.id}`});},create(){wx.navigateTo({url:'/pages/danger/danger'});}});

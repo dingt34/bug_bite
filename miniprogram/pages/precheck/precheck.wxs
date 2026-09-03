@@ -1,0 +1,11 @@
+// 判断数组是否包含某个值（WXML 不支持 indexOf，交给 WXS）
+function has(arr, item) {
+  if (!arr) {
+    return false;
+  }
+  return arr.indexOf(item) > -1;
+}
+
+module.exports = {
+  has: has
+};

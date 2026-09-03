@@ -1,0 +1,19 @@
+<view class="page with-tab home-page">
+  <view class="home-hero">
+    <image class="home-hero-art" src="/assets/home/home-hero-a.jpg" mode="aspectFill"/>
+    <view class="home-head"><view class="hello-pill"><image wx:if="{{user.avatar}}" class="hello-avatar" src="{{user.avatar}}" mode="aspectFill"/><view wx:else class="hello-avatar-fallback">林</view><text>早上好，{{user.nickname}}</text></view></view>
+    <view class="hero-copy"><view class="h1">进入自然，<text class="block-break"></text>也做好准备</view><view class="chip-row"><view class="hero-chip">浙江</view><view class="hero-chip">徒步</view><view class="hero-chip risk-chip {{riskSeason}}">{{riskMonth}} 月风险</view></view></view>
+  </view>
+  <view class="card danger-card">
+    <view class="row"><view class="circle circle-red" style="width:92rpx;height:92rpx"><image class="figma-icon md" src="/assets/figma/all/s03-imgFrame1.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:24rpx"><view class="h3 danger-text">已经被咬或蜇？</view><view class="danger-text">先排查危险信号，再给出立即行动</view></view></view>
+    <button class="primary-btn" style="margin-top:24rpx" bindtap="danger">立即进行安全判断</button>
+  </view>
+  <view class="section-title">你的今日状态</view>
+  <view class="status-grid">
+    <view class="card status-card" bindtap="plans"><view class="status-left"><view class="status-icon status-icon-green"><image class="figma-icon sm" src="/assets/figma/all/s03-img12.svg"/></view><view class="tiny status-date">{{plan.date}}</view></view><view class="status-copy"><view class="tiny">最近行程</view><view class="h3">{{plan.title || '暂无行程'}}</view></view></view>
+    <view class="card status-card" bindtap="event"><view class="status-left"><view class="status-icon status-icon-amber"><image class="figma-icon sm" src="/assets/figma/all/s03-img1.svg"/></view><view class="tiny status-date">{{event.reviewAt}}</view></view><view class="status-copy"><view class="tiny">待复查</view><view class="h3">{{event.type || '暂无事件'}}</view></view></view>
+  </view>
+  <view class="section-title"><text>行前准备</text><text class="aside" bindtap="plans">查看全部</text></view>
+  <view class="card trip-card" bindtap="precheck"><view class="h3 trip-title">{{plan.title || '暂无未来旅行计划'}}</view><view class="muted trip-meta"><image class="figma-icon sm figma-inline" src="/assets/figma/all/s03-img12.svg"/>{{plan.type || '创建新的旅行计划'}}<text wx:if="{{plan.date}}"> · {{plan.date}}</text></view><view wx:if="{{hasRoute}}" class="trip-route-visual"><image class="trip-map" src="/assets/figma/all/s03-imgFrame2.svg" mode="aspectFit"/><view class="trip-route-badge">{{routeInfo.distance || '已规划'}}</view></view><image wx:else class="trip-art-image" src="/assets/home/trip-empty-a.jpg" mode="aspectFill"/><view class="mini-btn">{{plan.id ? '继续完善计划' : '创建旅行计划'}}</view></view>
+  <view class="sync-pill"><view class="sync-main"><image class="sync-icon" src="/assets/figma/all/s03-imgEllipse6.svg"/><text>离线安全卡已更新</text></view><text class="sync-time">刚刚</text></view>
+</view>

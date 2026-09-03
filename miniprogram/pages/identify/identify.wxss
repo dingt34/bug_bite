@@ -1,0 +1,137 @@
+.page {
+  padding: 24rpx 24rpx 60rpx;
+}
+
+.head {
+  padding: 8rpx 8rpx 20rpx;
+}
+.head-title {
+  color: #2B2F36;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.head-sub {
+  margin-top: 4rpx;
+  color: #8A9299;
+  font-size: 24rpx;
+}
+
+.upload {
+  width: 100%;
+  height: 360rpx;
+  border: 2rpx dashed #C8D8D0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #FAFBFC;
+}
+.upload-placeholder {
+  text-align: center;
+  color: #B7C0C7;
+}
+.placeholder-icon {
+  font-size: 72rpx;
+}
+.placeholder-text {
+  font-size: 26rpx;
+  margin-top: 12rpx;
+}
+.preview {
+  width: 100%;
+  height: 100%;
+}
+
+.action {
+  margin-top: 24rpx;
+}
+.ready-tip {
+  margin-top: 14rpx;
+  color: #2E7D5B;
+  font-size: 23rpx;
+}
+.error-card {
+  border: 2rpx solid #F4D1CF;
+}
+.error-title {
+  color: #C62828;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.error-text {
+  margin-top: 8rpx;
+  color: #6B7379;
+  font-size: 24rpx;
+}
+.retry-btn {
+  margin-top: 20rpx;
+}
+
+.result-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+.result-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.result-provider {
+  font-size: 22rpx;
+  color: #B7C0C7;
+}
+
+.candidate {
+  margin-bottom: 24rpx;
+}
+.candidate-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+.candidate-name {
+  font-size: 28rpx;
+}
+.candidate-percent {
+  font-size: 23rpx;
+  color: var(--primary);
+  font-weight: 600;
+}
+.candidate-bar {
+  height: 16rpx;
+  background: #F0F2F4;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+.candidate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3F9D76, #2E7D5B);
+  border-radius: 8rpx;
+}
+
+.uncertain {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #7A5C00;
+  background: #FFF8E1;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+}
+.uncertain-sub {
+  font-size: 22rpx;
+  color: #B7C0C7;
+  margin-top: 8rpx;
+}
+.result-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+.action-button {
+  flex: 1;
+  margin: 0;
+  font-size: 25rpx;
+  line-height: 1.4;
+}

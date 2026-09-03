@@ -1,0 +1,2 @@
+const store=require('../../utils/store');const nav=require('../../utils/nav');
+Page({data:{plans:[],otherPlans:[],tabs:['近期','历史','草稿'],tab:'近期'},onShow(){const plans=store.get('plans',[]);this.setData({plans,otherPlans:plans.slice(1)});},back(){nav.back();},setTab(e){this.setData({tab:e.currentTarget.dataset.tab});},open(){wx.navigateTo({url:'/pages/precheck-result/precheck-result'});},create(){wx.navigateTo({url:'/pages/precheck/precheck'});}});

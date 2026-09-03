@@ -1,0 +1,20 @@
+<view class="login-page">
+  <view class="nature-hero">
+    <image class="login-figma-hero" src="/assets/figma/all/s01-imgFrame.svg" mode="aspectFill"/>
+        <view class="login-copy">
+      <view class="h1">欢迎使用虫咬识途</view>
+      <view class="login-sub">安心进入自然</view>
+    </view>
+  </view>
+  <view class="login-body">
+    <button class="primary-btn" bindtap="login"><image class="figma-icon md figma-inline" src="/assets/figma/all/s01-imgFrame1.svg"/>微信一键登录</button>
+    <view class="privacy-card row" bindtap="openPrivacy">
+      <view class="circle circle-green shield"><image class="figma-icon md" src="/assets/figma/all/s01-imgFrame2.svg"/></view>
+      <view class="grow">
+        <view>你的健康记录默认仅本人可见</view>
+        <view class="tiny">社区分享内容由你主动选择</view>
+      </view>
+    </view>
+    <view class="safe-note" bindtap="openPrivacy">登录即表示同意《用户协议》和《隐私政策》</view>
+  </view>
+</view>

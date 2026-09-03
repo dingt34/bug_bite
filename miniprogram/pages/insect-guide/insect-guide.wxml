@@ -1,0 +1,62 @@
+<view class="page">
+  <view class="head">
+    <view class="head-title">常见虫种对比图鉴</view>
+    <view class="head-sub">从外形、环境与接触方式寻找线索，不通过皮损直接判断虫种</view>
+  </view>
+
+  <view class="guide-notice">
+    <view class="notice-icon">i</view>
+    <view class="notice-copy">每个条目对应一个具体物种，并提供 3 张实物图。照片可帮助观察特征，但不能替代专业鉴定。</view>
+  </view>
+
+  <view class="search-box">
+    <text class="search-icon">⌕</text>
+    <input class="search-input" value="{{query}}" bindinput="onSearchInput" placeholder="搜索虫名、学名、别名或环境" confirm-type="search" />
+    <text class="search-clear" wx:if="{{query}}" bindtap="clearSearch">清除</text>
+  </view>
+
+  <scroll-view class="group-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="group-row">
+      <view class="group-chip {{activeGroup === item.key ? 'group-on' : ''}}" wx:for="{{groups}}" wx:key="key" bindtap="setGroup" data-group="{{item.key}}">{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="result-meta">找到 {{items.length}} 种 · 可选择 2～3 种对比</view>
+
+  <view class="insect-card" wx:for="{{items}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}" hover-class="insect-card-hover">
+    <view class="insect-visual">
+      <image class="insect-cover" src="{{item.coverImage}}" mode="aspectFill" lazy-load="true" aria-label="{{item.name}}图片" />
+      <view class="image-count">▧ {{item.imageCount}}</view>
+    </view>
+    <view class="insect-content">
+      <view class="insect-head">
+        <view class="insect-name">{{item.name}}</view>
+        <view class="insect-group">{{item.commonCategory}}</view>
+      </view>
+      <view class="scientific-name">{{item.scientificName}}</view>
+      <view class="insect-alias" wx:if="{{item.zhejiangStatus}}">浙江线索：{{item.zhejiangStatus}}</view>
+      <view class="insect-alias">别名：{{item.aliasText}}</view>
+      <view class="insect-summary">{{item.summary}}</view>
+      <view class="compare-clue">对比线索：{{item.compareClues}}</view>
+    </view>
+    <view class="select-button {{item.selected ? 'select-on' : ''}}" catchtap="toggleCompare" data-id="{{item.id}}">
+      <view class="select-check">{{item.selected ? '✓' : '+'}}</view>
+      <view>{{item.selected ? '已选' : '对比'}}</view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!items.length}}">
+    <view class="empty-icon">⌕</view>
+      <view class="empty-title">没有找到匹配物种</view>
+    <view class="empty-sub">尝试使用“水边”“宠物”“附着”等环境或接触词搜索</view>
+  </view>
+
+  <view class="compare-bar" wx:if="{{selectedCount}}">
+    <view class="compare-info">
+      <view class="compare-count">已选择 {{selectedCount}} / 3 种</view>
+      <view class="compare-help">{{selectedCount < 2 ? '再选 1 种即可开始对比' : '可以查看并排差异'}}</view>
+    </view>
+    <view class="clear-link" bindtap="clearSelection">清空</view>
+    <button class="compare-button" disabled="{{selectedCount < 2}}" bindtap="goCompare">开始对比</button>
+  </view>
+</view>

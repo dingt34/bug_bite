@@ -1,0 +1,2 @@
+const store=require('../../utils/store');const nav=require('../../utils/nav');
+Page({data:{user:{},event:{},plan:{}},onShow(){nav.syncTab(this,4);this.setData({user:store.get('user',{nickname:'林间观察员',region:'浙江省 · 杭州市'}),event:store.get('events',[])[0]||{},plan:store.get('plans',[])[0]||{}});},edit(){wx.navigateTo({url:'/pages/profile-edit/profile-edit'});},events(){wx.navigateTo({url:'/pages/events/events'});},plans(){wx.navigateTo({url:'/pages/my-plans/my-plans'});},privacy(){wx.navigateTo({url:'/pages/privacy/privacy'});}});

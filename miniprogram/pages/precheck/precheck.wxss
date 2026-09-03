@@ -1,0 +1,2 @@
+.precheck-hero { position:relative; overflow:hidden; min-height:184rpx; padding:32rpx; }
+.route-art { position:absolute; right:-30rpx; top:-20rpx; width:210rpx;height:220rpx;background:#a9ccb1;transform:rotate(8deg);border-radius:50% 0 0 50%; }

@@ -1,0 +1,334 @@
+/* 个人档案页：对齐参考稿的轻盈、留白与卡片层次。 */
+.page {
+  padding: 24rpx 36rpx 52rpx;
+  background: #f7f7fb;
+}
+
+.safe-top {
+  min-height: 18rpx;
+}
+
+.topbar {
+  height: 88rpx;
+}
+
+.top-title {
+  margin-left: 24rpx;
+}
+
+.top-title-main {
+  font-size: 46rpx;
+  letter-spacing: -1rpx;
+}
+
+.back .figma-back {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.profile-menu {
+  margin-left: auto;
+  width: 106rpx;
+  height: 56rpx;
+  background: #fff;
+  box-shadow: 0 6rpx 16rpx rgba(31, 42, 37, .04);
+}
+
+.profile-menu image {
+  width: 12rpx;
+  height: 12rpx;
+}
+
+.notice {
+  gap: 20rpx;
+  min-height: 112rpx;
+  padding: 22rpx 28rpx;
+  border-radius: 30rpx;
+  box-shadow: 0 10rpx 28rpx rgba(31, 42, 37, .06);
+}
+
+.notice .muted {
+  font-size: 24rpx;
+  line-height: 1.45;
+}
+
+.notice .tiny {
+  margin-top: 4rpx;
+  line-height: 1.4;
+}
+
+.section-title {
+  margin: 44rpx 0 20rpx;
+  font-size: 46rpx;
+}
+
+.basic-section-title {
+  font-size: 46rpx;
+}
+
+.profile-main-field {
+  width: 100%;
+  height: 176rpx !important;
+  min-height: 186rpx !important;
+  margin-left: 0;
+  box-sizing: border-box;
+}
+
+.profile-main-field .tiny {
+  margin-bottom: 12rpx;
+}
+
+.profile-main-field .grow {
+  transform: translateX(20rpx);
+}
+
+.avatar-select {
+  width: 96rpx;
+  height: 96rpx;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  flex: none;
+}
+
+.avatar-select::after {
+  border: 0;
+}
+
+.profile-main-field > .muted {
+  font-size: 24rpx;
+}
+
+.field {
+  height: 112rpx;
+  padding: 0 28rpx;
+  border-radius: 34rpx;
+  box-shadow: 0 10rpx 28rpx rgba(31, 42, 37, .055);
+}
+
+.field-value {
+  font-size: 30rpx;
+}
+
+.age-field .field-value {
+  font-weight: 400;
+}
+
+.region-value {
+  position: relative;
+  top: -2rpx;
+  left: 8rpx;
+  font-weight: 400;
+}
+
+.region-pin {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 8rpx;
+}
+
+.region-pin .figma-icon {
+  width: 26rpx;
+  height: 26rpx;
+}
+
+.region-list {
+  height: 300rpx;
+  margin: 12rpx 0 0;
+  padding: 8rpx 12rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 10rpx 28rpx rgba(31, 42, 37, .07);
+}
+
+.region-option {
+  height: 68rpx;
+  padding: 0 20rpx;
+  border-radius: 18rpx;
+  color: #68756f;
+  font-size: 26rpx;
+  line-height: 68rpx;
+}
+
+.region-option-on {
+  background: #e2eee6;
+  color: #2f7d5b;
+  font-weight: 600;
+}
+
+.region-back {
+  margin-bottom: 6rpx;
+  color: #2f7d5b;
+  background: #f3f8f5;
+}
+
+.card.card-pad {
+  padding: 28rpx;
+  border-radius: 34rpx;
+  box-shadow: 0 10rpx 28rpx rgba(31, 42, 37, .055);
+}
+
+.health-card {
+  padding: 28rpx 28rpx 22rpx;
+}
+
+.health-summary {
+  align-items: flex-start;
+}
+
+.health-summary .tiny {
+  margin-top: 8rpx;
+  line-height: 1.4;
+}
+
+.health-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22rpx;
+}
+
+.health-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 230rpx;
+  height: 68rpx;
+  padding: 0 28rpx;
+  border-radius: 34rpx;
+  background: #f0f1f3;
+  color: #8c8f96;
+  font-size: 22rpx;
+  line-height: 1;
+  text-align: center;
+}
+
+input.health-input {
+  display: block;
+  line-height: 68rpx;
+}
+
+.health-input-filled {
+  background: #e2eee6;
+  color: #2f7d5b;
+  border: 1rpx solid #9ed0b5;
+}
+
+.health-skip {
+  color: #a4a7ad;
+  font-size: 22rpx;
+}
+
+.health-options {
+  margin-top: 12rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 10rpx 28rpx rgba(31, 42, 37, .07);
+}
+
+.health-modal-mask {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 32rpx;
+  background: rgba(25, 31, 28, .32);
+}
+
+.health-modal {
+  width: 100%;
+  padding: 36rpx 32rpx 28rpx;
+  border-radius: 38rpx;
+  background: #fff;
+  box-shadow: 0 -8rpx 36rpx rgba(31, 42, 37, .16);
+}
+
+.health-modal-title {
+  color: #1e2021;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.health-modal-subtitle {
+  margin-top: 8rpx;
+  color: #a4a7ad;
+  font-size: 22rpx;
+}
+
+.health-modal .health-options {
+  margin: 22rpx 0 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.health-detail-input {
+  width: 100%;
+  height: 76rpx;
+  margin-top: 16rpx;
+  padding: 0 24rpx;
+  border-radius: 22rpx;
+  background: #f5f7f6;
+  color: #2f7d5b;
+  font-size: 24rpx;
+}
+
+.health-option {
+  display: flex;
+  align-items: center;
+  min-height: 68rpx;
+  color: #68756f;
+  font-size: 24rpx;
+}
+
+.health-check {
+  width: 34rpx;
+  height: 34rpx;
+  margin-right: 14rpx;
+  border: 2rpx solid #c9d3cd;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 23rpx;
+  line-height: 30rpx;
+  text-align: center;
+}
+
+.health-option-on {
+  color: #2f7d5b;
+  font-weight: 600;
+}
+
+.health-option-on .health-check {
+  border-color: #2f7d5b;
+  background: #2f7d5b;
+}
+
+.health-confirm {
+  width: 100%;
+  height: 68rpx;
+  margin-top: 12rpx;
+  border-radius: 34rpx;
+  background: #2f7d5b;
+  color: #fff;
+  font-size: 24rpx;
+  line-height: 68rpx;
+}
+
+.health-confirm[disabled] {
+  background: #eceef1;
+  color: #b6b8bd;
+}
+
+.primary-btn {
+  height: 104rpx;
+  border-radius: 52rpx;
+  box-shadow: 0 12rpx 26rpx rgba(31, 42, 37, .14);
+}
+
+.safe-note {
+  color: #a4a7ad;
+}

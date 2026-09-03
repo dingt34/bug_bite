@@ -1,0 +1,1 @@
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;background:#eff0f2;border-radius:42rpx;margin-top:20rpx}.mode-tab{height:84rpx;display:flex;align-items:center;justify-content:center;color:#8c8f96}.mode-tab.active{background:#fff;border-radius:42rpx;color:#ea6a37}.event-card{padding:30rpx}.event-icon{width:86rpx;height:86rpx;font-size:34rpx}
