@@ -1,4 +1,4 @@
-<view class="tab-shell">
+<view wx:if="{{selected !== 2}}" class="tab-shell">
   <view wx:for="{{list}}" wx:key="pagePath" class="tab-item {{item.center ? 'tab-center' : ''}} {{selected === index ? 'selected' : ''}}" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
     <view class="icon-wrap {{item.center ? 'center-disc' : ''}}">
       <image class="tab-icon" src="{{item.icon}}" mode="aspectFit" />

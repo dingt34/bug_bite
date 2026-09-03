@@ -1,2 +1,53 @@
-const nav=require('../../utils/nav');
-Page({data:{ids:[],species:[{name:'中华硬蜱',type:'附着类',figmaIcon:'/assets/figma/all/s20-imgEllipse1.svg'},{name:'白纹伊蚊',type:'叮咬类',figmaIcon:'/assets/figma/all/s20-imgEllipse4.svg'},{name:'胡蜂',type:'蜇伤类',figmaIcon:'/assets/figma/all/s20-imgEllipse5.svg'}]},onLoad(q){this.setData({ids:(q.ids||'tick,mosquito,bee').split(',')});},back(){nav.back();},danger(){wx.navigateTo({url:'/pages/danger/danger?source=compare'});}});
+const nav = require('../../utils/nav');
+const store = require('../../utils/store');
+const species = require('../../utils/species');
+
+const SELECTION_KEY = 'compare_selection';
+
+Page({
+  data: {
+    ids: [],
+    species: [],
+    rows: [],
+    headStyle: '',
+    tableStyle: ''
+  },
+
+  onLoad(query) {
+    const fromQuery = (query.ids || '').split(',').filter(Boolean);
+    const ids = fromQuery.length ? fromQuery : store.get(SELECTION_KEY, []);
+    this.apply(ids);
+  },
+
+  // 列数跟着实际选中的虫种走：选 2 种就是 2 列，不再固定 3 列
+  apply(ids) {
+    const view = species.buildCompare(ids);
+    const count = view.species.length;
+    this.setData({
+      ids: view.species.map(item => item.id),
+      species: view.species,
+      rows: count ? view.rows : [],
+      headStyle: `grid-template-columns:repeat(${count || 1},1fr)`,
+      tableStyle: `grid-template-columns:104rpx repeat(${count || 1},1fr)`
+    });
+  },
+
+  clear() {
+    if (!this.data.ids.length) return;
+    store.set(SELECTION_KEY, []);
+    this.apply([]);
+    wx.showToast({ title: '已清空对比', icon: 'none' });
+  },
+
+  toGuidebook() {
+    wx.navigateTo({ url: '/pages/guidebook/guidebook' });
+  },
+
+  back() {
+    nav.back();
+  },
+
+  danger() {
+    wx.navigateTo({ url: '/pages/danger/danger?source=compare' });
+  }
+});
