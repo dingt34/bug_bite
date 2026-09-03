@@ -1,51 +1,96 @@
 const cloud = require('wx-server-sdk');
-const https = require('https');
-const querystring = require('querystring');
+const qwen = require('./qwen-client');
+const knowledge = require('./knowledge-retrieval');
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-function request(url, options = {}, body = '') {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, options, res => {
-      let data = '';
-      res.setEncoding('utf8');
-      res.on('data', chunk => { data += chunk; });
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); } catch (_) { reject(new Error('INVALID_REMOTE_RESPONSE')); }
-      });
-    });
-    req.setTimeout(12000, () => req.destroy(new Error('REMOTE_TIMEOUT')));
-    req.on('error', reject);
-    if (body) req.write(body);
-    req.end();
+const MAX_BASE64_LENGTH = 8 * 1024 * 1024;
+
+async function loadImageBase64(event) {
+  let imageBase64 = String(event && event.imageBase64 || '').replace(/^data:image\/[\w+.-]+;base64,/, '');
+  if (!imageBase64 && event && event.fileId) {
+    const file = await cloud.downloadFile({ fileID: String(event.fileId) });
+    imageBase64 = file.fileContent.toString('base64');
+  }
+  if (!imageBase64) throw new Error('请先拍摄或选择图片');
+  if (imageBase64.length > MAX_BASE64_LENGTH) throw new Error('图片过大，请重新拍摄');
+  return imageBase64;
+}
+
+function buildVisionMessages(imageBase64, description) {
+  return [
+    {
+      role: 'system',
+      content: [
+        '你是“虫咬识途”的虫体图片候选分析器，只返回 JSON，不要输出 Markdown。',
+        '只描述图中可见的体型、颜色、足、翅、体节和环境线索；不做医疗诊断、病原体推测或风险分级。',
+        '候选只能从以下 45 项知识库名录中选择，最多 3 个 objectId；看不清、不是虫体或只有皮损时返回空数组：',
+        knowledge.catalogPromptText(),
+        'JSON 格式：{"candidateIds":["object_id"],"visibleFeatures":["可见特征"],"uncertainty":"不确定性说明"}'
+      ].join('\n')
+    },
+    {
+      role: 'user',
+      content: [
+        { type: 'text', text: String(description || '请根据可见特征给出虫体候选。').slice(0, 500) },
+        { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + imageBase64 } }
+      ]
+    }
+  ];
+}
+
+function normalizeAnalysis(content, fallbackText) {
+  const payload = qwen.parseJsonObject(content);
+  const candidateIds = knowledge.resolveCandidateIds(payload.candidateIds, fallbackText, 3);
+  return {
+    candidateIds,
+    visibleFeatures: (Array.isArray(payload.visibleFeatures) ? payload.visibleFeatures : [])
+      .map(value => String(value || '').trim()).filter(Boolean).slice(0, 8),
+    uncertainty: String(payload.uncertainty || '').trim().slice(0, 300)
+  };
+}
+
+async function identify(event) {
+  const apiKey = String(process.env.DASHSCOPE_API_KEY || '').trim();
+  if (!apiKey) throw new Error('请先配置 DASHSCOPE_API_KEY');
+  const imageBase64 = await loadImageBase64(event || {});
+  const description = String(event && event.description || '');
+  const content = await qwen.complete({
+    apiKey,
+    baseUrl: process.env.DASHSCOPE_BASE_URL || qwen.DEFAULT_BASE_URL,
+    model: process.env.AI_MODEL || qwen.DEFAULT_MODEL,
+    messages: buildVisionMessages(imageBase64, description),
+    temperature: 0,
+    maxTokens: 500,
+    timeout: 18000
   });
+  const analysis = normalizeAnalysis(content, description);
+  const facts = knowledge.extractSafetyFacts(description);
+  const entries = knowledge.retrieve(analysis.candidateIds, facts, description);
+  return {
+    candidates: entries.map(entry => ({
+      objectId: entry.objectId,
+      name: entry.organism.commonName,
+      scientificName: entry.organism.scientificName,
+      summary: entry.organism.summary,
+      actionLevel: entry.action.level
+    })),
+    visibleFeatures: analysis.visibleFeatures,
+    uncertainty: analysis.uncertainty || (entries.length ? '仅为图鉴候选，需结合尺寸和环境继续核对。' : '画面不足以给出可靠候选。'),
+    knowledgeVersion: knowledge.VERSION,
+    disclaimer: '图像候选只作为图鉴线索，不用于确诊、病原体判断或安全分级。'
+  };
 }
 
 exports.main = async event => {
-  const apiKey = process.env.BAIDU_API_KEY;
-  const secretKey = process.env.BAIDU_SECRET_KEY;
-  if (!apiKey || !secretKey) return { ok: false, code: 'NOT_CONFIGURED', message: '请先在云函数环境变量配置百度识别密钥' };
   try {
-    let imageBase64 = String(event.imageBase64 || '').replace(/^data:image\/[\w+.-]+;base64,/, '');
-    if (!imageBase64 && event.fileId) {
-      const file = await cloud.downloadFile({ fileID: String(event.fileId) });
-      imageBase64 = file.fileContent.toString('base64');
-    }
-    if (!imageBase64) return { ok: false, code: 'NO_IMAGE', message: '请先拍摄或选择图片' };
-    if (imageBase64.length > 8 * 1024 * 1024) return { ok: false, code: 'IMAGE_TOO_LARGE', message: '图片过大，请重新拍摄' };
-    const tokenUrl = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${encodeURIComponent(apiKey)}&client_secret=${encodeURIComponent(secretKey)}`;
-    const token = await request(tokenUrl, { method: 'POST' });
-    if (!token.access_token) throw new Error(token.error_description || 'TOKEN_FAILED');
-    const body = querystring.stringify({ image: imageBase64, top_num: 3, baike_num: 0 });
-    const result = await request(`https://aip.baidubce.com/rest/2.0/image-classify/v1/animal?access_token=${encodeURIComponent(token.access_token)}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(body) }
-    }, body);
-    if (result.error_code) throw new Error(result.error_msg || 'RECOGNITION_FAILED');
-    const candidates = (result.result || []).slice(0, 3).map(item => ({
-      name: String(item.name || '未知'), score: Math.round(Number(item.score || 0) * 10000) / 100
-    }));
-    return { ok: true, data: { candidates, disclaimer: '图像识别仅作为线索，不用于确诊或替代安全问答。' } };
+    return { ok: true, data: await identify(event || {}) };
   } catch (error) {
-    console.error('identifyInsect', error);
-    return { ok: false, code: 'RECOGNITION_FAILED', message: '暂时无法识别，请继续使用环境与症状问答' };
+    console.error('identifyInsect', error && error.message ? error.message : 'unknown error');
+    return { ok: false, code: 'RECOGNITION_FAILED', message: error && error.message || '暂时无法识别，请继续使用环境与症状问答' };
   }
 };
+
+exports.identify = identify;
+exports.loadImageBase64 = loadImageBase64;
+exports.normalizeAnalysis = normalizeAnalysis;
