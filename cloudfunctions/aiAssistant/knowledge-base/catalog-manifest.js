@@ -1,0 +1,71 @@
+const CORE_ENTRIES = [
+  ['mosquito', 'mosquito'],
+  ['culex_tritaeniorhynchus', 'mosquito'],
+  ['anopheles_sinensis', 'mosquito'],
+  ['armigeres_subalbatus', 'mosquito'],
+  ['culex_pipiens', 'mosquito'],
+  ['aedes_aegypti', 'mosquito'],
+  ['flea', 'flea'],
+  ['bedbug', 'bedbug'],
+  ['biting_midge', 'biting_fly'],
+  ['sandfly', 'biting_fly'],
+  ['stable_fly', 'biting_fly'],
+  ['black_fly', 'biting_fly'],
+  ['tick', 'hard_tick'],
+  ['brown_dog_tick', 'hard_tick'],
+  ['chigger', 'chigger'],
+  ['head_louse', 'head_louse'],
+  ['scabies_mite', 'scabies'],
+  ['bee_wasp', 'stinging_flying'],
+  ['vespa_mandarinia', 'stinging_flying'],
+  ['apis_cerana', 'stinging_flying'],
+  ['ant', 'fire_ant'],
+  ['scolopendra_subspinipes_mutilans', 'centipede'],
+  ['house_centipede', 'centipede'],
+  ['chinese_scorpion', 'scorpion'],
+  ['rove_beetle', 'paederus'],
+  ['caterpillar', 'caterpillar'],
+  ['tea_tussock_moth', 'caterpillar'],
+  ['pine_caterpillar', 'caterpillar'],
+  ['blister_beetle', 'blister_beetle']
+].map(([objectId, profileId]) => ({
+  objectId,
+  profileId,
+  packVersion: '1.0.0',
+  ruleVersion: '1.0.0',
+  status: 'DRAFT',
+  catalogStatus: 'CORE',
+  locale: 'zh-CN',
+  reviewNote: '已由产品名录结构化，仍需逐结论来源定位和医学审核后才能发布为正式健康建议。'
+}))
+
+const CANDIDATE_ENTRIES = [
+  ['hard_ticks_other', 'hard_tick'],
+  ['human_flea', 'flea'],
+  ['body_pubic_lice', 'privacy_lice'],
+  ['horse_deer_flies', 'biting_fly'],
+  ['tabanus', 'biting_fly'],
+  ['paper_wasp', 'stinging_flying'],
+  ['common_ants', 'common_ant'],
+  ['spider', 'spider'],
+  ['pine_caterpillars_other', 'caterpillar'],
+  ['tussock_moth_larvae', 'caterpillar'],
+  ['cucumber_leaf_beetles', 'low_evidence_contact'],
+  ['blister_beetles', 'blister_beetle'],
+  ['tropical_bedbug', 'bedbug'],
+  ['triatomine', 'travel_vector'],
+  ['tsetse_fly', 'travel_vector'],
+  ['leech', 'leech']
+].map(([objectId, profileId]) => ({
+  objectId,
+  profileId,
+  packVersion: '0.1.0',
+  ruleVersion: '0.1.0',
+  status: 'DRAFT',
+  catalogStatus: 'CANDIDATE',
+  locale: 'zh-CN',
+  mediaStatus: 'PENDING_LICENSE',
+  reviewNote: '候选类群或旅行补充条目；需补本地范围、逐结论来源和合法图片后再决定是否面向用户发布。'
+}))
+
+module.exports = CORE_ENTRIES.concat(CANDIDATE_ENTRIES)

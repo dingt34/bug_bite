@@ -1,4 +1,36 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s24-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">隐私与数据</view><view class="top-title-sub">了解并控制数据保存位置</view></view></view>
-<view class="notice"><view class="circle circle-green" style="width:72rpx;height:72rpx"><image class="icon-svg large" src="/assets/figma/s24-imgIconPrivacyShield.svg" mode="aspectFit"/></view><view><view>健康记录默认仅本人可见</view><view class="tiny">社群、路线和 AI 内容均由你主动选择发送</view></view></view><view class="section-title">数据分类</view>
-<view class="stack gap-12"><view class="field"><view class="circle circle-green small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataLocal.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>本机缓存</view><view class="tiny">离线安全卡、未提交草稿</view></view><text class="muted" bindtap="clear">清除</text></view><view class="field"><view class="circle circle-green small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataCloud.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>个人云端</view><view class="tiny">档案、行程、事件与图片</view></view><text class="muted">管理</text></view><view class="field"><view class="circle circle-amber small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataCommunity.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>公共社群</view><view class="tiny">帖子、评论、互动与共享路线</view></view><text class="muted">查看</text></view><view class="field"><view class="circle" style="width:64rpx;height:64rpx;background:#ece9f6"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataAi.svg" mode="aspectFit"/></view><view class="grow" style="margin-left:22rpx"><view>AI 临时数据</view><view class="tiny">本次对话附件，到期自动清理</view></view><text class="muted">说明</text></view></view>
-<view class="notice" style="margin-top:36rpx"><view class="circle circle-amber" style="width:64rpx;height:64rpx"><image class="figma-icon sm" src="/assets/figma/all/s24-imgVector.svg"/></view><view><view>社群路线不自动脱敏</view><view class="tiny">只有开启“公开完整轨迹”后才会显示精确路线</view></view></view><view class="section-title danger-text">删除与清理</view><view class="delete-grid"><button class="delete-btn" bindtap="clear">清除本机缓存</button><button class="delete-btn danger-text" bindtap="deletePosts">删除社群内容</button><button class="delete-btn danger-text" bindtap="deleteEvent">删除单条事件</button><button class="delete-btn delete-account" bindtap="deleteAccount">注销并删除账户</button></view><button class="danger-btn" style="margin-top:36rpx" bindtap="deleteAccount">删除前会说明影响范围并要求二次确认</button></view>
+<view class="page">
+  <view class="safe-top"></view>
+  <view class="topbar">
+    <view class="back" bindtap="back" aria-label="返回"><image class="figma-back" src="/assets/figma/all/s24-imgFrame.svg"/></view>
+    <view class="top-title"><view class="top-title-main">数据删除</view><view class="top-title-sub">管理希望移除的本机、云端和社群内容</view></view>
+  </view>
+
+  <view class="privacy-section-heading first-section-heading">
+    <view class="section-title">删除单项数据</view>
+    <view class="section-description">选择要删除的数据类型。删除后通常无法恢复，本机和云端内容会分别处理。</view>
+  </view>
+  <view class="stack gap-12">
+    <view class="field privacy-field">
+      <view class="circle circle-green small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataLocal.svg" mode="aspectFit"/></view>
+      <view class="grow privacy-copy"><view class="privacy-primary">本机缓存</view><view class="tiny">{{cacheInfo.summary}} · {{cacheInfo.detail}}</view></view>
+      <text class="privacy-action {{cacheInfo.hasData ? '' : 'privacy-action-disabled'}}" bindtap="clear">{{cacheInfo.hasData ? '清除' : '已清空'}}</text>
+    </view>
+    <view class="field privacy-field">
+      <view class="circle circle-green small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataCloud.svg" mode="aspectFit"/></view>
+      <view class="grow privacy-copy"><view class="privacy-primary">云端事件</view><view class="tiny">删除单条事件、复查记录及关联图片</view></view>
+      <text class="privacy-action" bindtap="deleteEvent">删除</text>
+    </view>
+    <view class="field privacy-field">
+      <view class="circle circle-amber small"><image class="icon-svg small" src="/assets/figma/s24-imgIconDataCommunity.svg" mode="aspectFit"/></view>
+      <view class="grow privacy-copy"><view class="privacy-primary">社群内容</view><view class="tiny">删除你发布的帖子、评论及公开路线</view></view>
+      <text class="privacy-action" bindtap="deletePosts">删除</text>
+    </view>
+  </view>
+
+  <view class="privacy-section-heading account-section-heading">
+    <view class="section-title account-title">删除全部数据</view>
+    <view class="section-description">永久删除账户以及关联的本机和云端数据。</view>
+  </view>
+  <button class="delete-account-btn" loading="{{accountDeleting}}" disabled="{{accountDeleting}}" bindtap="deleteAccount">永久删除账户</button>
+  <view class="account-note">此操作不可撤销。云端数据删除成功后，会自动清除本机数据并退出当前账户。</view>
+</view>

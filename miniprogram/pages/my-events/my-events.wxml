@@ -1,0 +1,17 @@
+<view class="page">
+  <view class="event-card" wx:for="{{events}}" wx:key="id" bindtap="viewEvent" data-id="{{item.id}}">
+    <view class="event-top">
+      <view class="event-type">{{item.contactTypeName || item.summary}}</view>
+      <view class="event-level risk-{{item.riskLevel}}">{{item.levelName}}</view>
+    </view>
+    <view class="event-time">{{item.occurredAt}}</view>
+    <view class="event-summary" wx:if="{{item.latestReviewSummary || item.summary}}">{{item.latestReviewSummary || item.summary}}</view>
+    <view class="event-images" wx:if="{{item.imageRefs && item.imageRefs.length}}">📷 {{item.imageRefs.length}} 张现场图片</view>
+    <view class="event-review" wx:if="{{item.nextReviewAt}}">⏰ 复查：{{item.nextReviewAt}}</view>
+  </view>
+
+  <view wx:if="{{!events.length}}" class="empty">
+    <view class="empty-icon">📋</view>
+    <view class="empty-text">还没有接触事件记录</view>
+  </view>
+</view>

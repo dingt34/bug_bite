@@ -14,6 +14,42 @@ async function removeWhere(collection, where) {
   return total;
 }
 
+async function removeFilesFromRecords(collection, where) {
+  const files = [];
+  let total = 0;
+  while (true) {
+    const rows = await db.collection(collection).where(where).field({ _id: true, imageFileIds: true }).limit(100).get();
+    if (!rows.data.length) break;
+    rows.data.forEach(row => (row.imageFileIds || []).forEach(fileId => {
+      if (fileId && files.indexOf(fileId) === -1) files.push(fileId);
+    }));
+    await Promise.all(rows.data.map(row => db.collection(collection).doc(row._id).remove()));
+    total += rows.data.length;
+    if (rows.data.length < 100) break;
+  }
+  if (files.length) await cloud.deleteFile({ fileList: files }).catch(error => console.warn('deleteFile', error));
+  return total;
+}
+
+async function removeOwnedPosts(openid) {
+  let total = 0;
+  while (true) {
+    const rows = await db.collection('community_posts').where({ ownerOpenid: openid }).field({ _id: true, imageFileIds: true }).limit(100).get();
+    if (!rows.data.length) break;
+    for (const post of rows.data) {
+      await removeWhere('community_comments', { postId: post._id });
+      await removeWhere('community_reactions', { postId: post._id });
+      await removeWhere('community_reports', { targetType: 'post', targetId: post._id });
+      await db.collection('community_posts').doc(post._id).remove();
+      const files = Array.isArray(post.imageFileIds) ? post.imageFileIds.filter(Boolean) : [];
+      if (files.length) await cloud.deleteFile({ fileList: files }).catch(error => console.warn('deleteFile', error));
+      total += 1;
+    }
+    if (rows.data.length < 100) break;
+  }
+  return total;
+}
+
 exports.main = async event => {
   const { OPENID } = cloud.getWXContext();
   if (!OPENID) return { ok: false, code: 'NO_OPENID', message: '无法确认微信身份' };
@@ -21,8 +57,8 @@ exports.main = async event => {
   try {
     if (action === 'event') {
       const clientId = String(event.clientId || '').slice(0, 80);
-      const deleted = await removeWhere('reviews', { ownerOpenid: OPENID, eventClientId: clientId });
-      const events = await removeWhere('events', { ownerOpenid: OPENID, clientId });
+      const deleted = await removeFilesFromRecords('reviews', { ownerOpenid: OPENID, eventClientId: clientId });
+      const events = await removeFilesFromRecords('events', { ownerOpenid: OPENID, clientId });
       return { ok: true, data: { deleted: deleted + events } };
     }
     if (action === 'community') {
@@ -38,17 +74,13 @@ exports.main = async event => {
       return { ok: true, data: { deleted: 1 + comments + reactions + reports } };
     }
     if (action === 'account') {
-      const ownedPosts = await db.collection('community_posts').where({ ownerOpenid: OPENID }).field({ _id: true, imageFileIds: true }).limit(100).get();
-      for (const post of ownedPosts.data) {
-        await removeWhere('community_comments', { postId: post._id });
-        await removeWhere('community_reactions', { postId: post._id });
-        await db.collection('community_posts').doc(post._id).remove();
-        const files = Array.isArray(post.imageFileIds) ? post.imageFileIds.filter(Boolean) : [];
-        if (files.length) await cloud.deleteFile({ fileList: files }).catch(error => console.warn('deleteFile', error));
-      }
+      const ownedPosts = await removeOwnedPosts(OPENID);
       const collections = ['plans', 'events', 'reviews', 'reminders', 'ai_audits', 'recognition_results'];
-      let deleted = ownedPosts.data.length;
-      for (const name of collections) deleted += await removeWhere(name, { ownerOpenid: OPENID });
+      let deleted = ownedPosts;
+      for (const name of collections) {
+        if (name === 'events' || name === 'reviews') deleted += await removeFilesFromRecords(name, { ownerOpenid: OPENID });
+        else deleted += await removeWhere(name, { ownerOpenid: OPENID });
+      }
       deleted += await removeWhere('community_comments', { ownerOpenid: OPENID });
       deleted += await removeWhere('community_reactions', { ownerOpenid: OPENID });
       deleted += await removeWhere('community_reports', { reporterOpenid: OPENID });

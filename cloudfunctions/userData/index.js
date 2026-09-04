@@ -8,9 +8,14 @@ const COLLECTIONS = {
   review: 'reviews'
 };
 const ALLOWED_FIELDS = {
-  plan: ['title','date','type','status','distance','destination','activity','environment','routeSummary','checklist','offlineCard'],
-  event: ['type','level','place','body','symptoms','trend','createdAtText','reviewAt','status','measures','imageFileIds'],
-  review: ['eventClientId','trend','range','symptoms','measures','imageFileIds','resultLevel']
+  plan: [
+    'title','date','type','status','distance','destination','destinationName','regionCodes','regionCode',
+    'dateValue','startDate','month','activityType','activity','habitatTags','environment','overnight',
+    'companionTags','gearTags','route','routeSummary','checklist','checklistState','riskTags','ruleSnapshot',
+    'offlineCard','syncStatus','updatedAtTimestamp'
+  ],
+  event: ['type','contactType','level','riskLevel','highestRiskLevel','place','body','symptoms','systemicSymptoms','trend','createdAtText','createdAtTimestamp','reviewAt','nextReviewAtTimestamp','status','measures','imageFileIds','timeline','recoveryLogs','notes','reminderId','reminderStatus','ruleVersion','syncStatus'],
+  review: ['eventClientId','trend','range','symptoms','systemicSymptoms','measures','imageFileIds','resultLevel','recordedAtTimestamp','nextReviewAtTimestamp']
 };
 
 function sanitize(type, source = {}) {

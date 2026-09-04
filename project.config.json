@@ -1,5 +1,5 @@
 {
-  "description": "虫咬识途 V4 微信小程序",
+  "description": "虫咬识途整合版微信小程序",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -26,12 +26,14 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "swc": false,
+    "disableSWC": true
   },
   "compileType": "miniprogram",
   "libVersion": "3.7.1",
   "appid": "wx1768a4ab35d8616e",
-  "projectname": "虫咬识途-V4",
+  "projectname": "虫咬识途-整合版",
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
   "simulatorPluginLibVersion": {},

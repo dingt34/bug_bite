@@ -1,0 +1,79 @@
+<view class="route-page">
+  <view class="safe-top"></view>
+  <view class="map-stage">
+    <map id="routeMap" class="route-map" latitude="{{mapLatitude}}" longitude="{{mapLongitude}}" scale="{{mapScale}}" polyline="{{polylines}}">
+      <cover-view class="map-back" bindtap="back">‹</cover-view>
+      <cover-view class="map-pick" catchtap="choosePlace" data-key="endName">◎</cover-view>
+    </map>
+  </view>
+
+  <view class="route-sheet">
+    <view class="sheet-handle"></view>
+    <view class="sheet-head">
+      <view class="sheet-title">{{routeTitle}}</view>
+      <view class="recommend-badge" wx:if="{{routes.length && selectedIndex === 0}}">推荐</view>
+      <view class="draft-badge" wx:else>规划中</view>
+    </view>
+
+    <view class="point-card">
+      <view class="place-block">
+        <view class="point-row">
+          <view class="point-track"><view class="place-dot start-dot"></view><view class="track-line"></view></view>
+          <view class="point-main"><view class="field-label">起点</view><input class="place-input" value="{{form.startName}}" placeholder="输入地点名称" maxlength="40" bindinput="onStartInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="startName" /></view>
+          <button class="point-action" catchtap="choosePlace" data-key="startName">地图选点</button>
+        </view>
+        <view class="suggest-panel" wx:if="{{activeSuggestKey === 'startName'}}">
+          <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view><view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
+          <view class="suggest-item" wx:for="{{suggestions}}" wx:key="id" catchtap="selectSuggestion" data-key="startName" data-index="{{index}}"><view class="suggest-title">{{item.title}}</view><view class="suggest-address">{{item.city}}{{item.district}} · {{item.address}}</view></view>
+        </view>
+      </view>
+
+      <block wx:for="{{waypoints}}" wx:key="id" wx:for-item="waypoint" wx:for-index="waypointIndex">
+        <view class="place-block waypoint-block">
+          <view class="point-row">
+            <view class="point-track"><view class="place-dot waypoint-dot"></view><view class="track-line"></view></view>
+            <view class="point-main"><view class="field-label">途经点 {{waypointIndex + 1}}</view><input class="place-input" value="{{waypoint.name}}" placeholder="输入途经地点" maxlength="40" bindinput="onWaypointInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="waypoint" data-index="{{waypointIndex}}" /></view>
+            <view class="waypoint-actions"><view class="point-link" catchtap="choosePlace" data-key="waypoint" data-index="{{waypointIndex}}">地图</view><view class="remove-link" catchtap="clearWaypoint" data-index="{{waypointIndex}}">移除</view></view>
+          </view>
+          <view class="suggest-panel" wx:if="{{activeSuggestKey === 'waypoint_' + waypointIndex}}">
+            <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view><view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
+            <view class="suggest-item" wx:for="{{suggestions}}" wx:for-item="suggestion" wx:for-index="suggestionIndex" wx:key="id" catchtap="selectSuggestion" data-key="waypoint_{{waypointIndex}}" data-index="{{suggestionIndex}}"><view class="suggest-title">{{suggestion.title}}</view><view class="suggest-address">{{suggestion.city}}{{suggestion.district}} · {{suggestion.address}}</view></view>
+          </view>
+        </view>
+      </block>
+
+      <view class="place-block">
+        <view class="point-row end-row">
+          <view class="point-track"><view class="place-dot end-dot"></view></view>
+          <view class="point-main"><view class="field-label">终点</view><input class="place-input" value="{{form.endName}}" placeholder="输入地点名称" maxlength="40" bindinput="onEndInput" bindfocus="onPlaceFocus" bindblur="onPlaceBlur" data-key="endName" /></view>
+          <button class="point-action" catchtap="choosePlace" data-key="endName">地图选点</button>
+        </view>
+        <view class="suggest-panel" wx:if="{{activeSuggestKey === 'endName'}}">
+          <view class="suggest-status" wx:if="{{suggestLoading}}">正在查找地点…</view><view class="suggest-status" wx:elif="{{suggestMessage}}">{{suggestMessage}}</view>
+          <view class="suggest-item" wx:for="{{suggestions}}" wx:key="id" catchtap="selectSuggestion" data-key="endName" data-index="{{index}}"><view class="suggest-title">{{item.title}}</view><view class="suggest-address">{{item.city}}{{item.district}} · {{item.address}}</view></view>
+        </view>
+      </view>
+
+      <view class="point-tools"><view class="add-waypoint {{waypoints.length >= 5 ? 'disabled' : ''}}" bindtap="addWaypoint">＋ 添加途经点 {{waypoints.length}}/5</view><view class="swap-places" bindtap="swapPlaces">⇅ 交换起终点</view></view>
+    </view>
+
+    <view class="mode-list"><view class="mode-item {{form.mode === item.key ? 'active' : ''}}" wx:for="{{modes}}" wx:key="key" bindtap="selectMode" data-mode="{{item.key}}">{{item.name}}</view></view>
+    <button wx:if="{{!routes.length}}" class="plan-button" loading="{{loading}}" disabled="{{!form.startName || !form.endName || loading}}" bindtap="planRoute">{{loading ? '正在规划…' : '生成路线'}}</button>
+    <view class="message" wx:if="{{message && !routes.length}}">{{message}}</view>
+
+    <block wx:if="{{routes.length}}">
+      <view class="section-line"><view class="section-label">备选路线</view><view class="replan-link" bindtap="planRoute">重新计算</view></view>
+      <view class="route-options">
+        <view class="route-option {{selectedIndex === index ? 'selected' : ''}}" wx:for="{{routes}}" wx:key="id" bindtap="selectRoute" data-index="{{index}}"><view class="route-choice-dot"></view><view class="route-choice-copy"><view class="route-name">{{item.name}}</view><view class="route-meta">{{item.distanceText}} · {{item.durationText}}</view></view><view class="route-state">{{selectedIndex === index ? '✓' : ''}}</view></view>
+      </view>
+      <view class="stats-card"><view class="stat-item"><view class="stat-value">{{selectedRoute.distanceText}}</view><view class="stat-label">距离</view></view><view class="stat-divider"></view><view class="stat-item"><view class="stat-value">{{selectedRoute.durationText}}</view><view class="stat-label">预计耗时</view></view><view class="stat-divider"></view><view class="stat-item"><view class="stat-value">{{waypoints.length}}</view><view class="stat-label">途经点</view></view></view>
+    </block>
+
+    <view class="environment-section">
+      <view class="environment-head"><view class="environment-title">沿途环境</view><view class="environment-aside">{{environmentStatus}}</view></view>
+      <view class="environment-chips"><view class="environment-chip {{item.selected ? 'active' : ''}}" wx:for="{{environmentOptions}}" wx:key="value" data-value="{{item.value}}" bindtap="toggleEnvironment">{{item.value}}</view></view>
+    </view>
+    <button wx:if="{{routes.length}}" class="primary-btn route-confirm-button" bindtap="confirmRoute">{{confirmLabel}}</button>
+    <view class="route-notice">路线由腾讯位置服务实时计算，请结合实际道路开放情况出行。</view>
+  </view>
+</view>

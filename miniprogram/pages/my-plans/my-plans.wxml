@@ -1,5 +1,61 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s11-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">我的行程</view><view class="top-title-sub">{{plans.length}} 个计划</view></view><view class="figma-menu"><image src="/assets/figma/all/s11-imgEllipse1.svg"/><image src="/assets/figma/all/s11-imgEllipse1.svg"/><image src="/assets/figma/all/s11-imgEllipse1.svg"/></view></view>
-<view class="mode-tabs"><view wx:for="{{tabs}}" wx:key="*this" class="mode-tab {{tab===item?'active':''}}" data-tab="{{item}}" bindtap="setTab">{{item}}</view></view>
-<view class="section-title">即将出发</view><view class="card main-trip" bindtap="open"><view class="tiny">还有 5 天</view><view class="h2" style="margin-top:60rpx">丽水古堰画乡</view><view class="muted">8月18–20日 · 徒步露营</view><view class="mini-btn">查看行前清单</view><view class="trip-art"><view class="trip-road"></view><view class="circle circle-amber count">3</view></view></view>
-<view class="section-title">其他计划</view><view class="stack gap-12"><view wx:for="{{otherPlans}}" wx:key="id" class="field" bindtap="open"><view class="circle circle-green" style="width:72rpx;height:72rpx"><image class="figma-icon md" src="{{index===0?'/assets/figma/all/s11-img1.svg':'/assets/figma/all/s11-imgRidingFill1.svg'}}"/></view><view class="grow" style="margin-left:22rpx"><view class="field-value">{{item.title}}</view><view class="tiny">{{item.date}} · {{item.type}}</view></view><view class="chip">{{item.status}}</view></view></view>
-<button class="secondary-btn" style="margin-top:52rpx" bindtap="create">＋ 新建行前计划</button><view class="card between" style="padding:24rpx 30rpx;margin-top:24rpx"><view><view>离线安全卡</view><view class="tiny">最近更新：今天 09:20</view></view><text class="muted">2 份可用</text></view></view>
+<view class="page">
+  <view class="safe-top"></view>
+  <view class="topbar">
+    <view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s11-imgFrame.svg"/></view>
+    <view class="top-title">
+      <view class="top-title-main">我的行程</view>
+      <view class="top-title-sub">{{planCount}} 个已保存计划</view>
+    </view>
+  </view>
+
+  <view class="mode-tabs">
+    <view wx:for="{{tabs}}" wx:key="*this" class="mode-tab {{tab===item?'active':''}}" data-tab="{{item}}" bindtap="setTab">{{item}}</view>
+  </view>
+
+  <block wx:if="{{tab!=='草稿'}}">
+    <view class="section-title">{{tab==='近期'?'即将出发':'历史行程'}}<text class="aside">{{visiblePlans.length}} 个</text></view>
+    <view wx:if="{{visiblePlans.length}}" class="stack gap-12">
+      <view wx:for="{{visiblePlans}}" wx:key="id" class="card plan-card" data-id="{{item.id}}" bindtap="open">
+        <view class="between plan-heading">
+          <view class="status-pill {{item.isHistory?'history':''}}">{{item.countdown}}</view>
+          <view class="sync-status">{{item.syncStatus||'已存本机'}}</view>
+        </view>
+        <view class="h2 plan-title">{{item.displayTitle}}</view>
+        <view class="plan-meta">{{item.displayDate}} · {{item.displayActivity}}</view>
+        <view class="between plan-footer">
+          <view class="progress-label">{{item.progressText}}</view>
+          <view class="open-link">查看清单 &gt;</view>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="card empty-card">
+      <view class="empty-title">{{tab==='近期'?'还没有近期计划':'还没有历史行程'}}</view>
+      <view class="empty-copy">{{tab==='近期'?'创建计划后，清单会保存在这里。':'出行日期过去后，计划会自动归入这里。'}}</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="section-title">未完成的计划</view>
+    <view wx:if="{{draft}}" class="card draft-card" bindtap="openDraft">
+      <view class="draft-label">本机草稿</view>
+      <view class="h2 plan-title">{{draft.displayTitle}}</view>
+      <view class="plan-meta">{{draft.displayDate}} · {{draft.displayActivity}}</view>
+      <view class="open-link draft-link">继续填写 &gt;</view>
+    </view>
+    <view wx:else class="card empty-card">
+      <view class="empty-title">没有未完成的草稿</view>
+      <view class="empty-copy">填写中的行前计划会自动保存在本机。</view>
+    </view>
+  </block>
+
+  <button class="secondary-btn create-btn" bindtap="create">＋ 新建行前计划</button>
+
+  <view wx:if="{{offlineCard}}" class="card offline-card" bindtap="openOffline">
+    <view class="offline-icon">离线</view>
+    <view class="grow">
+      <view class="offline-title">{{offlineCard.displayTitle}}</view>
+      <view class="tiny">{{offlineCard.cachedText}}</view>
+    </view>
+    <view class="open-link">打开 &gt;</view>
+  </view>
+</view>

@@ -1,0 +1,77 @@
+<view class="loading-page" wx:if="{{loadingPost}}">正在读取帖子内容…</view>
+
+<view class="page" wx:else>
+  <view class="draft-banner" wx:if="{{draftRestored}}">
+    <text>已恢复上次未发布的草稿</text>
+    <text class="draft-clear" bindtap="discardDraft">清空草稿</text>
+  </view>
+
+  <view class="event-import" wx:if="{{!editing}}" bindtap="choosePreviousEvent">
+    <view class="event-import-icon">↓</view>
+    <view class="event-import-copy">
+      <view class="event-import-title">从以前的事件快速填写</view>
+      <view class="event-import-sub" wx:if="{{selectedEventLabel}}">已选择：{{selectedEventLabel}}</view>
+      <view class="event-import-sub" wx:elif="{{hasPreviousEvents}}">选择一条记录，自动填写文字和标签</view>
+      <view class="event-import-sub" wx:else>暂无记录，可先完成一次安全判断</view>
+    </view>
+    <view class="event-import-arrow">›</view>
+  </view>
+
+  <view class="event-import route-import" bindtap="chooseRoute">
+    <view class="event-import-icon">⌖</view>
+    <view class="event-import-copy">
+      <view class="event-import-title">{{routePlan ? '已添加路线（选填）' : '添加路线（选填）'}}</view>
+      <view class="event-import-sub" wx:if="{{routePlan}}">{{routePathText}}</view>
+      <view class="event-import-sub" wx:else>先规划路线，可添加多个途经点</view>
+    </view>
+    <view class="route-remove" wx:if="{{routePlan}}" catchtap="removeRoute">移除</view>
+    <view class="event-import-arrow">›</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">{{editing ? '编辑你的分享' : '分享你的经历'}}</view>
+    <textarea class="editor" placeholder="描述你的户外经历、接触情况、路线心得或处理经验…" maxlength="500" bindinput="onInput" value="{{text}}" />
+    <view class="char-count">{{charCount}} / 500</view>
+  </view>
+
+  <view class="validation-banner" wx:if="{{validationMessage}}">{{validationMessage}}</view>
+
+  <view class="card">
+    <view class="card-title">添加图片 <text class="optional">选填</text></view>
+    <view class="upload" bindtap="chooseImage">
+      <image wx:if="{{previewImage}}" src="{{previewImage}}" mode="aspectFill" class="preview" />
+      <view wx:else class="upload-placeholder">＋</view>
+    </view>
+    <view class="image-actions" wx:if="{{previewImage}}">
+      <text bindtap="chooseImage">更换图片</text>
+      <text class="image-remove" bindtap="removeImage">移除图片</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">事件发生地点 <text class="required">*</text></view>
+    <view class="field-help">请选择最接近的浙江省内城市；添加路线后会辅助选择</view>
+    <view class="chips">
+      <text class="tag {{region === item ? 'active' : ''}}" wx:for="{{regions}}" wx:key="*this" bindtap="onRegionTap" data-v="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">接触类型标签 <text class="required">*</text></view>
+    <view class="chips">
+      <text class="tag {{contactType === item.key ? 'active' : ''}}" wx:for="{{types}}" wx:key="key" bindtap="onTypeTap" data-v="{{item.key}}" data-name="{{item.name}}">{{item.name}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">阶段标签 <text class="required">*</text></view>
+    <view class="chips">
+      <text class="tag {{stage === item ? 'active' : ''}}" wx:for="{{stages}}" wx:key="*this" bindtap="onStageTap" data-v="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="submit-wrap">
+    <button class="btn-primary" disabled="{{publishing}}" bindtap="publish">{{publishing ? (editing ? '正在保存修改…' : '正在保存并发布…') : (editing ? '保存修改' : '发布')}}</button>
+  </view>
+  <view class="tip" style="margin: 0 24rpx;">请分享可核实的个人经历，避免给他人下诊断或提供处方。{{editing ? '保存后将更新云端帖子。' : '文字与标签会自动保存为本机草稿，发布内容和图片将上传至云端社区。'}}</view>
+</view>

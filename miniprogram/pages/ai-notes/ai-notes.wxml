@@ -1,0 +1,7 @@
+<view class="page ai-notes-page">
+  <view class="safe-top"></view>
+  <view class="topbar"><view class="back" bindtap="back">返回</view><view class="top-title"><view class="top-title-main">AI 笔记</view><view class="top-title-sub">仅保存你主动保留的 AI 回复</view></view></view>
+  <view class="notice note-notice"><view class="notice-copy"><view class="notice-title">保存在本机</view><view class="notice-sub">关联事件的笔记会同时显示在对应事件详情中。</view></view></view>
+  <view wx:if="{{notes.length}}" class="note-list"><view wx:for="{{notes}}" wx:key="id" class="card note-card"><view class="note-head"><text class="note-time">{{item.timeText}}</text><text class="note-delete" data-id="{{item.id}}" bindtap="deleteNote">删除</text></view><view class="note-label">问题</view><view class="note-question">{{item.question}}</view><view class="note-label answer-label">回答</view><rich-text class="note-answer" nodes="{{item.markdownHtml}}" selectable></rich-text><view wx:if="{{item.recordCount}}" class="note-link">关联 {{item.recordCount}} 条记录</view></view></view>
+  <view wx:else class="empty-card"><view class="empty-title">还没有保存的 AI 笔记</view><view class="tiny">在 AI 回复下点击“保存为本机笔记”，即可在这里查看。</view><button class="primary-btn" bindtap="goAi">前往 AI 助手</button></view>
+</view>
