@@ -11,7 +11,7 @@ const copy = {
 Page({
   data: { level: 'observe', info: copy.observe, eventId: '', rules: [], steps: [], saved: false, reviewLabel: '', primaryActionLabel: '', allowStepBack: true },
   onLoad(query = {}) {
-    let draft = store.get('safetyDraft', {});
+    let draft = store.get('safetyDraft', {}) || {};
     // URL 只能提升到紧急级别，不能降低依据当前事实算出的级别。
     if (query.level === 'emergency') {
       if (query.from !== 'guide') draft = flow.newDraft();
@@ -42,16 +42,20 @@ Page({
       const index = events.findIndex(item => item.id === draft.eventId || (draft.sessionId && item.sessionId === draft.sessionId));
       const previous = index >= 0 ? events[index] : {};
       const now = Date.now();
-      const nextReviewAt = this.data.level === 'observe' ? (previous.nextReviewAt > now ? previous.nextReviewAt : now + 2 * 3600000) : null;
+      const reviewDelay = this.data.level === 'observe' ? 2 * 3600000 : this.data.level === 'consult' ? 30 * 60000 : 0;
+      const previousReviewAt = Number(previous.nextReviewAtTimestamp || previous.nextReviewAt) || 0;
+      const nextReviewAt = reviewDelay ? (previousReviewAt > now ? previousReviewAt : now + reviewDelay) : null;
       const event = { ...previous, id: previous.id || store.id('event'), sessionId: draft.sessionId,
         type: flow.typeNames[flow.normalizeType(draft.contactType)], contactType: draft.contactType || 'unknown',
         level: flow.levelNames[this.data.level], riskLevel: this.data.level, place: previous.place || (draft.facts || {}).environment || '待补充',
         body: (draft.facts || {}).bodyPart || previous.body || '待补充', symptoms: draft.symptoms || [],
         range: draft.range || '', trend: draft.trend || '待观察', facts: draft.facts || {}, photo: draft.photo || '',
         dangerSignals: draft.dangerSignals || [], matchedRules: draft.matchedRules, ruleVersion: draft.ruleVersion,
-        createdAt: previous.createdAt || flow.stamp(now), createdAtMs: previous.createdAtMs || now, updatedAt: now,
-        nextReviewAt, reviewAt: nextReviewAt ? flow.stamp(nextReviewAt) : '请及时求助',
-        status: this.data.level === 'observe' ? '待复查' : this.data.level === 'emergency' ? '待求助' : '待咨询', syncStatus: 'local' };
+        createdAt: previous.createdAt || flow.stamp(now), createdAtMs: previous.createdAtMs || now,
+        createdAtTimestamp: previous.createdAtTimestamp || previous.createdAtMs || now, updatedAt: now,
+        nextReviewAt, nextReviewAtTimestamp: nextReviewAt || 0,
+        reviewAt: nextReviewAt ? flow.stamp(nextReviewAt) : '请及时求助',
+        status: this.data.level === 'emergency' ? '待求助' : '待复查', syncStatus: 'local' };
       if (index >= 0) events[index] = event; else events.unshift(event);
       store.set('events', events);
       this.draft = { ...draft, eventId: event.id, completedAt: now };
@@ -85,7 +89,9 @@ Page({
       if (!hours) return;
       const events = store.get('events', []), item = events.find(e => e.id === this.data.eventId);
       if (!item) return;
-      item.nextReviewAt = Date.now() + hours * 3600000; item.reviewAt = flow.stamp(item.nextReviewAt);
+      item.nextReviewAt = Date.now() + hours * 3600000;
+      item.nextReviewAtTimestamp = item.nextReviewAt;
+      item.reviewAt = flow.stamp(item.nextReviewAt);
       try { store.set('events', events); this.setData({ reviewLabel: item.reviewAt }); }
       catch (_) { wx.showToast({ title: '复查时间未保存，请重试', icon: 'none' }); }
     } });

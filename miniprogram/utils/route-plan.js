@@ -64,10 +64,13 @@ function buildSelectedRoute(route, context, now) {
   return {
     id: 'route_' + (now || Date.now()),
     startName: normalizeText(context.startName),
+    startPlace: selectedPlaces.startName || null,
     waypointName: waypoints[0] ? waypoints[0].name : '',
     waypointNames: waypoints.map(item => item.name),
     waypoints,
     endName: normalizeText(context.endName),
+    endPlace: selectedPlaces.endName || null,
+    environmentTags: (Array.isArray(context.environmentTags) ? context.environmentTags : []).map(normalizeText).filter((value, index, all) => value && all.indexOf(value) === index).slice(0, 6),
     regions,
     mode: mode.key,
     modeName: mode.name,

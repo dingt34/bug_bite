@@ -2,64 +2,51 @@ const assert = require('assert');
 
 let pageDefinition = null;
 let navigatedUrl = '';
+let lastToast = '';
 const storage = {};
-const app = { globalData: { latestPlan: null } };
 
-global.Page = definition => {
-  pageDefinition = definition;
-};
-global.getApp = () => app;
+global.Page = definition => { pageDefinition = definition; };
 global.wx = {
-  getStorageSync(key) {
-    return storage[key];
-  },
-  setStorageSync(key, value) {
-    storage[key] = value;
-  },
-  navigateTo(options) {
-    navigatedUrl = options.url;
-  },
-  showToast() {
-    throw new Error('complete multi-region form should not fail validation');
-  }
+  getStorageSync(key) { return storage[key]; },
+  setStorageSync(key, value) { storage[key] = value; },
+  removeStorageSync(key) { delete storage[key]; },
+  navigateTo(options) { navigatedUrl = options.url; },
+  showToast(options) { lastToast = options.title; }
 };
 
 require('../miniprogram/pages/precheck/precheck.js');
 
-const page = Object.assign({}, pageDefinition, {
-  data: Object.assign({}, pageDefinition.data, {
-    form: {
-      regionCodes: ['杭州', '湖州', '嘉兴'],
-      month: '8月',
-      activityType: '骑行',
-      habitatTags: ['城市公园'],
-      overnight: '当日往返',
-      companionTags: ['同行成人'],
-      gearTags: ['长袖长裤', '包脚鞋袜']
-    }
-  })
+function createPage(data) {
+  return Object.assign({}, pageDefinition, {
+    data: Object.assign({}, pageDefinition.data, data),
+    setData(update, callback) { this.data = Object.assign({}, this.data, update); if (callback) callback(); }
+  });
+}
+
+const page = createPage({
+  destination: '浙江省丽水市古堰画乡',
+  dateValue: '2099-08-18',
+  date: '2099年08月18日',
+  activity: '徒步登山',
+  habitats: ['高草/灌木', '林地/落叶层'],
+  overnight: '户外过夜',
+  companions: ['儿童'],
+  gears: ['长袖长裤'],
+  route: null
 });
 
-page.submit();
-assert.strictEqual(storage.plans.length, 1);
-assert.deepStrictEqual(storage.plans[0].regionCodes, ['杭州', '湖州', '嘉兴']);
-assert.strictEqual(storage.plans[0].destinationName, '杭州、湖州、嘉兴');
-assert.strictEqual(storage.plans[0].regionCode, '杭州、湖州、嘉兴');
-assert.strictEqual(app.globalData.latestPlan.destinationName, '杭州、湖州、嘉兴');
-assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_杭州'));
-assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_湖州'));
-assert.ok(storage.plans[0].matchedRules.some(rule => rule.id === 'region_嘉兴'));
-assert.ok(navigatedUrl.includes('planId=' + storage.plans[0].id));
+page.generate();
+const plans = storage.bugtrail_v4_plans;
+assert.strictEqual(plans.length, 1);
+assert.deepStrictEqual(plans[0].regionCodes, ['丽水']);
+assert.strictEqual(plans[0].activityType, '徒步登山');
+assert.ok(plans[0].ruleSnapshot.checklist.length > 0);
+assert.ok(plans[0].ruleSnapshot.activityTips.some(item => item.includes('步道')));
+assert.ok(plans[0].ruleSnapshot.returnCheck.length > 0);
+assert.ok(navigatedUrl.includes('planId=' + plans[0].id));
 
-const progressPage = Object.assign({}, pageDefinition, {
-  data: {
-    requiredCount: 3,
-    form: { regionCodes: ['杭州'], month: '8月', activityType: '' }
-  },
-  setData(update) { this.data = Object.assign({}, this.data, update); }
-});
-progressPage.updateCompletion();
-assert.strictEqual(progressPage.data.answeredCount, 2);
-assert.strictEqual(progressPage.data.completionPercent, 67);
+const outside = createPage({ destination: '上海外滩', dateValue: '2099-08-18', activity: '骑行', habitats: [], overnight: '当日往返', companions: [], gears: [] });
+outside.generate();
+assert.strictEqual(lastToast, '目前仅支持浙江省内目的地');
 
 console.log('precheck page tests passed');

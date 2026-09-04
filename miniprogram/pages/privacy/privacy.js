@@ -54,21 +54,6 @@ Page({
       wx.showToast({ title: '本机缓存已清除' });
     }});
   },
-  manageCloud() {
-    wx.showActionSheet({ itemList: ['查看我的行程', '查看我的事件', '删除单条事件'], success: result => {
-      if (result.tapIndex === 2) { this.deleteEvent(); return; }
-      wx.navigateTo({ url: result.tapIndex === 0 ? '/pages/my-plans/my-plans' : '/pages/events/events' });
-    }});
-  },
-  manageCommunity() {
-    wx.showActionSheet({ itemList: ['查看社群内容', '删除我的社群内容'], success: result => {
-      if (result.tapIndex === 1) { this.deletePosts(); return; }
-      wx.switchTab({ url: '/pages/community/community' });
-    }});
-  },
-  viewCommunity() { wx.switchTab({ url: '/pages/community/community' }); },
-  explainAi() { wx.showModal({ title: 'AI 临时数据', content: '本次对话中主动添加的附件仅用于当前会话，到期后会自动清理，不会进入个人健康档案。', showCancel: false }); },
-  routePrivacy() { wx.showModal({ title: '路线公开规则', content: '发布经历时，完整路线默认不公开。只有你主动开启“公开完整轨迹”后，帖子读者才能查看精确路线。', showCancel: false }); },
   deletePosts() { wx.navigateTo({ url: '/pages/privacy-social-delete/privacy-social-delete' }); },
   deleteEvent() {
     if (this.data.eventDeleting) return;
@@ -92,9 +77,9 @@ Page({
   },
   deleteAccount() {
     if (this.data.accountDeleting) return;
-    wx.showModal({ title: '注销并删除账户', content: '此操作不可撤销，将删除个人档案、计划、事件和社群内容。', confirmText: '再次确认', confirmColor: '#ea4038', success: result => {
+    wx.showModal({ title: '永久删除账户？', content: '将永久删除账户、个人档案、行程、事件、复查记录、社群帖子、评论、互动及关联图片。', confirmText: '继续', confirmColor: '#ea4038', success: result => {
       if (!result.confirm) return;
-      wx.showModal({ title: '最后确认', content: '云端档案、事件、社群内容和关联图片将永久删除。本机缓存会在云端删除成功后清除。', confirmText: '永久删除', confirmColor: '#ea4038', success: finalResult => {
+      wx.showModal({ title: '最后确认', content: '确认后将立即提交删除。云端数据删除成功后，会自动清除本机数据并退出当前账户。', confirmText: '永久删除', confirmColor: '#ea4038', success: finalResult => {
         if (!finalResult.confirm) return;
         this.setData({ accountDeleting: true });
         cloud.call('deleteData', { action: 'account' })

@@ -536,13 +536,13 @@
   height: 106rpx;
 }
 .back {
-  width: 72rpx;
+  width: 88rpx;
   height: 72rpx;
   background: #fff;
   color: #547464;
-  font-size: 54rpx;
-  font-weight: 300;
-  line-height: 62rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 72rpx;
 }
 .top-title {
   margin-left: 22rpx;

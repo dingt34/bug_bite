@@ -16,16 +16,27 @@ assert.ok(safeMessage.includes('状态码 110'));
 assert.ok(!safeMessage.includes('secret'));
 assert.ok(safeMessage.includes('[已隐藏]'));
 
+const signatureError = new Error('request failed: https://example.test/?sig=generated-signature');
+assert.ok(sanitizeMessage(signatureError.message, '').includes('sig=[已隐藏]'));
+
 assert.strictEqual(sanitizeMessage('a\n\tb', ''), 'a b');
 assert.ok(readableError(new Error('FUNCTIONS_EXECUTE_FAIL')).includes('FUNCTIONS_EXECUTE_FAIL'));
 
 const functionSource = fs.readFileSync(path.join(__dirname, '../cloudfunctions/routePlan/index.js'), 'utf8');
-assert.ok(functionSource.includes('if (failedRequest) throw failedRequest.reason;'));
+assert.ok(functionSource.includes("const { readableError } = require('./error-message');"));
+assert.ok(functionSource.includes("const { inferEnvironmentTags } = require('./environment-tags');"));
+assert.ok(!functionSource.includes("require('crypto')"));
+assert.ok(!functionSource.includes('TENCENT_MAP_SK'));
+assert.ok(!functionSource.includes("'sig'"));
+assert.ok(functionSource.includes("params.toString()"));
 assert.ok(functionSource.includes("event.action === 'suggest'"));
-assert.ok(functionSource.includes('params.get_mp = 1'));
-assert.ok(functionSource.includes('params.waypoints ='));
-assert.ok(functionSource.includes('const start = await resolvePlace(startText, event.startPlace);'));
-assert.ok(functionSource.includes('await getRouteThroughWaypoints(start, waypoints, end, mode)'));
-assert.ok(!functionSource.includes('Promise.all([locate(startText), locate(endText)])'));
+assert.ok(functionSource.includes("params.set('get_mp', '1')"));
+assert.ok(functionSource.includes("params.set('waypoints'"));
+assert.ok(functionSource.includes('const start = await resolvePlace(startText, event.startPlace, mapKey);'));
+assert.ok(functionSource.includes('await getRouteThroughWaypoints(start, waypoints, end, mode, mapKey)'));
+assert.ok(functionSource.includes("/ws/place/v1/suggestion/"));
+assert.ok(functionSource.includes("/ws/direction/v1/"));
+assert.ok(functionSource.includes('decodePolyline(route.polyline)'));
+assert.ok(functionSource.includes('environmentTags: inferEnvironmentTags(route'));
 
 console.log('route plan cloud error tests passed');

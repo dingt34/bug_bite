@@ -1,4 +1,5 @@
 const assert = require('assert');
+const fs = require('fs');
 
 let pageDefinition = null;
 const calls = [];
@@ -35,6 +36,15 @@ global.wx = {
 };
 
 require('../miniprogram/pages/privacy/privacy.js');
+
+const privacyTemplate = fs.readFileSync(require.resolve('../miniprogram/pages/privacy/privacy.wxml'), 'utf8');
+assert.ok(privacyTemplate.includes('bindtap="deleteEvent"'));
+assert.ok(privacyTemplate.includes('bindtap="deletePosts"'));
+assert.ok(!privacyTemplate.includes('manageCloud'));
+assert.ok(!privacyTemplate.includes('manageCommunity'));
+assert.ok(!privacyTemplate.includes('routePrivacy'));
+assert.strictEqual(typeof pageDefinition.manageCloud, 'undefined');
+assert.strictEqual(typeof pageDefinition.manageCommunity, 'undefined');
 
 const page = Object.assign({}, pageDefinition, {
   data: Object.assign({}, pageDefinition.data),

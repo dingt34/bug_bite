@@ -11,8 +11,10 @@
 .destination-card .field { box-shadow:none; }
 .precheck-page .text-button { padding:18rpx 12rpx; min-height:76rpx; font-size:24rpx; color:#2f7d5b; }
 .precheck-page .map-button { text-align:left; margin-left:28rpx; padding-top:0; min-height:60rpx; }
+.coverage-warning,.coverage-ready{margin:0 28rpx 22rpx;padding:16rpx 20rpx;border-radius:18rpx;font-size:23rpx;line-height:1.5}.coverage-warning{background:#fff1ee;color:#b84e47}.coverage-ready{background:#edf7f0;color:#2f7d5b}
 .environment-copy { margin:0 20rpx; }
 .environment-options { margin-top:24rpx; }
+.optional-title{font-size:27rpx;font-weight:600}.optional-groups{margin-top:28rpx;padding-top:8rpx;border-top:1rpx solid #e5ebe7}.option-label{margin-top:24rpx;color:#344b3f;font-size:25rpx;font-weight:700}
 .precheck-page .chip { color:#59645e; min-height:76rpx; }
 .route-card { margin-top:28rpx; }
 .route-warning { margin-top:16rpx; }

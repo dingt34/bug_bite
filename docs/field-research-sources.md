@@ -79,4 +79,3 @@ CDC 建议质性资料经历管理、压缩、展示、解释四个阶段。建�
 6. [WHO：Implementation Research Toolkit—Sampling in qualitative methods](https://iris.who.int/bitstream/handle/10665/363749/9789241513685-eng.pdf)——质性抽样目标、目的性与最大差异抽样原则。
 7. [WHO Research Ethics Review Committee：Templates for informed consent forms](https://www.who.int/groups/research-ethics-review-committee/guidelines-on-submitting-research-proposals-for-ethics-review/templates-for-informed-consent-forms)——信息说明、同意证明、易懂语言和质性研究同意模板。
 8. [国家卫生健康委：《涉及人的生命科学和医学研究伦理审查办法》](https://www.nhc.gov.cn/wjw/c100375/202302/902b4a1dc3af4aba862a6387e6e376dc.shtml)——国内适用范围、伦理审查、知情同意、保密和退出权要求。
-

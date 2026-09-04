@@ -224,5 +224,3 @@ function getProfile(profileId) {
 }
 
 module.exports = { COMMON_EMERGENCY_CONDITIONS, PROFILES, getProfile }
-
-

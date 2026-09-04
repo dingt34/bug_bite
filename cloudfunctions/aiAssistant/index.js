@@ -26,6 +26,7 @@ function buildSystemPrompt(entries) {
     '知识包状态为 DRAFT，尚待医学/疾控审核，回答中必须保留不确定性。',
     '行动等级来自用户文字事实触发的本地规则，不得擅自降低。',
     '请按“现在先做什么—需要观察什么—何时求助—不确定性”简洁回答。',
+    '回答必须使用简洁的 Markdown：用 ### 三级标题划分内容，用 - 列表表达行动步骤，用 **加粗** 标出关键行动。不要输出 HTML，不要使用表格。',
     '当前知识库版本：' + knowledge.VERSION,
     '检索结果：' + knowledge.formatContext(entries)
   ].join('\n');

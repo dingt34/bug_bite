@@ -1,7 +1,51 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s15-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">复查更新</view><view class="top-title-sub">蚊虫叮咬 · 第 1 次复查</view></view><view class="top-action" bindtap="saveDraft">保存草稿</view></view>
-<view class="card card-pad row"><view class="circle circle-green" style="width:82rpx;height:82rpx">2h</view><view style="margin-left:24rpx"><view>距离首次记录约 2 小时</view><view class="tiny">只更新变化，不必重复填写全部信息</view></view></view>
-<view class="section-title">现在和之前相比怎样？</view><view class="choice-grid"><view wx:for="{{trends}}" wx:key="*this" class="choice {{trend===item?'danger-active':''}}" data-v="{{item}}" bindtap="setTrend">{{item}}</view></view>
-<view class="section-title"><text>当前表现</text><text class="aside">可多选</text></view><view class="chip-row"><view wx:for="{{symptomChoices}}" wx:key="label" class="chip {{item.selected?'danger-active':''}}" data-v="{{item.label}}" bindtap="toggle">{{item.label}}</view></view>
-<view class="section-title">范围变化</view><view class="choice-grid"><view wx:for="{{ranges}}" wx:key="*this" class="choice {{range===item?'danger-active':''}}" data-v="{{item}}" bindtap="setRange">{{item}}</view></view>
-<view class="card card-pad row" style="margin-top:44rpx" bindtap="photo"><image wx:if="{{photo}}" class="review-photo" src="{{photo}}" mode="aspectFill"/><image wx:else class="photo-placeholder" src="/assets/figma/all/s15-imgFrame1.svg" mode="aspectFit"/><view class="grow" style="margin-left:24rpx"><view>添加现在的照片</view><view class="tiny">用于与首次照片对照变化</view></view><text class="muted">添加</text></view>
-<view class="notice notice-red" style="margin-top:38rpx"><image class="figma-icon sm" src="/assets/figma/all/s15-img2.svg"/>若出现呼吸困难或意识异常<text class="block-break"></text>立即中断复查并紧急求助</view><button class="primary-btn" style="margin-top:38rpx" bindtap="save">重新评估并保存</button><view class="safe-note" style="margin-top:20rpx">首次结果会保留，系统不会直接覆盖历史记录</view></view>
+<view class="page review-page">
+  <view class="safe-top"></view>
+  <view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s15-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">复查更新</view><view class="top-title-sub">第 {{reviewNumber}} 次 · 只记录发生变化的内容</view></view><view class="top-action draft-action" bindtap="saveDraft">保存草稿</view></view>
+
+  <view class="card review-hero">
+    <view class="between"><view class="review-count">第 {{reviewNumber}} 次复查</view><view class="elapsed-pill">已观察 {{elapsedText}}</view></view>
+    <view class="hero-title">{{event.type}}</view>
+    <view class="hero-meta">{{event.body||'部位待补充'}}<text wx:if="{{event.place}}"> · {{event.place}}</text></view>
+    <view class="hero-tip">首次记录和历史分级会保留，本次提交只追加一条复查记录。</view>
+  </view>
+
+  <view class="danger-notice" bindtap="goDanger"><image class="figma-icon sm" src="/assets/figma/all/s15-img2.svg"/><view class="grow"><view class="danger-title">出现呼吸困难、口咽肿胀或意识异常？</view><view class="danger-copy">立即中断复查并进入紧急安全判断</view></view><text class="danger-arrow">立即处理</text></view>
+
+  <view class="form-progress"><view class="progress-line"></view><view class="progress-copy">先完成两项必填，再补充其他变化</view></view>
+
+  <view class="card question-card required-card">
+    <view class="question-head"><view class="step-number">1</view><view class="grow"><view class="question-title">整体变化</view><view class="question-sub">趋势和范围均为必填</view></view><view class="required-badge">必填</view></view>
+    <view class="field-question">现在和之前相比怎样？</view>
+    <view class="choice-grid"><view wx:for="{{trends}}" wx:key="*this" class="choice {{trend===item?'selected':''}} {{item==='明显减轻'?'choice-good':item==='逐渐加重'?'choice-alert':'choice-neutral'}}" data-value="{{item}}" bindtap="setTrend">{{item}}</view></view>
+    <view class="field-divider"></view>
+    <view class="field-question">红肿或不适的范围</view>
+    <view class="choice-grid"><view wx:for="{{ranges}}" wx:key="*this" class="choice range-choice {{range===item?'selected':''}} {{item==='缩小'?'choice-good':item==='扩大'?'choice-alert':'choice-neutral'}}" data-value="{{item}}" bindtap="setRange">{{item}}</view></view>
+  </view>
+
+  <view class="card question-card">
+    <view class="question-head"><view class="step-number optional-step">2</view><view class="grow"><view class="question-title">局部表现</view><view class="question-sub">可多选，没有变化也可以不选</view></view><view class="optional-badge">选填</view></view>
+    <view class="previous-note"><view class="previous-label">上次记录</view><view>{{event.symptomsText}}</view></view>
+    <view class="chip-row option-row"><view wx:for="{{symptomChoices}}" wx:key="label" class="chip symptom-chip {{item.selected?'selected':''}}" data-value="{{item.label}}" bindtap="toggleSymptom">{{item.label}}</view></view>
+    <view class="custom-symptom-card" wx:if="{{otherSelected}}"><textarea class="custom-symptom-input" value="{{customSymptomText}}" bindinput="onCustomSymptomInput" maxlength="100" auto-height placeholder="描述颜色、触感或其他可观察变化"/><text class="custom-symptom-count">{{customSymptomText.length}}/100</text></view>
+  </view>
+
+  <view class="card question-card">
+    <view class="question-head"><view class="step-number optional-step">3</view><view class="grow"><view class="question-title">全身表现</view><view class="question-sub">仅选择本次新出现或仍在持续的表现</view></view><view class="optional-badge">选填</view></view>
+    <view class="previous-note"><view class="previous-label">上次记录</view><view>{{previousSystemicText}}</view></view>
+    <view class="chip-row option-row"><view wx:for="{{systemicChoices}}" wx:key="label" class="chip systemic-chip {{item.selected?'selected':''}}" data-value="{{item.label}}" bindtap="toggleSystemic">{{item.label}}</view></view>
+  </view>
+
+  <view class="card question-card">
+    <view class="question-head"><view class="step-number optional-step">4</view><view class="grow"><view class="question-title">本次采取的措施</view><view class="question-sub">选择复查期间实际采取的措施</view></view><view class="optional-badge">选填</view></view>
+    <view class="previous-note"><view class="previous-label">上次记录</view><view>{{previousMeasuresText}}</view></view>
+    <view class="chip-row option-row"><view wx:for="{{measureChoices}}" wx:key="label" class="chip measure-chip {{item.selected?'selected':''}}" data-value="{{item.label}}" bindtap="toggleMeasure">{{item.label}}</view></view>
+  </view>
+
+  <view class="card photo-card">
+    <view class="question-head photo-head"><view class="step-number optional-step">5</view><view class="grow"><view class="question-title">对照照片</view><view class="question-sub">用于比较变化，由你主动选择</view></view><view class="optional-badge">选填</view></view>
+    <view class="photo-content" bindtap="choosePhoto"><image wx:if="{{photo}}" class="review-photo" src="{{photo}}" mode="aspectFill"/><view wx:else class="photo-placeholder"><image class="figma-icon md" src="/assets/figma/all/s15-imgFrame1.svg"/></view><view class="grow photo-copy"><view class="photo-title">{{photo?'更换本次照片':'添加本次照片'}}</view><view class="tiny">图片不会自动发送给 AI</view></view><text class="photo-action">{{photo?'更换':'添加'}}</text></view>
+    <button wx:if="{{photo}}" class="photo-remove" bindtap="removePhoto">移除这张照片</button>
+  </view>
+
+  <view class="submit-area"><button class="primary-btn save-button {{saving?'disabled-btn':''}}" disabled="{{saving}}" bindtap="save">{{saving?'正在保存':'重新评估并保存'}}</button><view class="safe-note result-note">提交后会追加到恢复时间线，不会覆盖首次结果</view></view>
+</view>

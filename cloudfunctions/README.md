@@ -20,7 +20,8 @@
 - `DASHSCOPE_API_KEY`：阿里云百炼 API Key，`identifyInsect` 和 `aiAssistant` 均需配置。
 - `DASHSCOPE_BASE_URL`：可选，默认为 `https://dashscope.aliyuncs.com/compatible-mode/v1`；Token Plan 用户填对应的 OpenAI 兼容地址。
 - `AI_MODEL`：可选，默认为 `qwen3.7-flash`。
-- `TENCENT_MAP_KEY`：腾讯地图路线规划 WebService Key，需配置云函数出口 IP/配额策略。
+- `TENCENT_MAP_KEY`：腾讯地图路线规划 WebService Key。
+- `TENCENT_MAP_SK`：该 Key 使用“签名校验”时生成的 Secret Key，仅配置在 `routePlan` 云函数环境变量中。
 - `SUBSCRIBE_TEMPLATE_ID`：复查订阅消息模板 ID。
 - `MINIPROGRAM_STATE`：可选，`developer` / `trial` / `formal`。
 

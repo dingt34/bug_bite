@@ -9,6 +9,11 @@ const qwen = require('../cloudfunctions/identifyInsect/qwen-client');
 
 assert.deepStrictEqual(identifyKnowledge.validate(), { valid: true, errors: [], packCount: 45 });
 assert.deepStrictEqual(assistantKnowledge.validate(), { valid: true, errors: [], packCount: 45 });
+const tickLocation = require('../cloudfunctions/aiAssistant/knowledge-base').getKnowledgeFlow('tick', { stage: 'location' });
+assert.strictEqual(tickLocation.contentBlocks.length, 1);
+assert.ok(tickLocation.organism.occurrenceReference.possiblePlaceDescription.includes('高草'));
+assert.strictEqual(tickLocation.organism.occurrenceReference.precision, 'ENVIRONMENT_TYPE_ONLY');
+assert.ok(assistantKnowledge.retrieve(['tick'], {}, '')[0].organism.occurrenceReference.notice.includes('不证明某个具体城市'));
 assert.strictEqual(identifyKnowledge.catalogPromptText().split('\n').length, 45);
 assert.deepStrictEqual(identifyKnowledge.resolveCandidateIds(['mosquito', 'flea'], '', 3), ['mosquito', 'flea']);
 assert.deepStrictEqual(identifyKnowledge.findCandidateIds('我看到了一只花蚊子', 3), ['mosquito']);

@@ -92,7 +92,7 @@ P2 不是不能做，而是必须等 P0 的安全规则、内容审核和数据�
 | route-plan/my-plans | 行程工具 | 从首页降级为行前准备中的二级功能 |
 | identify/insect-guide/insect-detail/compare | 可信知识 | 标注候选、不确定性、非诊断；均提供安全判断入口 |
 | community/post-publish/post-detail | 经验交流 | 结构化发布，降低点赞/收藏对主流程的干扰 |
-| ai-chat | 补充咨询 | 必须显示事件上下文和 Markdown 小卡片，但不替代分流 |
+| ai | 补充咨询 | 必须显示事件上下文和 Markdown 小卡片，但不替代分流 |
 | profile/privacy/login | 信任与数据 | 登录延后到需要云端、社群或备份时 |
 
 ## 六、视觉与交互重点

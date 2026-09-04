@@ -1,6 +1,44 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s14-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">事件详情</view><view class="top-title-sub">{{event.createdAt}}</view></view></view>
-<view class="card card-pad row"><view class="circle circle-amber" style="width:106rpx;height:106rpx">2h</view><view class="grow" style="margin-left:28rpx"><view class="h2">{{event.level}}</view><view class="muted">{{event.type}} · {{event.body}}</view><view class="chip" style="margin-top:20rpx">{{event.reviewAt}} 需要复查</view></view><text class="muted">调整</text></view>
-<view class="section-title">事件摘要</view><view class="card card-pad summary-grid"><text class="tiny">发生地点</text><text>{{event.place}}</text><text class="tiny">局部表现</text><text>{{event.symptomsText}}</text><text class="tiny">变化趋势</text><text>{{event.trend}}</text></view>
-<view class="section-title">恢复时间线</view><view class="card card-pad timeline"><view class="time-row"><image class="figma-icon md" src="/assets/figma/all/s14-imgEllipse2.svg"/><view><view class="danger-text">首次安全判断</view><view class="tiny">14:30 · {{event.level}}</view></view></view><view class="time-row"><image class="figma-icon md" src="/assets/figma/all/s14-imgEllipse3.svg"/><view><view class="danger-text">等待复查</view><view class="tiny">{{event.reviewAt}} · 约 2 小时后</view></view></view></view>
-<view class="section-title">图片记录</view><view class="row gap-12"><image class="photo-placeholder" src="/assets/figma/all/s14-imgFrame1.svg" mode="aspectFill"/><view class="photo-add"><image class="figma-icon md" src="/assets/figma/all/s14-imgFrame1.svg"/><view class="tiny">添加复查照片</view></view><text class="tiny">1 张</text></view>
-<view class="action-grid"><button class="green-btn secondary-btn" bindtap="review">进行复查</button><button class="secondary-btn" bindtap="summary">就医摘要</button></view><view class="safe-note" style="margin-top:22rpx">可选择将本事件文字摘要发送给 AI</view></view>
+<view class="page detail-page">
+  <view class="safe-top"></view>
+  <view class="topbar">
+    <view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s14-imgFrame.svg"/></view>
+    <view class="top-title"><view class="top-title-main">事件详情</view><view class="top-title-sub">首次记录于 {{event.createdAt}}</view></view>
+  </view>
+
+  <view class="card detail-hero {{isEmergency?'hero-emergency':isRecovered?'hero-recovered':'hero-pending'}}">
+    <view class="hero-status-row"><view class="level-badge {{isEmergency?'level-emergency':isRecovered?'level-recovered':'level-pending'}}">{{event.level}}</view><view class="sync-label">{{event.syncStatus||'待同步'}}</view></view>
+    <view class="hero-title">{{event.type}}</view>
+    <view class="hero-meta-row"><view class="meta-chip">部位 · {{event.body||'待补充'}}</view><view wx:if="{{event.place}}" class="meta-chip">地点 · {{event.place}}</view><view class="meta-chip">已记录 {{event.elapsedText}}</view></view>
+    <view wx:if="{{isPending}}" class="review-panel"><view class="grow"><view class="review-label">下次复查</view><view class="review-time">{{event.reviewAt}}</view><view class="review-hint">{{event.reminderStatus==='已登记'?'复查计划已保存；开启订阅后可接收提醒':'请按计划自行回来记录变化'}}</view></view><button class="adjust-button" bindtap="adjustReview">调整时间</button></view>
+    <view wx:elif="{{isEmergency}}" class="urgent-panel"><view class="status-title">需要立即处理</view><view class="status-copy">请立即求助，不要等待复查时间或图片判断。</view></view>
+    <view wx:else class="recovered-panel"><view class="status-title">本次事件已结束</view><view class="status-copy">历史信息和恢复过程仍会保留，可随时重新开启观察。</view></view>
+  </view>
+
+  <view class="action-grid"><button wx:if="{{isPending}}" class="primary-action" bindtap="review">进行复查</button><button wx:elif="{{isEmergency}}" class="primary-action emergency-action" bindtap="danger">立即安全判断</button><button wx:else class="primary-action" bindtap="reopenObservation">重新开启观察</button><button class="summary-action" bindtap="summary">复制就医摘要</button></view>
+
+  <view class="section-title"><text>事件信息</text><text class="aside">当前状态</text></view>
+  <view class="card summary-card">
+    <view class="summary-row"><view class="summary-label">当前分级</view><view class="summary-value level-value">{{event.level}}</view></view>
+    <view class="summary-row"><view class="summary-label">历史最高</view><view class="summary-value">{{event.highestRiskLabel}}</view></view>
+    <view class="summary-row"><view class="summary-label">局部表现</view><view class="summary-value">{{event.symptomsText}}</view></view>
+    <view class="summary-row"><view class="summary-label">全身表现</view><view class="summary-value">{{event.systemicText}}</view></view>
+    <view class="summary-row"><view class="summary-label">变化趋势</view><view class="summary-value">{{event.trend||'待观察'}}</view></view>
+    <view class="summary-row"><view class="summary-label">已采取措施</view><view class="summary-value">{{event.measuresText}}</view></view>
+  </view>
+
+  <view class="section-title"><text>恢复时间线</text><text class="aside">{{timeline.length}} 条</text></view>
+  <view class="card timeline"><view wx:for="{{timeline}}" wx:key="id" class="time-row"><view class="timeline-axis"><view class="timeline-dot">{{index+1}}</view><view class="timeline-line" wx:if="{{index!==timeline.length-1}}"></view></view><view class="timeline-copy"><view class="between timeline-heading"><view class="timeline-title">{{item.title}}</view><view class="timeline-level">{{item.riskLabel}}</view></view><view class="timeline-time">{{item.timeText}}</view><view class="timeline-detail">{{item.symptomsText}} · {{item.trend}}<text wx:if="{{item.range}}"> · 范围{{item.range}}</text></view></view></view></view>
+
+  <view class="section-title"><text>图片记录</text><text class="aside">{{imageCount}} 张</text></view>
+  <scroll-view wx:if="{{imageCount}}" class="photo-list" scroll-x enhanced show-scrollbar="{{false}}"><image wx:for="{{event.imageRefs}}" wx:key="*this" class="event-photo" src="{{item}}" mode="aspectFill" data-src="{{item}}" bindtap="previewPhoto"/><view class="photo-add" bindtap="addPhoto"><image class="figma-icon md" src="/assets/figma/all/s14-imgFrame1.svg"/><view class="photo-add-title">添加照片</view><view class="tiny">记录后续变化</view></view></scroll-view>
+  <view wx:else class="card photo-empty" bindtap="addPhoto"><image class="figma-icon md" src="/assets/figma/all/s14-imgFrame1.svg"/><view class="grow"><view class="photo-add-title">添加复查照片</view><view class="tiny">仅在你主动选择后保存</view></view><text class="photo-arrow">＋</text></view>
+
+  <block wx:if="{{notes.length}}"><view class="section-title"><text>事件笔记</text><text class="aside">{{notes.length}} 条</text></view><view wx:for="{{notes}}" wx:key="id" class="card note-card"><rich-text class="note-markdown" nodes="{{item.markdownHtml}}" selectable></rich-text><view class="tiny note-time">由你主动从 AI 回复保存</view></view></block>
+
+  <view class="card ai-entry" bindtap="sendToAi"><view class="ai-mark">AI</view><view class="grow"><view class="ai-title">携带本事件咨询 AI</view><view class="tiny">点击后才会发送文字摘要，不会自动发送图片</view></view><text class="ai-arrow">前往</text></view>
+  <view class="safe-note">事件记录用于持续观察和沟通，不替代医疗诊断；出现呼吸困难、意识异常等危险表现时请立即求助。</view>
+  <button class="delete-entry" bindtap="deleteEvent">删除事件及关联复查记录</button>
+
+  <view class="custom-mask" wx:if="{{customReviewVisible}}" catchtap="closeCustomReview"></view>
+  <view class="custom-sheet" wx:if="{{customReviewVisible}}"><view class="custom-title">自定义复查时间</view><view class="custom-sub">请选择一个晚于当前时间的日期和时刻</view><view class="custom-fields"><picker mode="date" value="{{customReviewDate}}" start="{{minReviewDate}}" bindchange="onCustomDate"><view class="custom-field"><text>日期</text><text>{{customReviewDate}}</text></view></picker><picker mode="time" value="{{customReviewTime}}" bindchange="onCustomTime"><view class="custom-field"><text>时间</text><text>{{customReviewTime}}</text></view></picker></view><view class="custom-actions"><button class="custom-cancel" bindtap="closeCustomReview">取消</button><button class="custom-confirm" bindtap="confirmCustomReview">确认调整</button></view></view>
+</view>

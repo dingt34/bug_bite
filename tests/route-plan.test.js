@@ -30,10 +30,14 @@ const multiSelected = route.buildSelectedRoute({
     { name: '西湖', place: { city: '杭州市', title: '西湖' } },
     { name: '南浔古镇', place: { city: '湖州市', title: '南浔古镇' } }
   ],
-  selectedPlaces: { startName: { city: '杭州市' }, endName: { city: '湖州市' } }
+  selectedPlaces: { startName: { city: '杭州市' }, endName: { city: '湖州市' } },
+  environmentTags: ['林地/落叶层', '水边/湿地']
 }, 2000);
 assert.deepStrictEqual(multiSelected.waypointNames, ['西湖', '南浔古镇']);
 assert.deepStrictEqual(multiSelected.regions, ['杭州', '湖州']);
+assert.strictEqual(multiSelected.startPlace.city, '杭州市');
+assert.strictEqual(multiSelected.endPlace.city, '湖州市');
+assert.deepStrictEqual(multiSelected.environmentTags, ['林地/落叶层', '水边/湿地']);
 
 assert.ok(route.getErrorMessage({ errMsg: 'FUNCTION_NOT_FOUND' }).includes('尚未部署'));
 assert.ok(route.getErrorMessage({ errMsg: 'WebserviceAPI' }).includes('权限'));

@@ -1,4 +1,5 @@
 const store = require('./utils/store');
+const { ENV_ID } = require('./config/cloud');
 
 App({
   globalData: {
@@ -8,7 +9,7 @@ App({
   },
   onLaunch() {
     if (wx.cloud) {
-      wx.cloud.init({ traceUser: true });
+      wx.cloud.init({ env: ENV_ID, traceUser: true });
       this.globalData.cloudReady = true;
     }
     this.globalData.user = store.get('user', null);

@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '..');
 const mini = path.join(root, 'miniprogram');
 const app = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 const errors = [];
-const allowed = new Set(['view','text','image','button','input','textarea','scroll-view','camera','picker','swiper','swiper-item','switch','checkbox','radio','form','label','navigator','block']);
+const allowed = new Set(['view','text','image','button','input','textarea','scroll-view','rich-text','camera','picker','swiper','swiper-item','switch','checkbox','radio','form','label','navigator','block']);
 const voidTags = new Set(['image','input','switch','checkbox','radio']);
 
 if ('lazyCodeLoading' in app) errors.push('app.json 不应启用 lazyCodeLoading，避免旧基础库 wx://not-found。');
@@ -62,7 +62,7 @@ if (!cameraWxml.includes('<camera') || !cameraJs.includes('wx.createCameraContex
 
 const figmaAssetDir = path.join(mini, 'assets', 'figma', 'all');
 const figmaAssets = fs.existsSync(figmaAssetDir) ? fs.readdirSync(figmaAssetDir).filter(name => name.endsWith('.svg')) : [];
-if (figmaAssets.length !== 222) errors.push(`Figma 原始 SVG 数量异常：期望 222，实际 ${figmaAssets.length}。`);
+if (figmaAssets.length !== 228) errors.push(`Figma 原始 SVG 数量异常：期望 228，实际 ${figmaAssets.length}。`);
 
 const cloudRoot = path.join(root, 'cloudfunctions');
 const requiredFunctions = ['login','userData','evaluateSafety','community','identifyInsect','routePlan','aiAssistant','reminder','deleteData'];
@@ -75,10 +75,10 @@ for (const name of requiredFunctions) {
 const projectConfig = JSON.parse(fs.readFileSync(path.join(root, 'project.config.json'), 'utf8'));
 if (projectConfig.cloudfunctionRoot !== 'cloudfunctions/') errors.push('project.config.json 未正确配置 cloudfunctionRoot。');
 const clientCode = fs.readdirSync(path.join(mini, 'utils')).filter(name => name.endsWith('.js')).map(name => fs.readFileSync(path.join(mini, 'utils', name), 'utf8')).join('\n');
-if (/BAIDU_(?:API|SECRET)_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode) || /COZE_API_TOKEN\s*[:=]\s*['"][^'"]+/.test(clientCode) || /DASHSCOPE_API_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode)) errors.push('小程序端不得包含服务密钥。');
+if (/BAIDU_(?:API|SECRET)_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode) || /DASHSCOPE_API_KEY\s*[:=]\s*['"][^'"]+/.test(clientCode)) errors.push('小程序端不得包含服务密钥。');
 
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(`检查通过：${app.pages.length} 个页面、222 个 Figma 原始 SVG、5 个 Figma 导航 SVG、真实摄像头接口、9 个云函数。`);
+console.log(`检查通过：${app.pages.length} 个页面、228 个 Figma 原始 SVG、5 个 Figma 导航 SVG、真实摄像头接口、9 个云函数。`);

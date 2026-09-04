@@ -52,6 +52,10 @@ const habitat = precheck.evaluatePlan(plan({ habitatTags: ['高草/灌木', '林
 assert.ok(habitat.riskTags.includes('高草灌木'));
 assert.ok(habitat.riskTags.includes('林地落叶'));
 assert.ok(habitat.activityTips.some(item => item.includes('高草')));
+assert.ok(habitat.knowledgeMatches.some(item => item.objectId === 'tick'));
+assert.ok(habitat.activityTips.includes('在草地、灌木和林地穿浅色长袖长裤并扎紧裤脚。'));
+assert.strictEqual(habitat.knowledgeMeta.catalogSize, 45);
+assert.strictEqual(habitat.knowledgeMeta.reviewStatus, 'DRAFT');
 
 const overnight = precheck.evaluatePlan(plan({ overnight: '户外过夜' }));
 assert.ok(overnight.riskTags.includes('夜间过夜'));
@@ -75,6 +79,7 @@ assert.ok(noGear.matchedRules.some(rule => rule.id === 'no_gears'));
 const indoorStay = precheck.evaluatePlan(plan({ overnight: '室内住宿', habitatTags: ['室内住宿'] }));
 assert.ok(indoorStay.riskTags.includes('室内住宿'));
 assert.ok(indoorStay.matchedRules.some(rule => rule.id === 'indoor_stay'));
+assert.ok(indoorStay.knowledgeMatches.some(item => item.objectId === 'bedbug'));
 
 const farming = precheck.evaluatePlan(plan({ activityType: '农事/采摘', habitatTags: ['农田/果园'] }));
 assert.ok(farming.riskTags.includes('植被接触'));

@@ -20,6 +20,6 @@ Page({
   },
 
   goAiChat() {
-    wx.navigateTo({ url: '/pages/ai-chat/ai-chat' });
+    wx.switchTab({ url: '/pages/ai/ai' });
   }
 });

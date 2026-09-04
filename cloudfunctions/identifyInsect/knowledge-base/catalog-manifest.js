@@ -69,5 +69,3 @@ const CANDIDATE_ENTRIES = [
 }))
 
 module.exports = CORE_ENTRIES.concat(CANDIDATE_ENTRIES)
-
-

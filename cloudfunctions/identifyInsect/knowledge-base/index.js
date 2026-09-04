@@ -59,6 +59,20 @@ function content(contentId, stage, title, body, sourceClaimIds) {
   return { contentId, stage, title, body, sourceClaimIds, offlineAvailable: true }
 }
 
+function locationReference(item) {
+  const zhejiangStatus = item.zhejiangStatus || '暂无独立的浙江本地分布结论'
+  const localEvidencePending = /待补充|待核验|暂无/.test(zhejiangStatus)
+  return {
+    geographicScope: item.distribution,
+    zhejiangStatus,
+    possiblePlaceDescription: item.habitat,
+    precision: 'ENVIRONMENT_TYPE_ONLY',
+    evidenceStatus: localEvidencePending ? 'LOCAL_EVIDENCE_PENDING' : 'CATALOG_REFERENCE',
+    status: 'DRAFT',
+    notice: '仅表示资料中记录的分布范围和常见环境，不证明某个具体城市、景点或住址存在该对象，也不能用于计算个人接触概率。'
+  }
+}
+
 function buildKnowledgePack(entry) {
   const item = guide.getById(entry.objectId) || candidateRecords.getById(entry.objectId)
   if (!item) throw new Error(`Catalog item missing: ${entry.objectId}`)
@@ -70,6 +84,7 @@ function buildKnowledgePack(entry) {
     .map((source) => source.sourceId)
   const actionSourceIds = evidenceSourceIds.length ? evidenceSourceIds : allSourceIds
   const prefix = item.id
+  const occurrence = locationReference(item)
 
   const claims = [
     claim(`${prefix}-identity`, '对象身份', `${item.name}（${item.scientificName}）属于${item.commonCategory}。${item.summary}`, allSourceIds, 'MEDICAL_FACT'),
@@ -86,6 +101,7 @@ function buildKnowledgePack(entry) {
 
   const contentBlocks = [
     content(`${prefix}-overview`, 'overview', item.name, [item.summary, item.appearance, item.compareClues], [`${prefix}-identity`, `${prefix}-appearance`]),
+    content(`${prefix}-location`, 'location', '可能出现的地点（参考）', [`分布参考：${occurrence.geographicScope}`, `可能相关环境：${occurrence.possiblePlaceDescription}`, `浙江证据状态：${occurrence.zhejiangStatus}`, occurrence.notice], [`${prefix}-ecology`]),
     content(`${prefix}-prevention-content`, 'prevention', '减少接触', safetyProfile.prevention, [`${prefix}-prevention`, `${prefix}-ecology`]),
     content(`${prefix}-discovery`, 'discovery', '发现后先做什么', ['先确认是否存在需要立即求助的危险表现。'].concat(safetyProfile.firstActions), [`${prefix}-first-action`, `${prefix}-emergency`]),
     content(`${prefix}-image`, 'image', '图片仅用于辅助记录', [safetyProfile.identificationBoundary, '没有照片或图片无法判断时，仍可继续安全处置和症状分流。'], [`${prefix}-image-boundary`]),
@@ -159,6 +175,7 @@ function buildKnowledgePack(entry) {
       commonReaction: item.commonReaction,
       compareClues: item.compareClues,
       caution: item.caution,
+      occurrenceReference: occurrence,
       identificationBoundary: safetyProfile.identificationBoundary
     },
     media: item.images || [],
@@ -292,6 +309,11 @@ function validateKnowledgePack(pack) {
   const claimIds = new Set((pack.claims || []).map((record) => record.claimId))
   const contentIds = new Set((pack.contentBlocks || []).map((record) => record.contentId))
 
+  const occurrence = pack.organism.occurrenceReference
+  if (!occurrence || !occurrence.geographicScope || !occurrence.possiblePlaceDescription) errors.push(`${pack.meta.objectId} 缺少可查询的地点参考`)
+  if (occurrence && occurrence.precision !== 'ENVIRONMENT_TYPE_ONLY') errors.push(`${pack.meta.objectId} 地点参考不得表达为具体地点确证`)
+  if (!(pack.contentBlocks || []).some((block) => block.stage === 'location')) errors.push(`${pack.meta.objectId} 缺少地点参考内容块`)
+
   if (!pack.sources || !pack.sources.length) errors.push(`${pack.meta.objectId} 没有来源`)
   if ((!pack.media || !pack.media.length) && pack.meta.mediaStatus !== 'PENDING_LICENSE') {
     errors.push(`${pack.meta.objectId} 没有图片授权记录，也未标记为待授权`)
@@ -340,7 +362,7 @@ function validateCatalog() {
 }
 
 module.exports = {
-  KNOWLEDGE_INTERFACE_VERSION: '1.0.0',
+  KNOWLEDGE_INTERFACE_VERSION: '1.1.0',
   getKnowledgePack,
   listKnowledgePacks,
   getKnowledgeFlow,
@@ -349,5 +371,3 @@ module.exports = {
   validateCatalog,
   _entriesById: entriesById
 }
-
-

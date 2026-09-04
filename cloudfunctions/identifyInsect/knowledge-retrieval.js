@@ -191,6 +191,7 @@ function retrieve(candidateIds, facts, fallbackText) {
         commonReaction: pack.organism.commonReaction,
         compareClues: pack.organism.compareClues,
         caution: pack.organism.caution,
+        occurrenceReference: pack.organism.occurrenceReference,
         identificationBoundary: pack.organism.identificationBoundary
       },
       action: {

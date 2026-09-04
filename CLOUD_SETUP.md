@@ -14,6 +14,11 @@
 
 - `users`：保存微信云身份的昵称、头像云文件 ID 和登录时间。
 - `user_data`：保存每个微信用户的计划、事件和个人图片映射同步快照。
+- `plans`：保存可供事件页与 AI 助手选择的行程摘要。
+- `events`：保存事件、时间线、复查状态和 AI 笔记。
+- `reviews`：保存每次复查的结构化结果。
+- `reminders`：保存用户主动设置的复查提醒。
+- `ai_audits`：只记录 AI 检索使用的知识库版本、对象编号和用户主动选择的记录编号，不保存图片。
 - `community_posts`：保存所有用户可见的公共帖子和互动计数。
 - `community_comments`：保存公共评论。
 - `community_reactions`：保存用户对帖子的点赞、收藏，以及对评论的赞踩状态。
@@ -28,7 +33,10 @@
 - `cloudfunctions/login`
 - `cloudfunctions/syncData`
 - `cloudfunctions/community`
-- `cloudfunctions/cozeAgent`
+- `cloudfunctions/userData`
+- `cloudfunctions/deleteData`
+- `cloudfunctions/reminder`
+- `cloudfunctions/aiAssistant`
 - `cloudfunctions/routePlan`
 
 部署环境必须与 `ENV_ID` 指向的环境一致。
@@ -38,7 +46,9 @@
 - 名称：`TENCENT_MAP_KEY`
 - 值：项目管理员统一维护的腾讯位置服务 Key
 
-该 Key 不应写入代码或提交到 GitHub。团队成员只要使用同一个小程序 AppID 和云开发环境，即可共用已部署的路线服务。
+当前 `routePlan` 采用与 `bug_bite--hsy` 一致的 Key-only 调用方式。请在腾讯位置服务控制台中把该 Key 的 WebServiceAPI 校验方式设置为“域名白名单”，并将白名单留空；不要选择“签名校验”，否则腾讯地图会因为请求中没有 `sig` 而返回状态码 111。
+
+该方案不再读取 `TENCENT_MAP_SK`。Key 不应写入代码、提交到 GitHub 或发送到聊天中。团队成员只要使用同一个小程序 AppID 和云开发环境，即可共用已部署的路线服务。
 
 ## 4. 验证
 
@@ -75,14 +85,14 @@
 - 旧版本保存在本机的个人帖子会在完成微信云登录后尝试迁移一次到公共社区。
 - “隐私与本机数据”页面可分别清除本机数据，或删除个人云备份和本人产生的社区数据。
 
-## AI 建议助手
+## AI 建议助手与知识库
 
-1. 在云开发控制台为 `cozeAgent` 云函数添加环境变量 `COZE_API_TOKEN`，值为扣子 API Token。不要把 Token 写入小程序代码、Git 或截图。
-2. 右键 `cloudfunctions/cozeAgent`，选择“上传并部署：云端安装依赖”。
-3. 云函数默认调用项目 `7678279631425994762` 的 HTTPS 接口。如需迁移，可通过云函数环境变量 `COZE_API_ENDPOINT` 和 `COZE_PROJECT_ID` 覆盖。
-4. 重新编译后进入“AI 建议助手”，发送不含个人信息的测试问题，确认页面显示“扣子 Agent”并正常回复。
-5. Agent 已设置为：不做虫种或疾病确诊，优先识别危险信号，严重情况建议立即呼叫 120 或就近急诊。
+1. 在云开发控制台为 `aiAssistant` 云函数添加环境变量 `DASHSCOPE_API_KEY`，值为阿里云百炼 DashScope API Key。不要把 Key 写入小程序代码、Git 或截图。
+2. 如需切换模型，可增加 `AI_MODEL`；如需切换兼容接口地址，可增加 `DASHSCOPE_BASE_URL`。未设置时使用云函数内的安全默认值。
+3. 右键 `cloudfunctions/aiAssistant`，选择“上传并部署：云端安装依赖”。部署包必须包含同目录下的 `knowledge-base`、`knowledge-retrieval.js` 和 `qwen-client.js`。
+4. 重新编译后进入“AI 助手”，先直接发送一个普通问题，再选择一条真实行程或事件记录发送，确认均能收到回复。
+5. AI 会先用本地知识库检索形成约束上下文，再调用千问生成回答；危险信号仍优先引导用户进入安全判断，不以 AI 回答替代医疗诊断。
 
-目前已部署的扣子 API 输入定义只确认支持文字，因此图片按钮暂不向 Agent 发送内容。发送个人记录时由用户勾选计划或事件，只发送所选记录及复查的文字摘要，不发送未选记录，也不自动发送历史图片。
+发送个人记录时仅发送用户本次主动勾选的文字摘要（每次最多 3 条），不发送历史图片；成功发送后选择会自动清空。知识库内容位于 `cloudfunctions/aiAssistant/knowledge-base`，更新后需要重新部署该云函数。
 
-图片识别接入步骤、请求格式、安全要求和验收清单见 `docs/AI_IMAGE_RECOGNITION_GUIDE.md`。
+“AI 助手”统一调用 `aiAssistant`，避免多套 AI 服务混用。

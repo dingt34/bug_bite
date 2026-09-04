@@ -1,7 +1,8 @@
 function sanitizeMessage(value, mapKey) {
   let message = String(value || '').replace(/[\r\n\t]+/g, ' ').trim();
-  if (mapKey) message = message.split(String(mapKey)).join('[已隐藏]');
-  message = message.replace(/([?&](?:key|apikey)=)[^&\s]+/gi, '$1[已隐藏]');
+  const secrets = Array.isArray(mapKey) ? mapKey : [mapKey];
+  secrets.filter(Boolean).forEach(secret => { message = message.split(String(secret)).join('[已隐藏]'); });
+  message = message.replace(/([?&](?:key|apikey|sig)=)[^&\s]+/gi, '$1[已隐藏]');
   return message.slice(0, 240);
 }
 

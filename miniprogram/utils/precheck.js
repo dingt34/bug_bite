@@ -1,7 +1,9 @@
 // 行前建议规则（浙江省课程演示版）。
 // 所有输入只用于生成场景化防护提示，不用于疾病概率预测或诊断。
 
-const RULE_VERSION = 'precheck-demo-1.1.0';
+const knowledge = require('./precheck-knowledge');
+
+const RULE_VERSION = 'precheck-kb-1.2.0';
 const WARM_MONTHS = ['5月', '6月', '7月', '8月', '9月', '10月'];
 
 const CITY_PROFILES = {
@@ -148,6 +150,19 @@ function evaluatePlan(form) {
   }
   addUnique(checklist, '携带充电设备和应急联系人信息');
 
+  const knowledgeMatches = knowledge.matchKnowledge({
+    month: input.month,
+    activityType: input.activityType,
+    habitatTags: habitats,
+    overnight: input.overnight,
+    companionTags: companions
+  });
+  knowledgeMatches.forEach(entry => {
+    addUnique(riskTags, entry.tag);
+    entry.prevention.forEach(tip => addUnique(activityTips, tip));
+    matched('knowledge_' + entry.objectId, '知识包场景：' + entry.name);
+  });
+
   addUnique(returnCheck, '回家后更换衣物并检查鞋袜、裤脚和随身物品');
   addUnique(returnCheck, '检查头皮、耳后、腋下、腰部和膝后等不易察觉部位');
   if (habitats.indexOf('高草/灌木') > -1 || habitats.indexOf('林地/落叶层') > -1 || habitats.indexOf('农田/果园') > -1) {
@@ -166,7 +181,22 @@ function evaluatePlan(form) {
     checklist: checklist,
     activityTips: activityTips,
     returnCheck: returnCheck,
-    matchedRules: matchedRules
+    matchedRules: matchedRules,
+    knowledgeMatches: knowledgeMatches.map(entry => ({
+      objectId: entry.objectId,
+      name: entry.name,
+      reason: entry.reason,
+      possiblePlaces: entry.possiblePlaces,
+      packVersion: entry.packVersion,
+      ruleVersion: entry.ruleVersion,
+      status: entry.status
+    })),
+    knowledgeMeta: {
+      interfaceVersion: knowledge.KNOWLEDGE_INTERFACE_VERSION,
+      reviewStatus: knowledge.REVIEW_STATUS,
+      catalogSize: knowledge.CATALOG_SIZE,
+      matchedCount: knowledgeMatches.length
+    }
   };
 }
 

@@ -13,7 +13,7 @@
 <view class="page" wx:elif="{{post}}">
   <view class="safe-top"></view>
   <view class="topbar">
-    <view class="back" bindtap="back">‹</view>
+    <view class="back" bindtap="back">返回</view>
     <view class="top-title-main top-title">经历详情</view>
   </view>
   <view class="card post-card">

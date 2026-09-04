@@ -216,5 +216,3 @@ function getById(id) {
 }
 
 module.exports = { RECORDS, getById }
-
-
