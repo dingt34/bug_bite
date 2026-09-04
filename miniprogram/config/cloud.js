@@ -5,5 +5,6 @@ module.exports = {
   ENV_ID,
   LOGIN_FUNCTION: 'login',
   SYNC_FUNCTION: 'syncData',
-  COMMUNITY_FUNCTION: 'community'
+  COMMUNITY_FUNCTION: 'community',
+  COZE_AGENT_FUNCTION: 'cozeAgent'
 };

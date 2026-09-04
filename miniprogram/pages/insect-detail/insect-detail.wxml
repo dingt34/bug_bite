@@ -1,4 +1,62 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s19-imgFrame.svg"/></view><view class="top-title-main top-title">虫种详情</view><view class="top-action" bindtap="compare">加入对比</view></view>
-<view class="species-hero"><image class="species-hero-bg" src="/assets/figma/all/s19-imgFrame1.svg" mode="aspectFill"/><view class="chip">疑似候选</view><image class="hero-tick" src="/assets/figma/all/s19-imgFrame2.svg" mode="aspectFit"/><view class="species-name"><view class="h2">中华硬蜱</view><view class="tiny">Ixodes sinensis · 附着类参考</view></view></view><view class="notice" style="margin-top:28rpx;text-align:center;justify-content:center">外形和环境信息仅供对照，不构成虫种确诊</view>
-<view class="section-title">关键特征</view><view class="stack gap-12"><view wx:for="{{features}}" wx:key="n" class="field"><view class="circle circle-green" style="width:56rpx;height:56rpx">{{item.n}}</view><view class="grow" style="margin-left:22rpx">{{item.t}}</view><text class="muted">{{item.d}}</text></view></view>
-<view class="section-title">常见环境</view><view class="chip-row"><view class="chip active">草地</view><view class="chip active">灌木</view><view class="chip">动物活动区</view><view class="chip active">春夏秋</view></view><view class="detail-actions"><button class="secondary-btn" bindtap="compare">加入对比</button><button class="primary-btn" bindtap="danger">发生接触，安全判断</button></view><view class="safe-note" style="margin-top:24rpx">不要仅依据图片自行移除附着物</view></view>
+<view class="page">
+  <view class="safe-top"></view>
+
+  <view class="topbar">
+    <view class="back" bindtap="back">
+      <image class="figma-back" src="/assets/figma/all/s18-icon-back.svg"/>
+    </view>
+    <view class="top-title-main top-title">虫种详情</view>
+    <view class="top-action" bindtap="openCompare">查看对比</view>
+  </view>
+
+  <view class="species-hero">
+    <image class="species-hero-bg" src="{{photo}}" mode="aspectFill"/>
+    <view class="hero-shade"></view>
+    <view class="chip">疑似候选</view>
+    <view class="species-name">
+      <view class="h2 hero-text">{{name}}</view>
+      <view class="tiny hero-text">{{latin}} · {{typeLabel}}参考</view>
+    </view>
+    <view class="photo-credit">图片：{{photoCredit}}</view>
+  </view>
+
+  <view class="notice" style="margin-top:28rpx;text-align:center;justify-content:center">外形和环境信息仅供对照，不构成虫种确诊</view>
+
+  <block wx:if="{{features.length}}">
+    <view class="section-title">关键特征</view>
+    <view class="stack gap-12">
+      <view wx:for="{{features}}" wx:key="n" class="feature-row">
+        <view class="circle circle-green feature-no">{{item.n}}</view>
+        <view class="feature-body">
+          <view class="feature-title">{{item.t}}</view>
+          <view class="feature-desc">{{item.d}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 还没逐条整理关键特征的虫种，显示知识库里的概述，页面不留空 -->
+  <block wx:elif="{{summary}}">
+    <view class="section-title">虫种概述</view>
+    <view class="card card-pad prose">{{summary}}</view>
+  </block>
+
+  <block wx:if="{{compareClues}}">
+    <view class="section-title">对比要点</view>
+    <view class="card card-pad prose">{{compareClues}}</view>
+  </block>
+
+  <block wx:if="{{environments.length}}">
+    <view class="section-title">常见环境</view>
+    <view class="chip-row">
+      <view wx:for="{{environments}}" wx:key="name" class="chip {{item.active ? 'active' : ''}}">{{item.name}}</view>
+    </view>
+  </block>
+
+  <view class="detail-actions">
+    <button class="secondary-btn" bindtap="compare">{{inCompare ? '移出对比' : '加入对比'}}</button>
+    <button class="primary-btn" bindtap="danger">发生接触，安全判断</button>
+  </view>
+
+  <view class="safe-note" style="margin-top:24rpx">{{detailNote}}</view>
+</view>

@@ -62,7 +62,7 @@ if (!cameraWxml.includes('<camera') || !cameraJs.includes('wx.createCameraContex
 
 const figmaAssetDir = path.join(mini, 'assets', 'figma', 'all');
 const figmaAssets = fs.existsSync(figmaAssetDir) ? fs.readdirSync(figmaAssetDir).filter(name => name.endsWith('.svg')) : [];
-if (figmaAssets.length !== 222) errors.push(`Figma 原始 SVG 数量异常：期望 222，实际 ${figmaAssets.length}。`);
+if (figmaAssets.length !== 228) errors.push(`Figma 原始 SVG 数量异常：期望 228，实际 ${figmaAssets.length}。`);
 
 const cloudRoot = path.join(root, 'cloudfunctions');
 const requiredFunctions = ['login','userData','evaluateSafety','community','identifyInsect','routePlan','aiAssistant','reminder','deleteData'];
@@ -81,4 +81,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(`检查通过：${app.pages.length} 个页面、222 个 Figma 原始 SVG、5 个 Figma 导航 SVG、真实摄像头接口、9 个云函数。`);
+console.log(`检查通过：${app.pages.length} 个页面、228 个 Figma 原始 SVG、5 个 Figma 导航 SVG、真实摄像头接口、9 个云函数。`);

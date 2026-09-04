@@ -1,1 +1,19 @@
-.insect-grid{display:grid;grid-template-columns:1fr 1fr;gap:24rpx}.insect-card{padding:24rpx;position:relative}.insect-image{height:180rpx;border-radius:30rpx;background:#f2f4f2;display:flex;align-items:center;justify-content:center;position:relative}.check{position:absolute;right:10rpx;top:10rpx;width:44rpx;height:44rpx}.select-hit{position:absolute;inset:0}.species-svg{width:118rpx;height:118rpx;display:block}
+.insect-grid{display:grid;grid-template-columns:1fr 1fr;gap:24rpx}
+.insect-card{padding:24rpx;position:relative}
+.insect-image{height:180rpx;border-radius:30rpx;background:#f2f4f2;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+/* 实物照片铺满卡片图片区 */
+.species-photo{width:100%;height:100%;display:block}
+/* 已选：绿底白勾，照片上也看得清 */
+.check{position:absolute;right:12rpx;top:12rpx;width:44rpx;height:44rpx;border-radius:50%;box-shadow:0 2rpx 10rpx rgba(0,0,0,.25)}
+/* 只有图片右上角这一小块用于勾选，卡片其余部分点开详情 */
+.select-hit{position:absolute;right:0;top:0;width:88rpx;height:88rpx}
+.species-svg{width:118rpx;height:118rpx;display:block}
+.keyword-clear{font-size:24rpx;padding-left:12rpx}
+.empty-state{margin-top:24rpx;text-align:center}
+.empty-state .tiny{margin-top:10rpx}
+
+/* navigationStyle 是 custom，顶部要自己让出状态栏和胶囊按钮的高度 */
+.safe-top{height:calc(env(safe-area-inset-top) + 60rpx);min-height:150rpx}
+
+/* 返回按钮：白底圆形 + 柔和阴影，与参考图一致 */
+.back{box-shadow:0 6rpx 20rpx rgba(31,42,37,.10)}

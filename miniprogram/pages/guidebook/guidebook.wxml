@@ -1,5 +1,59 @@
-<view class="page"><view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s18-imgEllipse.svg"/></view><view class="top-title"><view class="top-title-main">虫种图鉴</view><view class="top-title-sub">外形与环境参考，不构成确诊</view></view></view>
-<view class="field"><image class="figma-icon sm" src="/assets/figma/all/s18-imgEllipse6.svg"/><input class="grow" placeholder="搜索名称或关键特征"/><text class="muted">29 种</text></view><view class="chip-row" style="margin-top:26rpx"><view wx:for="{{categories}}" wx:key="*this" class="chip {{category===item?'active':''}}" data-v="{{item}}" bindtap="setCategory">{{item}}</view></view>
-<view class="notice" style="margin-top:34rpx"><view class="circle circle-green" style="width:64rpx;height:64rpx"><image class="figma-icon md" src="/assets/figma/all/s18-imgBug2.svg"/></view><view><view>识别结果的疑似候选已标记</view><view class="tiny">候选只供对照，安全判断仍以症状为准</view></view></view>
-<view class="section-title"><text>常见对象</text><text class="aside">选择 2–3 种进行对比</text></view><view class="insect-grid"><view wx:for="{{items}}" wx:key="id" class="card insect-card"><view class="insect-image" data-id="{{item.id}}" bindtap="detail"><image class="species-svg" src="{{item.figmaIcon}}" mode="aspectFit"/><image wx:if="{{item.selected}}" class="figma-icon sm check" src="/assets/figma/all/s18-imgEllipse2.svg"/></view><view class="h3" style="margin-top:18rpx" data-id="{{item.id}}" bindtap="detail">{{item.name}}</view><view class="tiny">{{item.meta}}</view><view class="select-hit" data-id="{{item.id}}" bindtap="toggle"></view></view></view>
-<button class="secondary-btn" style="margin-top:36rpx" bindtap="compare">对比已选的 {{selected.length}} 种</button><button class="primary-btn" style="margin-top:20rpx" bindtap="danger">发生接触或不适？进行安全判断</button></view>
+<view class="page">
+  <view class="safe-top"></view>
+
+  <view class="topbar">
+    <view class="back" bindtap="back">
+      <image class="figma-back" src="/assets/figma/all/s18-icon-back.svg"/>
+    </view>
+    <view class="top-title">
+      <view class="top-title-main">虫种图鉴</view>
+      <view class="top-title-sub">外形与环境参考，不构成确诊</view>
+    </view>
+  </view>
+
+  <view class="field">
+    <image class="figma-icon sm" src="/assets/figma/all/s18-imgEllipse6.svg"/>
+    <input class="grow" placeholder="搜索名称或关键特征" value="{{keyword}}" bindinput="onKeyword" confirm-type="search"/>
+    <text wx:if="{{keyword}}" class="muted keyword-clear" bindtap="clearKeyword">清除</text>
+    <text wx:else class="muted">{{total}} 种</text>
+  </view>
+
+  <view class="chip-row" style="margin-top:26rpx">
+    <view wx:for="{{categories}}" wx:key="*this" class="chip {{category===item?'active':''}}" data-v="{{item}}" bindtap="setCategory">{{item}}</view>
+  </view>
+
+  <view class="notice" style="margin-top:34rpx">
+    <view class="circle circle-green" style="width:64rpx;height:64rpx">
+      <image class="figma-icon md" src="/assets/figma/all/s18-imgBug2.svg"/>
+    </view>
+    <view>
+      <view>识别结果的疑似候选已标记</view>
+      <view class="tiny">候选只供对照，安全判断仍以症状为准</view>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <text>常见对象</text>
+    <text class="aside">选择 2–3 种进行对比</text>
+  </view>
+
+  <view wx:if="{{items.length}}" class="insect-grid">
+    <view wx:for="{{items}}" wx:key="id" class="card insect-card" data-id="{{item.id}}" bindtap="detail">
+      <view class="insect-image">
+        <image class="species-photo" src="{{item.photo}}" mode="aspectFill" lazy-load/>
+        <image wx:if="{{item.selected}}" class="figma-icon sm check" src="/assets/figma/all/s18-icon-check.svg"/>
+        <view class="select-hit" data-id="{{item.id}}" catchtap="toggle"></view>
+      </view>
+      <view class="h3" style="margin-top:18rpx">{{item.name}}</view>
+      <view class="tiny">{{item.meta}}</view>
+    </view>
+  </view>
+
+  <view wx:else class="card card-pad empty-state">
+    <view class="h3">没有匹配的虫种</view>
+    <view class="tiny">换一个关键词，或把分类切回"全部"</view>
+  </view>
+
+  <button class="secondary-btn {{selected.length &lt; 2 ? 'disabled-btn' : ''}}" style="margin-top:36rpx" bindtap="compare">对比已选的 {{selected.length}} 种</button>
+  <button class="primary-btn" style="margin-top:20rpx" bindtap="danger">发生接触或不适？进行安全判断</button>
+</view>
