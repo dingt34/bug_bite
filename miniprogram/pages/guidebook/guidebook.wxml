@@ -54,6 +54,6 @@
     <view class="tiny">换一个关键词，或把分类切回"全部"</view>
   </view>
 
-  <button class="secondary-btn {{selected.length &lt; 2 ? 'disabled-btn' : ''}}" style="margin-top:36rpx" bindtap="compare">对比已选的 {{selected.length}} 种</button>
+  <button class="secondary-btn {{compareDisabled ? 'disabled-btn' : ''}}" style="margin-top:36rpx" bindtap="compare">对比已选的 {{selected.length}} 种</button>
   <button class="primary-btn" style="margin-top:20rpx" bindtap="danger">发生接触或不适？进行安全判断</button>
 </view>

@@ -10,20 +10,25 @@ Page({
     category: '全部',
     keyword: '',
     selected: [],
+    compareDisabled: true,
     items: [],
     total: 0
   },
 
   onLoad() {
     const saved = species.sanitize(store.get(SELECTION_KEY, ['tick', 'mosquito']));
-    this.setData({ selected: saved, total: species.all().length });
+    this.setData({
+      selected: saved,
+      compareDisabled: saved.length < 2,
+      total: species.all().length
+    });
     this.refresh();
   },
 
   onShow() {
     // 从详情页"加入对比"回来时，已选虫种可能已经变了
     const saved = species.sanitize(store.get(SELECTION_KEY, this.data.selected));
-    this.setData({ selected: saved });
+    this.setData({ selected: saved, compareDisabled: saved.length < 2 });
     this.refresh();
   },
 
@@ -63,7 +68,10 @@ Page({
       return;
     }
     store.set(SELECTION_KEY, result.ids);
-    this.setData({ selected: result.ids }, () => this.refresh());
+    this.setData({
+      selected: result.ids,
+      compareDisabled: result.ids.length < 2
+    }, () => this.refresh());
   },
 
   detail(e) {
