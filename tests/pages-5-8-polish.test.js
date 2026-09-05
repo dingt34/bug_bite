@@ -100,7 +100,8 @@ test('result: modified answers update same event and retain creation time', () =
   assert.equal(store.get('events').length, 1);
   assert.deepEqual(store.get('events')[0].symptoms, ['水疱']);
   assert.equal(store.get('events')[0].createdAt, before.createdAt);
-  assert.equal(store.get('events')[0].nextReviewAt, null);
+  assert.ok(store.get('events')[0].nextReviewAt > Date.now());
+  assert.equal(store.get('events')[0].status, '待复查');
 });
 test('result: emergency never shows routine care, and call survives storage failure', () => {
   reset(); draft({ dangerSignals: ['breathing'] }); failKey = 'bugtrail_v4_events';
@@ -129,11 +130,11 @@ function filledPlan() {
   const p = page('precheck');
   p.inputDestination({ detail: { value: '杭州植物园' } });
   p.chooseDate({ detail: { value: '2099-10-01' } });
-  p.chooseActivity(); return p;
+  p.chooseActivity({ detail: { value: '1' } }); return p;
 }
 test('precheck: no demonstration defaults; manual destination works without location permission', () => {
   reset(); const p = page('precheck');
-  assert.equal(p.data.destination, ''); assert.equal(p.data.activity, ''); assert.deepEqual(p.data.environment, []);
+  assert.equal(p.data.destination, ''); assert.equal(p.data.activity, ''); assert.deepEqual(p.data.habitats, []);
   p.chooseDestination(); assert.ok(calls.at(-1)[1].includes('手动输入'));
   const filled = filledPlan(); filled.generate(); assert.equal(store.get('plans').length, 1);
 });
@@ -153,10 +154,10 @@ test('precheck: generate is idempotent, draft not recreated on unload', () => {
 test('precheck: environment saved, old route ignored, demo distance excluded', () => {
   reset(); store.set('routeDraft', { distance: '12.6 km' });
   const p = filledPlan(); p.onShow(); assert.equal(p.data.route, null);
-  p.toggleEnvironment(tap('草地'));
+  p.toggleHabitat(tap('高草/灌木'));
   p.route(); store.set('routeDraft', { summary: '演示', distance: '12.6 km' }); p.onShow();
   assert.equal(p.data.route.summary, '演示'); p.generate();
-  assert.equal(store.get('plans')[0].distance, ''); assert.deepEqual(store.get('plans')[0].environment, ['草地']);
+  assert.equal(store.get('plans')[0].distance, ''); assert.deepEqual(store.get('plans')[0].environment, ['高草/灌木']);
 });
 test('precheck: storage error does not claim completion; retry reuses plan ID', () => {
   reset(); const p = filledPlan(); failKey = 'bugtrail_v4_currentPlan'; p.generate();

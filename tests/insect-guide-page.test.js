@@ -24,14 +24,17 @@ const page = Object.assign({}, pageDefinition, {
 });
 
 page.onLoad({});
-assert.strictEqual(page.data.items.length, 29);
+assert.strictEqual(page.data.items.length, 45);
 
 page.setGroup({ currentTarget: { dataset: { group: 'attached' } } });
-assert.deepStrictEqual(page.data.items.map(item => item.id), ['tick', 'brown_dog_tick', 'chigger', 'head_louse', 'scabies_mite']);
+assert.deepStrictEqual(page.data.items.map(item => item.id), [
+  'tick', 'brown_dog_tick', 'chigger', 'head_louse', 'scabies_mite',
+  'hard_ticks_other', 'body_pubic_lice', 'leech'
+]);
 
 page.setData({ activeGroup: 'all' });
 page.onSearchInput({ detail: { value: '床虱' } });
-assert.deepStrictEqual(page.data.items.map(item => item.id), ['bedbug']);
+assert.deepStrictEqual(page.data.items.map(item => item.id), ['bedbug', 'tropical_bedbug']);
 
 page.toggleCompare({ currentTarget: { dataset: { id: 'bedbug' } } });
 page.toggleCompare({ currentTarget: { dataset: { id: 'tick' } } });

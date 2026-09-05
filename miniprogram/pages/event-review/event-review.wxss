@@ -7,13 +7,13 @@
 }
 .head-title {
   color: #2B2F36;
-  font-size: 32rpx;
+  font-size:var(--font-section-title);
   font-weight: 600;
 }
 .head-sub {
   margin-top: 6rpx;
   color: #8A9299;
-  font-size: 24rpx;
+  font-size:var(--font-body);
 }
 
 .danger-card {
@@ -47,12 +47,12 @@
 }
 .danger-name {
   color: #2B2F36;
-  font-size: 28rpx;
+  font-size:var(--font-card-title);
   font-weight: 600;
 }
 .danger-desc {
   color: #8A9299;
-  font-size: 23rpx;
+  font-size:var(--font-caption);
 }
 .emergency-tip,
 .validation-banner {
@@ -61,7 +61,7 @@
   border-radius: 12rpx;
   background: var(--danger-light);
   color: var(--danger);
-  font-size: 24rpx;
+  font-size:var(--font-body);
 }
 .validation-banner {
   margin: 0 0 20rpx;
@@ -74,13 +74,13 @@
 .optional {
   margin-left: 8rpx;
   color: #B7C0C7;
-  font-size: 22rpx;
+  font-size:var(--font-caption);
   font-weight: 400;
 }
 .question-help {
   margin: -4rpx 0 16rpx;
   color: #737D85;
-  font-size: 23rpx;
+  font-size:var(--font-caption);
   line-height: 1.55;
 }
 .chips {
@@ -101,7 +101,7 @@
 .upload-placeholder {
   padding: 0 20rpx;
   color: #8A9299;
-  font-size: 25rpx;
+  font-size:var(--font-body);
   text-align: center;
 }
 .preview {

@@ -2,7 +2,7 @@ const store = require('../../utils/store');
 const nav = require('../../utils/nav');
 
 function getPlanStart(plan, currentYear) {
-  const raw = String(plan.startAt || plan.date || '').trim();
+  const raw = String(plan.startAt || plan.startDate || plan.date || '').trim();
   const match = raw.match(/(?:(\d{4})[-年/])?(\d{1,2})[-月/](\d{1,2})/);
   if (!match) return NaN;
   const year = Number(match[1] || currentYear);
@@ -12,6 +12,29 @@ function getPlanStart(plan, currentYear) {
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
     ? date.getTime()
     : NaN;
+}
+
+function formatPlanDate(plan, now = new Date()) {
+  const timestamp = getPlanStart(plan, now.getFullYear());
+  if (!Number.isFinite(timestamp)) return '';
+  const date = new Date(timestamp);
+  return `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+}
+
+function formatCompactPlanDate(plan, now = new Date()) {
+  const timestamp = getPlanStart(plan, now.getFullYear());
+  if (!Number.isFinite(timestamp)) return '';
+  const date = new Date(timestamp);
+  return `${String(date.getMonth() + 1).padStart(2, '0')}月${String(date.getDate()).padStart(2, '0')}日`;
+}
+
+function normalizeHomePlan(plan, now = new Date()) {
+  const source = plan && plan.id ? plan : {};
+  return Object.assign({}, source, {
+    displayTitle: source.title || source.destinationName || source.destination || '',
+    displayDate: formatPlanDate(source, now),
+    compactDate: formatCompactPlanDate(source, now)
+  });
 }
 
 function getNearestUpcomingPlan(plans, now = new Date()) {
@@ -38,7 +61,7 @@ Page({
   data: { user: {}, plan: {}, event: {}, hasRoute: false, routeInfo: {}, riskMonth: '', riskSeason: '' },
   onShow() {
     nav.syncTab(this, 0);
-    const plan = getNearestUpcomingPlan(store.get('plans', []));
+    const plan = normalizeHomePlan(getNearestUpcomingPlan(store.get('plans', [])));
     const currentPlan = store.get('currentPlan', {});
     const routeDraft = currentPlan.id === plan.id
       ? currentPlan.route || store.get('routeDraft', null)
@@ -57,3 +80,5 @@ Page({
   plans() { wx.navigateTo({ url: '/pages/my-plans/my-plans' }); },
   event() { wx.navigateTo({ url: `/pages/event-detail/event-detail?id=${this.data.event.id || 'event_mosquito'}` }); }
 });
+
+module.exports = { getPlanStart, getNearestUpcomingPlan, formatPlanDate, formatCompactPlanDate, normalizeHomePlan };

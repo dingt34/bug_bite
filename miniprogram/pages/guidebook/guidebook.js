@@ -12,7 +12,8 @@ Page({
     selected: [],
     compareDisabled: true,
     items: [],
-    total: 0
+    total: 0,
+    filteredCount: 0
   },
 
   onLoad() {
@@ -38,11 +39,14 @@ Page({
     const items = species.filter({ category, keyword }).map(item => ({
       id: item.id,
       name: item.name,
+      latin: item.latin,
+      typeLabel: item.typeLabel,
       meta: item.meta,
+      summary: item.summary,
       photo: item.photo,
       selected: selected.indexOf(item.id) >= 0
     }));
-    this.setData({ items });
+    this.setData({ items, filteredCount: items.length });
   },
 
   back() {
@@ -59,6 +63,10 @@ Page({
 
   clearKeyword() {
     this.setData({ keyword: '' }, () => this.refresh());
+  },
+
+  resetFilters() {
+    this.setData({ category: '全部', keyword: '' }, () => this.refresh());
   },
 
   toggle(e) {

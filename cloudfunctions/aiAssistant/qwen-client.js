@@ -2,6 +2,7 @@ const https = require('https');
 
 const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 const DEFAULT_MODEL = 'qwen3.7-flash';
+const DEFAULT_TIMEOUT = 30000;
 
 function endpoint(baseUrl) {
   const base = String(baseUrl || DEFAULT_BASE_URL).trim().replace(/\/+$/, '');
@@ -44,7 +45,7 @@ function complete(options) {
         Accept: 'application/json',
         'Content-Length': Buffer.byteLength(body)
       },
-      timeout: options.timeout || 18000
+      timeout: options.timeout || DEFAULT_TIMEOUT
     }, response => {
       response.setEncoding('utf8');
       let responseBody = '';
@@ -74,4 +75,4 @@ function parseJsonObject(content) {
   try { return JSON.parse(raw.slice(start, end + 1)); } catch (_) { throw new Error('千问返回的 JSON 格式无效'); }
 }
 
-module.exports = { DEFAULT_BASE_URL, DEFAULT_MODEL, complete, parseJsonObject, parseContent, endpoint };
+module.exports = { DEFAULT_BASE_URL, DEFAULT_MODEL, DEFAULT_TIMEOUT, complete, parseJsonObject, parseContent, endpoint };

@@ -7,13 +7,13 @@
 }
 .head-title {
   color: #2B2F36;
-  font-size: 32rpx;
+  font-size:var(--font-section-title);
   font-weight: 600;
 }
 .head-sub {
   margin-top: 4rpx;
   color: #8A9299;
-  font-size: 24rpx;
+  font-size:var(--font-body);
 }
 
 .upload {
@@ -35,7 +35,7 @@
   font-size: 72rpx;
 }
 .placeholder-text {
-  font-size: 26rpx;
+  font-size:var(--font-body);
   margin-top: 12rpx;
 }
 .preview {
@@ -49,20 +49,20 @@
 .ready-tip {
   margin-top: 14rpx;
   color: #2E7D5B;
-  font-size: 23rpx;
+  font-size:var(--font-caption);
 }
 .error-card {
   border: 2rpx solid #F4D1CF;
 }
 .error-title {
   color: #C62828;
-  font-size: 28rpx;
+  font-size:var(--font-card-title);
   font-weight: 600;
 }
 .error-text {
   margin-top: 8rpx;
   color: #6B7379;
-  font-size: 24rpx;
+  font-size:var(--font-body);
 }
 .retry-btn {
   margin-top: 20rpx;
@@ -75,11 +75,11 @@
   margin-bottom: 20rpx;
 }
 .result-title {
-  font-size: 32rpx;
+  font-size:var(--font-section-title);
   font-weight: 600;
 }
 .result-provider {
-  font-size: 22rpx;
+  font-size:var(--font-caption);
   color: #B7C0C7;
 }
 
@@ -92,10 +92,10 @@
   margin-bottom: 8rpx;
 }
 .candidate-name {
-  font-size: 28rpx;
+  font-size:var(--font-card-title);
 }
 .candidate-percent {
-  font-size: 23rpx;
+  font-size:var(--font-caption);
   color: var(--primary);
   font-weight: 600;
 }
@@ -113,14 +113,14 @@
 
 .uncertain {
   margin-top: 8rpx;
-  font-size: 24rpx;
+  font-size:var(--font-body);
   color: #7A5C00;
   background: #FFF8E1;
   border-radius: 12rpx;
   padding: 16rpx 20rpx;
 }
 .uncertain-sub {
-  font-size: 22rpx;
+  font-size:var(--font-caption);
   color: #B7C0C7;
   margin-top: 8rpx;
 }
@@ -132,6 +132,6 @@
 .action-button {
   flex: 1;
   margin: 0;
-  font-size: 25rpx;
+  font-size:var(--font-body);
   line-height: 1.4;
 }

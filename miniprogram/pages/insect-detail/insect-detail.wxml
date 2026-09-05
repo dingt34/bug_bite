@@ -5,53 +5,27 @@
     <view class="back" bindtap="back">
       <image class="figma-back" src="/assets/figma/all/s18-icon-back.svg"/>
     </view>
-    <view class="top-title-main top-title">虫种详情</view>
+    <view class="top-title"><view class="top-title-main">虫种详情</view><view class="top-title-sub">{{typeLabel}} · 科学辨识参考</view></view>
     <view class="top-action" bindtap="openCompare">查看对比</view>
   </view>
 
-  <view class="species-hero">
-    <image class="species-hero-bg" src="{{photo}}" mode="aspectFill"/>
-    <view class="hero-shade"></view>
-    <view class="chip">疑似候选</view>
-    <view class="species-name">
-      <view class="h2 hero-text">{{name}}</view>
-      <view class="tiny hero-text">{{latin}} · {{typeLabel}}参考</view>
-    </view>
-    <view class="photo-credit">图片：{{photoCredit}}</view>
-  </view>
+  <view class="species-identity"><view class="identity-type">{{typeLabel}}</view><view class="h2">{{name}}</view><view class="species-latin">{{latin}}</view><view class="identity-summary">{{summary}}</view></view>
+
+  <swiper class="species-gallery" indicator-dots circular>
+    <swiper-item wx:for="{{images}}" wx:key="src"><view class="gallery-slide"><image class="gallery-image" src="{{item.src}}" mode="aspectFill"/><view class="gallery-caption"><view>{{index + 1}} / {{images.length}} · {{item.caption}}</view><view class="gallery-credit">{{item.credit}} · {{item.license}}</view></view></view></swiper-item>
+  </swiper>
+  <view wx:if="{{mediaPending}}" class="media-pending">当前条目的已授权实拍图仍在审核；以上三图为观察方法示意，不作为虫体外形证据。</view>
 
   <view class="notice" style="margin-top:28rpx;text-align:center;justify-content:center">外形和环境信息仅供对照，不构成虫种确诊</view>
 
-  <block wx:if="{{features.length}}">
-    <view class="section-title">关键特征</view>
-    <view class="stack gap-12">
-      <view wx:for="{{features}}" wx:key="n" class="feature-row">
-        <view class="circle circle-green feature-no">{{item.n}}</view>
-        <view class="feature-body">
-          <view class="feature-title">{{item.t}}</view>
-          <view class="feature-desc">{{item.d}}</view>
-        </view>
-      </view>
-    </view>
-  </block>
+  <view class="section-title">形态与辨识</view>
+  <view class="card card-pad science-card"><view class="science-label">形态特征</view><view class="prose">{{appearance}}</view><view class="science-label science-label-spaced">关键辨识点</view><view class="evidence-row" wx:for="{{identificationKeys}}" wx:key="*this"><view class="evidence-dot"></view><view>{{item}}</view></view></view>
 
-  <!-- 还没逐条整理关键特征的虫种，显示知识库里的概述，页面不留空 -->
-  <block wx:elif="{{summary}}">
-    <view class="section-title">虫种概述</view>
-    <view class="card card-pad prose">{{summary}}</view>
-  </block>
-
-  <block wx:if="{{compareClues}}">
-    <view class="section-title">对比要点</view>
-    <view class="card card-pad prose">{{compareClues}}</view>
-  </block>
-
-  <block wx:if="{{environments.length}}">
-    <view class="section-title">常见环境</view>
-    <view class="chip-row">
-      <view wx:for="{{environments}}" wx:key="name" class="chip {{item.active ? 'active' : ''}}">{{item.name}}</view>
-    </view>
-  </block>
+  <view class="section-title">分布与环境</view><view class="card card-pad science-card"><view class="science-label">分布概况</view><view class="prose">{{distribution}}</view><view class="science-label science-label-spaced">常见环境</view><view class="prose">{{habitat}}</view></view>
+  <view class="section-title">接触与常见表现</view><view class="card card-pad science-card"><view class="science-label">接触方式</view><view class="prose">{{contactPattern}}</view><view class="science-label science-label-spaced">常见表现</view><view class="prose">{{commonReaction}}</view></view>
+  <view class="section-title">发生接触后</view><view class="card card-pad science-card"><view class="action-row" wx:for="{{firstActions}}" wx:key="*this"><view class="action-index">{{index + 1}}</view><view>{{item}}</view></view></view>
+  <view class="section-title">对比线索与判断边界</view><view class="card card-pad science-card"><view class="science-label">对比线索</view><view class="prose">{{compareClues}}</view><view class="science-label science-label-spaced">判断边界</view><view class="prose">{{caution}}</view></view>
+  <view class="section-title">资料来源</view><view class="card card-pad source-card"><view wx:for="{{sources}}" wx:key="url" class="source-row"><view class="source-mark">{{index + 1}}</view><view>{{item.title}}</view></view><view wx:if="{{!sources.length}}" class="prose">候选条目的来源记录正在整理，暂不提供种级结论。</view></view>
 
   <view class="detail-actions">
     <button class="secondary-btn" bindtap="compare">{{inCompare ? '移出对比' : '加入对比'}}</button>

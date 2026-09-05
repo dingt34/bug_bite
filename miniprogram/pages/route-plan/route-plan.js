@@ -371,6 +371,8 @@ Page({
       summary: [selected.startName].concat(selected.waypointNames || [], [selected.endName]).filter(Boolean).join(' → '),
       start: selected.startName,
       end: selected.endName,
+      endPlace: selected.endPlace,
+      regions: selected.regions,
       mode: selected.mode,
       distance: selected.distanceText,
       duration: selected.durationText,

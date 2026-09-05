@@ -42,6 +42,6 @@ assert.ok(!communityTemplate.includes('setContentType'));
 assert.ok(communityTemplate.includes('wx:if="{{item.routePlan}}"'));
 assert.ok(publishTemplate.includes('添加路线（选填）'));
 assert.ok(publishTemplate.includes('chooseRoute'));
-assert.ok(precheckTemplate.includes('routeSuggestedRegions'));
+assert.ok(precheckTemplate.includes('路线规划（选填）'));
 
 console.log('route community feature tests passed');

@@ -48,13 +48,13 @@
 }
 .hero-title {
   position: relative;
-  font-size: 56rpx;
+  font-size:var(--font-display);
   font-weight: 700;
   letter-spacing: 3rpx;
 }
 .hero-sub {
   position: relative;
-  font-size: 27rpx;
+  font-size:var(--font-body);
   opacity: 0.92;
   margin-top: 12rpx;
   letter-spacing: 1rpx;
@@ -62,7 +62,7 @@
 .hero-scope {
   position: relative;
   display: inline-block;
-  font-size: 22rpx;
+  font-size:var(--font-caption);
   background: rgba(255, 255, 255, 0.20);
   padding: 8rpx 24rpx;
   border-radius: 26rpx;
@@ -77,7 +77,7 @@
   align-items: flex-start;
   background: #FFF8E1;
   color: #7A5C00;
-  font-size: 24rpx;
+  font-size:var(--font-body);
   padding: 22rpx 30rpx;
   margin: -36rpx 24rpx 0;
   border-radius: 16rpx;
@@ -86,7 +86,7 @@
 }
 .notice-icon {
   margin-right: 12rpx;
-  font-size: 28rpx;
+  font-size:var(--font-card-title);
 }
 .notice-text {
   flex: 1;
@@ -100,12 +100,12 @@
   margin: 40rpx 28rpx 20rpx;
 }
 .funcs-title {
-  font-size: 34rpx;
+  font-size:var(--font-section-title);
   font-weight: 700;
   color: #2B3330;
 }
 .funcs-sub {
-  font-size: 24rpx;
+  font-size:var(--font-body);
   color: #A0A8A5;
   margin-left: 16rpx;
 }
@@ -130,7 +130,7 @@
   height: 104rpx;
   line-height: 104rpx;
   text-align: center;
-  font-size: 58rpx;
+  font-size:var(--font-display);
   border-radius: 28rpx;
   margin-right: 24rpx;
   flex-shrink: 0;
@@ -154,12 +154,12 @@
   flex: 1;
 }
 .func-title {
-  font-size: 32rpx;
+  font-size:var(--font-section-title);
   font-weight: 600;
   color: #2B3330;
 }
 .func-desc {
-  font-size: 24rpx;
+  font-size:var(--font-body);
   color: #8A9299;
   margin-top: 8rpx;
   line-height: 1.4;
@@ -169,7 +169,7 @@
   margin-top: 14rpx;
 }
 .func-tag {
-  font-size: 20rpx;
+  font-size:var(--font-caption);
   color: #2E7D5B;
   background: #E8F3EE;
   padding: 4rpx 16rpx;
@@ -181,7 +181,7 @@
   height: 48rpx;
   line-height: 48rpx;
   text-align: center;
-  font-size: 30rpx;
+  font-size:var(--font-card-title);
   color: #2E7D5B;
   background: #EAF3EF;
   border-radius: 50%;
@@ -191,7 +191,7 @@
 
 .footer-note {
   text-align: center;
-  font-size: 22rpx;
+  font-size:var(--font-caption);
   color: #B7C0C7;
   padding: 30rpx 60rpx;
 }

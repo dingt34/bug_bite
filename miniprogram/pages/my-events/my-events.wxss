@@ -15,26 +15,26 @@
   justify-content: space-between;
 }
 .event-type {
-  font-size: 32rpx;
+  font-size:var(--font-section-title);
   font-weight: 600;
 }
 .event-level {
-  font-size: 24rpx;
+  font-size:var(--font-body);
   font-weight: 600;
 }
 .event-time {
-  font-size: 24rpx;
+  font-size:var(--font-body);
   color: #8A9299;
   margin-top: 8rpx;
 }
 .event-summary {
-  font-size: 26rpx;
+  font-size:var(--font-body);
   color: #3A414A;
   margin-top: 12rpx;
   line-height: 1.6;
 }
 .event-review {
-  font-size: 24rpx;
+  font-size:var(--font-body);
   color: #F57C00;
   margin-top: 12rpx;
 }
@@ -42,7 +42,7 @@
 .event-images {
   margin-top: 10rpx;
   color: #2E7D5B;
-  font-size: 24rpx;
+  font-size:var(--font-body);
 }
 
 .empty {
@@ -54,6 +54,6 @@
   font-size: 80rpx;
 }
 .empty-text {
-  font-size: 28rpx;
+  font-size:var(--font-card-title);
   margin-top: 20rpx;
 }

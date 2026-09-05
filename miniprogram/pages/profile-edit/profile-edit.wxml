@@ -4,7 +4,7 @@
   <view class="notice card" style="margin-top:24rpx"><view class="circle circle-green" style="width:64rpx;height:64rpx"><image style="width: 45rpx; height: 45rpx; display: block; box-sizing: border-box" class="figma-icon sm" src="/assets/figma/all/s02-imgFrame1.svg"/></view><view><view class="muted">用于复查提醒和安全记录整理</view><view class="tiny">不会参与公开社群展示</view></view></view>
   <view class="section-title basic-section-title"><text>基本资料</text><text class="aside">必填</text></view>
   <view class="field profile-main-field">
-    <button class="avatar-select" open-type="chooseAvatar" bindchooseavatar="chooseAvatar"><image wx:if="{{avatar}}" class="circle" style="width:96rpx;height:96rpx" src="{{avatar}}" mode="aspectFill" /><view wx:else class="circle circle-green" style="width:96rpx;height:96rpx;font-size:38rpx">林</view></button>
+    <button class="avatar-select" open-type="chooseAvatar" bindchooseavatar="chooseAvatar"><image wx:if="{{avatar}}" class="circle" style="width:96rpx;height:96rpx" src="{{avatar}}" mode="aspectFill" /><view wx:else class="circle circle-green avatar-fallback">林</view></button>
     <view class="grow" catchtap="focusNickname" style="margin-left:24rpx;text-align:left"><view class="tiny">微信昵称</view><input class="field-value" type="nickname" focus="{{nicknameFocus}}" value="{{nickname}}" bindinput="changeName" bindblur="blurNickname" /></view><text class="muted">更换</text>
   </view>
   <view class="tiny" style="margin:44rpx 0 14rpx">年龄范围</view><view class="field age-field" bindtap="chooseAge"><text class="field-value">{{age}}</text><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view>

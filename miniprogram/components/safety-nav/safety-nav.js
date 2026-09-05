@@ -63,7 +63,7 @@ Component({
         wx.redirectTo({ url: '/pages/post-detail/post-detail?id=' + encodeURIComponent(postId) });
         return;
       }
-      wx.switchTab({ url: '/pages/index/index' });
+      wx.switchTab({ url: '/pages/home/home' });
     },
 
     onStepTap(e) {

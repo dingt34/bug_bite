@@ -7,6 +7,13 @@ assert.ok(template.includes('wx:for="{{sections}}"'));
 assert.ok(template.includes('{{section.title}}'));
 assert.ok(template.includes('{{section.subtitle}}'));
 assert.ok(template.includes('wx:if="{{!isOffline}}" class="primary-btn"'));
+assert.ok(template.includes('class="vector-alert"'));
+assert.ok(template.includes('虫媒提示'));
+assert.ok(template.includes('不代表目的地虫媒病风险预测'));
+
+const tabBarStyles = fs.readFileSync(path.join(__dirname, '../miniprogram/custom-tab-bar/index.wxss'), 'utf8');
+assert.ok(tabBarStyles.includes('--tab-label-size:20rpx'));
+assert.ok(tabBarStyles.includes('font-size:var(--tab-label-size)!important'));
 
 let pageDefinition = null;
 const plan = {

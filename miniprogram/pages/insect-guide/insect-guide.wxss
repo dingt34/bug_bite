@@ -8,13 +8,13 @@
 }
 .head-title {
   color: var(--text-main);
-  font-size: 36rpx;
+  font-size:var(--font-section-title);
   font-weight: 700;
 }
 .head-sub {
   margin-top: 6rpx;
   color: var(--text-sub);
-  font-size: 23rpx;
+  font-size:var(--font-caption);
   line-height: 1.5;
 }
 .guide-notice {
@@ -32,7 +32,7 @@
   border: 2rpx solid var(--primary);
   border-radius: 50%;
   color: var(--primary);
-  font-size: 19rpx;
+  font-size:var(--font-caption);
   font-weight: 700;
   line-height: 32rpx;
   text-align: center;
@@ -40,7 +40,7 @@
 .notice-copy {
   flex: 1;
   color: #5D6C65;
-  font-size: 22rpx;
+  font-size:var(--font-caption);
   line-height: 1.5;
 }
 .search-box {
@@ -56,16 +56,16 @@
 .search-icon {
   margin-right: 12rpx;
   color: #89938E;
-  font-size: 32rpx;
+  font-size:var(--font-section-title);
 }
 .search-input {
   flex: 1;
-  font-size: 25rpx;
+  font-size:var(--font-body);
 }
 .search-clear {
   padding: 12rpx 0 12rpx 18rpx;
   color: var(--primary);
-  font-size: 22rpx;
+  font-size:var(--font-caption);
 }
 .group-scroll {
   width: 100%;
@@ -83,7 +83,7 @@
   border-radius: 28rpx;
   background: #FFFFFF;
   color: #68756F;
-  font-size: 23rpx;
+  font-size:var(--font-caption);
 }
 .group-on {
   border-color: var(--primary);
@@ -94,7 +94,7 @@
 .result-meta {
   margin: 16rpx 4rpx;
   color: #929C97;
-  font-size: 21rpx;
+  font-size:var(--font-caption);
 }
 .insect-card {
   position: relative;
@@ -134,7 +134,7 @@
   border-radius: 14rpx;
   background: rgba(20, 34, 27, 0.72);
   color: #FFFFFF;
-  font-size: 17rpx;
+  font-size:var(--font-micro);
 }
 .insect-content {
   flex: 1;
@@ -146,7 +146,7 @@
 }
 .insect-name {
   color: #2A3630;
-  font-size: 31rpx;
+  font-size:var(--font-card-title);
   font-weight: 700;
 }
 .insect-group {
@@ -155,30 +155,30 @@
   border-radius: 16rpx;
   background: var(--primary-light);
   color: var(--primary);
-  font-size: 18rpx;
+  font-size:var(--font-micro);
 }
 .insect-alias {
   margin-top: 6rpx;
   color: #9AA39F;
-  font-size: 19rpx;
+  font-size:var(--font-caption);
 }
 .scientific-name {
   margin-top: 2rpx;
   color: #66746D;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 20rpx;
+  font-size:var(--font-caption);
   font-style: italic;
 }
 .insect-summary {
   margin-top: 10rpx;
   color: #5E6B65;
-  font-size: 23rpx;
+  font-size:var(--font-caption);
   line-height: 1.5;
 }
 .compare-clue {
   margin-top: 10rpx;
   color: #7D8A84;
-  font-size: 20rpx;
+  font-size:var(--font-caption);
   line-height: 1.45;
 }
 .select-button {
@@ -191,11 +191,11 @@
   border-radius: 18rpx;
   background: #F5F8F6;
   color: #718078;
-  font-size: 17rpx;
+  font-size:var(--font-micro);
   text-align: center;
 }
 .select-check {
-  font-size: 28rpx;
+  font-size:var(--font-card-title);
   font-weight: 700;
   line-height: 30rpx;
 }
@@ -215,13 +215,13 @@
 .empty-title {
   margin-top: 16rpx;
   color: #52605A;
-  font-size: 27rpx;
+  font-size:var(--font-body);
   font-weight: 600;
 }
 .empty-sub {
   margin-top: 8rpx;
   color: #98A19D;
-  font-size: 22rpx;
+  font-size:var(--font-caption);
 }
 .compare-bar {
   position: fixed;
@@ -243,18 +243,18 @@
 }
 .compare-count {
   color: #34423B;
-  font-size: 24rpx;
+  font-size:var(--font-body);
   font-weight: 600;
 }
 .compare-help {
   margin-top: 2rpx;
   color: #89958F;
-  font-size: 18rpx;
+  font-size:var(--font-micro);
 }
 .clear-link {
   padding: 18rpx 20rpx;
   color: #7D8883;
-  font-size: 21rpx;
+  font-size:var(--font-caption);
 }
 .compare-button {
   width: 180rpx;
@@ -262,7 +262,7 @@
   border-radius: 34rpx;
   background: var(--primary);
   color: #FFFFFF;
-  font-size: 24rpx;
+  font-size:var(--font-body);
   line-height: 68rpx;
 }
 .compare-button::after {

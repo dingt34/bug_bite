@@ -61,7 +61,7 @@
   width: 25%;
   text-align: center;
   color: #8A9299;
-  font-size: 20rpx;
+  font-size:var(--font-caption);
   line-height: 1.35;
 }
 .safety-step::after {
@@ -86,7 +86,7 @@
   border-radius: 50%;
   background: #FFFFFF;
   color: #8A9299;
-  font-size: 20rpx;
+  font-size:var(--font-caption);
   line-height: 34rpx;
 }
 .step-done {

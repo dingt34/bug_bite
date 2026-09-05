@@ -23,6 +23,24 @@ Page({
       if (dangerSignals.length) {
         wx.redirectTo({ url: '/pages/result/result' }); return;
       }
+      const hasDraft = Boolean(draft.contactType || (draft.symptoms || []).length || Object.keys(draft.facts || {}).length);
+      if (hasDraft && !draft.completedAt) {
+        const resume = () => {
+          if (draft.contactType) this.setData({ selected: flow.normalizeType(draft.contactType) });
+          if (draft.contactType) {
+            this.setData({ submitting: true });
+            wx.redirectTo({ url: '/pages/guide/guide?type=' + flow.normalizeType(draft.contactType), fail: () => this.setData({ submitting: false }) });
+          }
+        };
+        const restart = () => { draft = { ...flow.newDraft(), screened: true, dangerSignals: [], step: 2 }; flow.persist(draft); this.setData({ selected: '' }); };
+        if (wx.showModal) wx.showModal({ title: '继续填写草稿？', content: '检测到尚未完成的填写内容。', confirmText: '继续填写', cancelText: '重新开始', success: result => result.confirm ? resume() : restart() });
+        else resume();
+      }
+    }
+    // 已完成的记录从本页重新开始时，开启新事件，避免沿用旧事件编号和结果。
+    if (draft.completedAt) {
+      draft = { ...flow.newDraft(), screened: true, contactType: '', step: 2 };
+      if (!flow.persist(draft)) return;
     }
     if (!draft.screened || (draft.dangerSignals || []).length) {
       wx.redirectTo({ url: '/pages/danger/danger' });

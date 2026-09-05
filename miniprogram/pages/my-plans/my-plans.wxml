@@ -24,7 +24,7 @@
         <view class="plan-meta">{{item.displayDate}} · {{item.displayActivity}}</view>
         <view class="between plan-footer">
           <view class="progress-label">{{item.progressText}}</view>
-          <view class="open-link">查看清单 &gt;</view>
+          <view class="open-link">查看清单 ></view>
         </view>
       </view>
     </view>
@@ -40,7 +40,7 @@
       <view class="draft-label">本机草稿</view>
       <view class="h2 plan-title">{{draft.displayTitle}}</view>
       <view class="plan-meta">{{draft.displayDate}} · {{draft.displayActivity}}</view>
-      <view class="open-link draft-link">继续填写 &gt;</view>
+      <view class="open-link draft-link">继续填写 ></view>
     </view>
     <view wx:else class="card empty-card">
       <view class="empty-title">没有未完成的草稿</view>
@@ -56,6 +56,6 @@
       <view class="offline-title">{{offlineCard.displayTitle}}</view>
       <view class="tiny">{{offlineCard.cachedText}}</view>
     </view>
-    <view class="open-link">打开 &gt;</view>
+    <view class="open-link">打开 ></view>
   </view>
 </view>

@@ -13,6 +13,12 @@ global.wx = {
 };
 
 const helpers = require('../miniprogram/pages/my-plans/my-plans.js');
+const markup = require('fs').readFileSync(require('path').join(__dirname, '../miniprogram/pages/my-plans/my-plans.wxml'), 'utf8');
+assert.ok(markup.includes('查看清单 >'));
+assert.ok(markup.includes('继续填写 >'));
+assert.ok(markup.includes('打开 >'));
+assert.strictEqual(markup.includes('›'), false);
+assert.strictEqual(markup.includes('&gt;'), false);
 
 assert.strictEqual(helpers.countdown('2099-08-18', '2099-08-13'), '还有 5 天');
 assert.strictEqual(helpers.countdown('2099-08-13', '2099-08-13'), '今天出发');

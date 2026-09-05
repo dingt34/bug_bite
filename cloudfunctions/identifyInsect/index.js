@@ -62,7 +62,7 @@ async function identify(event) {
     messages: buildVisionMessages(imageBase64, description),
     temperature: 0,
     maxTokens: 500,
-    timeout: 18000
+    timeout: 30000
   });
   const analysis = normalizeAnalysis(content, description);
   const facts = knowledge.extractSafetyFacts(description);

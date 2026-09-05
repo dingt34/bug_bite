@@ -26,7 +26,7 @@ Component({
         wx.navigateBack({ delta: 1 });
         return;
       }
-      wx.switchTab({ url: '/pages/index/index' });
+      wx.switchTab({ url: '/pages/home/home' });
     }
   }
 });

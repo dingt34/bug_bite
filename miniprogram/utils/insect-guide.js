@@ -1,3 +1,5 @@
+const CANDIDATE_ITEMS = require('./insect-guide-candidates');
+
 const GROUPS = [
   { key: 'all', name: '全部' },
   { key: 'blood_feeding', name: '吸血叮咬' },
@@ -55,7 +57,7 @@ function commonsFile(fileName) {
   return 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(fileName).replace(/%20/g, '_');
 }
 
-const ITEMS = [
+const CORE_ITEMS = [
   {
     id: 'mosquito', name: '白纹伊蚊', scientificName: 'Aedes albopictus', commonCategory: '蚊类',
     aliases: ['亚洲虎蚊', '花蚊子', '伊蚊'], group: 'blood_feeding', groupName: '吸血叮咬', accent: '#3F8F70',
@@ -621,6 +623,8 @@ const ITEMS = [
   }
 ];
 
+const ITEMS = CORE_ITEMS.concat(CANDIDATE_ITEMS);
+
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
 function normalizeText(value) { return String(value || '').trim().toLowerCase(); }
 function sourceList(sourceKeys) { return (sourceKeys || []).map(key => SOURCES[key]).filter(Boolean); }
@@ -629,7 +633,7 @@ function toSummary(item) {
   return { id: item.id, name: item.name, scientificName: item.scientificName, commonCategory: item.commonCategory,
     aliases: item.aliases.slice(), group: item.group, groupName: item.groupName, accent: item.accent,
     zhejiangStatus: item.zhejiangStatus || '', summary: item.summary, compareClues: item.compareClues,
-    coverImage: item.images[0].src, imageCount: item.images.length };
+    coverImage: item.images[0].src, imageCount: item.images.length, mediaStatus: item.mediaStatus || 'LICENSED' };
 }
 
 function list(options) {
@@ -647,8 +651,8 @@ function getById(id) {
   const item = ITEMS.find(entry => entry.id === id);
   if (!item) return null;
   const result = clone(item);
-  result.sources = sourceList(item.sourceKeys);
-  result.sources.unshift({ title: 'Wikimedia Commons · ' + item.scientificName + ' 图片与分类', url: item.taxonUrl });
+  result.sources = item.sources ? clone(item.sources) : sourceList(item.sourceKeys);
+  if (item.taxonUrl) result.sources.unshift({ title: 'Wikimedia Commons · ' + item.scientificName + ' 图片与分类', url: item.taxonUrl });
   result.urgentSignals = COMMON_URGENT.slice();
   result.confusedItems = item.confusedWith.map(confusedId => {
     const confused = ITEMS.find(entry => entry.id === confusedId);

@@ -4,6 +4,7 @@ const path = require('path');
 
 let pageDefinition = null;
 let savedRoute = null;
+let savedRouteDraft = null;
 let toastTitle = '';
 
 global.Page = definition => { pageDefinition = definition; };
@@ -11,6 +12,7 @@ global.wx = {
   getStorageSync() { return null; },
   setStorageSync(key, value) {
     if (key === 'selectedRoutePlan') savedRoute = value;
+    if (key === 'bugtrail_v4_routeDraft') savedRouteDraft = value;
   },
   showToast(options) { toastTitle = options.title; },
   chooseLocation(options) {
@@ -53,6 +55,8 @@ assert.strictEqual(savedRoute.waypointName, '黄龙体育中心');
 assert.strictEqual(savedRoute.routeName, '推荐路线');
 assert.strictEqual(savedRoute.modeName, '步行');
 assert.deepStrictEqual(savedRoute.environmentTags, ['林地/落叶层']);
+assert.deepStrictEqual(savedRouteDraft.regions, []);
+assert.strictEqual(savedRouteDraft.end, '西湖景区');
 assert.strictEqual(toastTitle, '路线已保存');
 
 page.choosePlace({ currentTarget: { dataset: { key: 'startName' } } });

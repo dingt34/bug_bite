@@ -1,81 +1,55 @@
 const assert = require('assert');
 
-let pageDefinition = null;
-let nextImage = '';
-let navigatedUrl = '';
-const savedPaths = [];
-const app = {
-  globalData: {
-    draftEvent: {
-      id: 'event_guide_images_001',
-      contactType: 'bite',
-      contactTypeName: '叮咬'
-    }
+let definition;
+const storage = {
+  bugtrail_v4_safetyDraft: {
+    sessionId: 'session_photo',
+    screened: true,
+    dangerSignals: [],
+    contactType: 'bite',
+    symptoms: ['红肿'],
+    systemicSymptoms: ['无明显全身不适'],
+    range: '1 处',
+    trend: '基本不变',
+    facts: { occurredAt: '今天', biteFeel: '不确定' }
   }
 };
 
-global.Page = definition => { pageDefinition = definition; };
-global.getApp = () => app;
+global.Page = page => { definition = page; };
+global.getApp = () => ({ globalData: {} });
 global.wx = {
-  chooseImage(options) { options.success({ tempFilePaths: [nextImage] }); },
-  saveFile(options) {
-    savedPaths.push(options.tempFilePath);
-    options.success({ savedFilePath: 'wxfile://usr/' + options.tempFilePath.split('/').pop() });
+  getStorageSync(key) { return storage[key]; },
+  setStorageSync(key, value) { storage[key] = value; },
+  chooseMedia(options) {
+    options.success({ tempFiles: [{ tempFilePath: '/tmp/evidence.jpg' }] });
   },
-  navigateTo(options) { navigatedUrl = options.url; },
-  showModal() {}
+  saveFile(options) {
+    options.success({ savedFilePath: 'wxfile://usr/evidence.jpg' });
+    if (options.complete) options.complete();
+  },
+  showToast() {},
+  redirectTo() {},
+  navigateTo() {}
 };
 
 require('../miniprogram/pages/guide/guide.js');
-
-const page = Object.assign({}, pageDefinition, {
-  data: Object.assign({}, pageDefinition.data, {
-    contactType: 'bite',
-    answers: {
-      systemicSymptoms: ['无明显'],
-      localSymptoms: ['红肿'],
-      trend: '保持不变'
-    },
-    persistedImages: { insect: false, wound: false }
-  }),
-  setData(update) {
+const page = Object.assign({}, definition, {
+  data: Object.assign({}, definition.data),
+  setData(update, callback) {
     this.data = Object.assign({}, this.data, update);
+    if (callback) callback();
   }
 });
 
-assert.strictEqual(page.data.actionOptions.includes('服药'), false);
-assert.strictEqual(page.data.actionOptions.includes('挤压伤口'), false);
-page.data.actionOptions = page.buildActionOptions('bite');
-assert.strictEqual(page.data.actionOptions.includes('尚未处理'), true);
-
-nextImage = '/tmp/insect.jpg';
-page.chooseImage({ currentTarget: { dataset: { type: 'insect' } } });
-nextImage = '/tmp/wound.jpg';
-page.chooseImage({ currentTarget: { dataset: { type: 'wound' } } });
-assert.strictEqual(page.data.insectImage, '/tmp/insect.jpg');
-assert.strictEqual(page.data.woundImage, '/tmp/wound.jpg');
-
-page.onActionTap({ currentTarget: { dataset: { v: '尚未处理' } } });
-assert.deepStrictEqual(page.data.actionsTaken, ['尚未处理']);
-page.onActionTap({ currentTarget: { dataset: { v: '已隔布冷敷' } } });
-assert.deepStrictEqual(page.data.actionsTaken, ['已隔布冷敷']);
-
-let persisted = false;
-page.persistImage(() => { persisted = true; });
-assert.strictEqual(persisted, true);
-assert.deepStrictEqual(savedPaths, ['/tmp/insect.jpg', '/tmp/wound.jpg']);
-assert.strictEqual(page.data.insectImage, 'wxfile://usr/insect.jpg');
-assert.strictEqual(page.data.woundImage, 'wxfile://usr/wound.jpg');
-
-page.finishSubmit();
-assert.deepStrictEqual(app.globalData.draftEvent.imageRefs, [
-  'wxfile://usr/insect.jpg',
-  'wxfile://usr/wound.jpg'
-]);
-assert.deepStrictEqual(
-  app.globalData.draftEvent.imageRecords.map(item => item.category),
-  ['insect', 'wound']
-);
-assert.ok(navigatedUrl.startsWith('/pages/result/result?level='));
+page.onLoad({ type: 'bite' });
+page.addPhoto();
+assert.strictEqual(page.data.photo, 'wxfile://usr/evidence.jpg');
+assert.strictEqual(storage.bugtrail_v4_safetyDraft.photo, 'wxfile://usr/evidence.jpg');
+assert.strictEqual(page.data.extraQuestions
+  .find(item => item.key === 'actionsTaken')
+  .options.some(item => item.value === '尚未处理'), true);
+assert.strictEqual(page.data.extraQuestions
+  .find(item => item.key === 'actionsTaken')
+  .options.some(item => /挤压/.test(item.value)), false);
 
 console.log('guide image page tests passed');

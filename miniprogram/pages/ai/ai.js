@@ -215,7 +215,7 @@ Page({
     cloud.call('aiAssistant', {
       messages: requestMessages,
       selectedRecordIds: attachedIds
-    }, { timeout: 22000 }).then(result => {
+    }, { timeout: 35000 }).then(result => {
       const scrollToken = this.data.scrollToken + 1;
       this.setData({ messages: before.concat(createMessage('ai', result.answer, '', attachedIds)), scrollToken, scrollIntoView: `chat-bottom-${scrollToken}` });
     }).catch(() => {

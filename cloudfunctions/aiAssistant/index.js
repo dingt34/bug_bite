@@ -47,7 +47,7 @@ async function answer(event) {
     messages: [{ role: 'system', content: buildSystemPrompt(entries) }].concat(messages),
     temperature: 0.2,
     maxTokens: 1400,
-    timeout: 20000
+    timeout: 30000
   });
   return {
     answer: content,

@@ -25,7 +25,7 @@ function evaluateRisk(contactType, answers) {
   }
 
   const systemic = answers.systemicSymptoms || [];
-  const meaningfulSystemic = systemic.filter(item => item !== '无明显');
+  const meaningfulSystemic = systemic.filter(item => item !== '无明显' && item !== '无明显全身不适');
   if (meaningfulSystemic.length) {
     match('systemic_symptoms', '出现全身不适：' + meaningfulSystemic.join('、'));
   }

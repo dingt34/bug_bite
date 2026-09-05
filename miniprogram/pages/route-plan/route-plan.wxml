@@ -2,7 +2,7 @@
   <view class="safe-top"></view>
   <view class="map-stage">
     <map id="routeMap" class="route-map" latitude="{{mapLatitude}}" longitude="{{mapLongitude}}" scale="{{mapScale}}" polyline="{{polylines}}">
-      <cover-view class="map-back" bindtap="back">‹</cover-view>
+      <cover-view class="map-back" bindtap="back">返回</cover-view>
       <cover-view class="map-pick" catchtap="choosePlace" data-key="endName">◎</cover-view>
     </map>
   </view>

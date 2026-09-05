@@ -12,7 +12,18 @@ Page({
     typeLabel: '',
     photo: '',
     photoCredit: '',
+    images: [],
+    mediaPending: false,
     features: [],
+    identificationKeys: [],
+    appearance: '',
+    distribution: '',
+    habitat: '',
+    contactPattern: '',
+    commonReaction: '',
+    firstActions: [],
+    caution: '',
+    sources: [],
     environments: [],
     summary: '',
     compareClues: '',
@@ -20,8 +31,13 @@ Page({
     inCompare: false
   },
 
-  onLoad(query) {
+  onLoad(query = {}) {
     const item = species.getById(query.id);
+    if (!item) {
+      wx.showToast({ title: '未找到该图鉴条目', icon: 'none' });
+      nav.back('/pages/home/home');
+      return;
+    }
     const selected = species.sanitize(store.get(SELECTION_KEY, []));
     this.setData({
       id: item.id,
@@ -30,16 +46,29 @@ Page({
       typeLabel: item.typeLabel,
       photo: item.photo,
       photoCredit: item.photoCredit,
+      images: item.images,
+      mediaPending: item.mediaStatus === 'PENDING_LICENSE',
       // 已整理过的虫种显示关键特征和环境标签；
       // 其余用知识库里的概述与对比要点，不留空页
       features: item.features || [],
+      identificationKeys: item.identificationKeys || [],
+      appearance: item.appearance,
+      distribution: item.distribution,
+      habitat: item.habitat,
+      contactPattern: item.contactPattern,
+      commonReaction: item.commonReaction,
+      firstActions: item.firstActions || [],
+      caution: item.caution,
+      sources: item.sources || [],
       environments: item.environments || [],
       summary: item.summary,
       compareClues: item.compareClues,
       detailNote: item.detailNote,
       inCompare: selected.indexOf(item.id) >= 0
     });
-    wx.setNavigationBarTitle({ title: item.name });
+    if (typeof wx.setNavigationBarTitle === 'function') {
+      wx.setNavigationBarTitle({ title: item.name });
+    }
   },
 
   back() {

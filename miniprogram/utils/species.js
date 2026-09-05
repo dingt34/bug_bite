@@ -131,7 +131,8 @@ const DETAILS = {
 };
 
 function build() {
-  return guide.list().map(item => {
+  return guide.list().map(summary => {
+    const item = guide.getById(summary.id);
     const extra = DETAILS[item.id] || {};
     return {
       id: item.id,
@@ -141,10 +142,22 @@ function build() {
       typeLabel: item.groupName,
       meta: extra.meta || `${item.commonCategory} · ${item.groupName}`,
       aliases: item.aliases || [],
-      photo: item.coverImage,
+      photo: item.images[0].src,
       photoCredit: extra.photoCredit || DEFAULT_CREDIT,
+      images: item.images || [],
+      imageCount: (item.images || []).length,
+      mediaStatus: item.mediaStatus || 'LICENSED',
       summary: item.summary || '',
       compareClues: item.compareClues || '',
+      appearance: item.appearance || '',
+      identificationKeys: item.identificationKeys || [],
+      distribution: item.distribution || '',
+      habitat: item.habitat || '',
+      contactPattern: item.contactPattern || '',
+      commonReaction: item.commonReaction || '',
+      firstActions: item.firstActions || [],
+      caution: item.caution || '',
+      sources: item.sources || [],
       features: extra.features || null,
       environments: extra.environments || null,
       compare: extra.compare || null,
@@ -160,7 +173,7 @@ function all() {
 }
 
 function getById(id) {
-  return SPECIES.find(item => item.id === id) || SPECIES[0];
+  return SPECIES.find(item => item.id === id) || null;
 }
 
 // 图鉴页的筛选：分类 + 关键词（名称 / 学名 / 别名 / 分类 / 概述）

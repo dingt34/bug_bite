@@ -4,11 +4,12 @@ const risk = require('./risk');
 const typeNames = { bite: '叮咬', sting: '蜇伤', attached: '附着虫体', contact: '接触刺激', unknown: '不确定接触' };
 const levelNames = { emergency: '紧急求助', consult: '尽快咨询', observe: '观察记录' };
 const branches = {
-  bite: [{ key: 'bodyPart', title: '主要接触部位', options: ['手臂 / 腿部', '躯干', '眼周', '口唇/口腔', '其他 / 不确定'] }],
-  sting: [{ key: 'distribution', title: '蜇伤分布', options: ['单一部位', '分散在多个部位', '不确定'] }],
+  // 身体部位由通用问题统一填写，避免在每种接触分支中重复询问。
+  bite: [],
+  // 蜇伤范围已由通用的“影响范围”统一填写，避免同一事实重复选择。
+  sting: [],
   attached: [
     { key: 'attachedTime', title: '发现附着至今约多久？', options: ['刚发现', '24小时内', '超过24小时', '不确定'] },
-    { key: 'bodyPart', title: '附着部位', options: ['手臂 / 腿部', '躯干', '头颈部', '眼周', '口唇/口腔', '其他 / 不确定'] },
     { key: 'removed', title: '虫体目前的状态', options: ['仍未移除', '已完整移除', '疑似有残留', '不确定'] }
   ],
   contact: [{ key: 'exposure', title: '怎样发生接触？', options: ['直接碰触', '毛刺 / 液体接触', '不确定'] }],
@@ -25,7 +26,7 @@ function evaluate(draft) {
   const type = normalizeType(draft.contactType);
   const facts = draft.facts || {};
   return risk.evaluateRisk(type === 'attached' ? 'attachment' : type, {
-    ...facts, bodyParts: facts.bodyPart ? [facts.bodyPart] : [],
+    ...facts, bodyParts: facts.bodyParts || (facts.bodyPart ? [facts.bodyPart] : []),
     localSymptoms: (draft.symptoms || []).map(s => s === '出血' ? '出血/皮肤破损' : s),
     systemicSymptoms: draft.systemicSymptoms || [], trend: draft.trend,
     distribution: type === 'sting' && draft.range === '多处 / 成片' ? '分散在多个部位' : facts.distribution

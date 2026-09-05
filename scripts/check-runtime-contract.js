@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '..');
 const mini = path.join(root, 'miniprogram');
 const app = JSON.parse(fs.readFileSync(path.join(mini, 'app.json'), 'utf8'));
 const errors = [];
-const allowed = new Set(['view','text','image','button','input','textarea','scroll-view','rich-text','camera','picker','swiper','swiper-item','switch','checkbox','radio','form','label','navigator','block']);
+const allowed = new Set(['view','text','image','button','input','textarea','scroll-view','rich-text','camera','picker','swiper','swiper-item','switch','checkbox','radio','form','label','navigator','block','map','cover-view','cover-image']);
 const voidTags = new Set(['image','input','switch','checkbox','radio']);
 
 if ('lazyCodeLoading' in app) errors.push('app.json 不应启用 lazyCodeLoading，避免旧基础库 wx://not-found。');

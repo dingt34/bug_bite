@@ -55,7 +55,7 @@ locked.onStepTap({ currentTarget: { dataset: { step: 2 } } });
 assert.strictEqual(toastTitle, '紧急结果不可返回修改');
 
 component.goHome();
-assert.strictEqual(switchedUrl, '/pages/index/index');
+assert.strictEqual(switchedUrl, '/pages/home/home');
 assert.strictEqual(app.globalData.draftEvent, null);
 
 app.globalData.draftEvent = { id: 'draft_from_post' };

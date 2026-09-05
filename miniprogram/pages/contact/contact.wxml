@@ -1,7 +1,12 @@
-<view class="page">
+<view class="page contact-page">
   <view class="safe-top"></view><view class="topbar"><view class="back" bindtap="back"><image class="figma-back" src="/assets/figma/all/s05-imgFrame.svg"/></view><view class="top-title"><view class="top-title-main">接触类型</view><view class="top-title-sub">第 2 步，共 4 步</view></view><view class="top-action" bindtap="save">保存草稿</view></view><view class="progress"><view class="progress-fill" style="width:50%"></view></view>
   <view class="notice" style="margin-top:36rpx;background:#e3eee5;color:#71907f"><image class="figma-icon sm" src="/assets/figma/all/s05-imgEllipse2.svg"/>未发现危险信号，可以继续描述</view>
-  <view class="h2" style="margin-top:56rpx">你遇到的是哪种接触？</view><view style="margin:8rpx 0 30rpx">选择最接近的一项，稍后仍可修改</view>
-  <view class="contact-grid"><view wx:for="{{items}}" wx:key="id" class="card contact-card {{selected === item.id ? 'selected-card' : ''}} {{item.id === 'unknown' ? 'wide' : ''}}" data-id="{{item.id}}" bindtap="select"><view class="between"><view class="circle {{index % 2 ? 'circle-amber' : 'circle-green'}}" style="width:72rpx;height:72rpx"><image class="icon-svg" src="{{item.icon}}" mode="aspectFit"/></view><image wx:if="{{selected === item.id}}" class="figma-icon sm" src="/assets/figma/all/s05-imgEllipse3.svg" mode="aspectFit"/></view><view class="h3" style="margin-top:22rpx">{{item.title}}</view><view class="tiny">{{item.desc}}</view></view></view>
-  <view class="spacer"></view><view class="bottom-actions"><button class="primary-btn" disabled="{{!selected}}" bindtap="next">继续：描述症状</button><view class="safe-note" style="margin-top:22rpx">退出时可保留当前草稿</view></view>
+  <view class="h2 contact-question">你遇到的是哪种接触？</view><view class="contact-help">选择最接近的一项，稍后仍可修改</view>
+  <view class="contact-grid">
+    <view wx:for="{{items}}" wx:key="id" class="card contact-card {{selected === item.id ? 'selected-card' : ''}} {{item.id === 'unknown' ? 'wide unknown-card' : ''}}" data-id="{{item.id}}" bindtap="select">
+      <block wx:if="{{item.id === 'unknown'}}"><view class="unknown-card-main"><view class="circle circle-green unknown-icon"><image class="icon-svg" src="{{item.icon}}" mode="aspectFit"/></view><view class="unknown-copy"><view class="h3">{{item.title}}</view><view class="tiny">{{item.desc}}</view></view></view><image wx:if="{{selected === item.id}}" class="figma-icon sm unknown-selected" src="/assets/figma/all/s05-imgEllipse3.svg" mode="aspectFit"/></block>
+      <block wx:else><view class="between"><view class="circle {{index % 2 ? 'circle-amber' : 'circle-green'}} contact-icon"><image class="icon-svg" src="{{item.icon}}" mode="aspectFit"/></view><image wx:if="{{selected === item.id}}" class="figma-icon sm" src="/assets/figma/all/s05-imgEllipse3.svg" mode="aspectFit"/></view><view class="h3 card-title">{{item.title}}</view><view class="tiny">{{item.desc}}</view></block>
+    </view>
+  </view>
+  <view class="contact-footer"><button class="primary-btn" hover-class="none" disabled="{{!selected}}" bindtap="next">继续：描述症状</button><view class="safe-note">退出时可保留当前草稿</view></view>
 </view>

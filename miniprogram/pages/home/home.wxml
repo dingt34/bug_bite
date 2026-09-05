@@ -10,7 +10,7 @@
   </view>
   <view class="section-title">你的今日状态</view>
   <view class="status-grid">
-    <view class="card status-card" bindtap="plans"><view class="status-left"><view class="status-icon status-icon-green"><image class="figma-icon sm" src="/assets/figma/all/s03-img12.svg"/></view><view class="tiny status-date">{{plan.date}}</view></view><view class="status-copy"><view class="tiny">最近行程</view><view class="h3">{{plan.title || '暂无行程'}}</view></view></view>
+    <view class="card status-card" bindtap="plans"><view class="status-left"><view class="status-icon status-icon-green"><image class="figma-icon sm" src="/assets/figma/all/s03-img12.svg"/></view><view wx:if="{{plan.id && plan.compactDate}}" class="tiny status-date">{{plan.compactDate}}</view></view><view class="status-copy"><view class="tiny">最近行程</view><view class="h3">{{plan.displayTitle || '暂无行程'}}</view></view></view>
     <view class="card status-card" bindtap="event"><view class="status-left"><view class="status-icon status-icon-amber"><image class="figma-icon sm" src="/assets/figma/all/s03-img1.svg"/></view><view class="tiny status-date">{{event.reviewAt}}</view></view><view class="status-copy"><view class="tiny">待复查</view><view class="h3">{{event.type || '暂无事件'}}</view></view></view>
   </view>
   <view class="section-title"><text>行前准备</text><text class="aside" bindtap="plans">查看全部</text></view>

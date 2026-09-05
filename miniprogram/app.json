@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/home/home",
     "pages/login/login",
     "pages/profile-edit/profile-edit",
-    "pages/home/home",
     "pages/danger/danger",
     "pages/contact/contact",
     "pages/guide/guide",
@@ -11,6 +11,7 @@
     "pages/route-plan/route-plan",
     "pages/precheck-result/precheck-result",
     "pages/my-plans/my-plans",
+    "pages/my-events/my-events",
     "pages/profile/profile",
     "pages/events/events",
     "pages/event-detail/event-detail",

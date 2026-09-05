@@ -1,6 +1,6 @@
 <view class="page with-tab ai-page">
   <view class="safe-top"></view>
-  <view class="ai-top"><view><view class="top-title-main">AI 助手</view><view class="ai-sub"><text class="status-dot"></text>安全建议 · 不替代安全判断</view></view><view class="ai-mode">文字咨询</view></view>
+  <view class="ai-top topbar-plain"><view class="topbar-copy"><view class="top-title-main">AI 助手</view><view class="ai-sub"><text class="status-dot"></text>安全建议 · 不替代安全判断</view></view><view class="ai-mode">文字咨询</view></view>
   <view class="danger-entry" bindtap="danger"><view class="danger-alert-icon"><image class="danger-alert-bg" src="/assets/figma/all/s16-imgEllipse1.svg"/><text class="danger-alert-mark">!</text></view><view class="grow"><view class="danger-title">症状正在加重，或已被咬、蜇？</view><view class="tiny danger-text">先判断危险信号，再决定下一步</view></view><view class="safety-link">安全判断</view></view>
   <view class="prompt-head"><view class="prompt-title">可以这样问</view><view class="prompt-hint">点选即可填入</view></view>
   <scroll-view class="suggestions" scroll-x show-scrollbar="{{false}}"><view class="suggestions-row"><view wx:for="{{suggestions}}" wx:key="*this" class="suggestion {{index===1?'highlight':''}}" data-text="{{item}}" bindtap="chooseSuggestion">{{item}}</view></view></scroll-view>

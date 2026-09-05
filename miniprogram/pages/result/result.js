@@ -9,7 +9,7 @@ const copy = {
   observe: { title: '观察记录', sub: '本次填写未触发咨询或紧急规则', color: '#2F7D5B', action: '记录当前表现，持续留意是否加重或出现新症状。' }
 };
 Page({
-  data: { level: 'observe', info: copy.observe, eventId: '', rules: [], steps: [], saved: false, reviewLabel: '', primaryActionLabel: '', allowStepBack: true },
+  data: { level: 'observe', info: copy.observe, eventId: '', rules: [], steps: [], saved: false, reviewLabel: '', primaryActionLabel: '', allowStepBack: true, summaryOpen: false, recordOpen: false, summaryLines: [], recordLines: [] },
   onLoad(query = {}) {
     let draft = store.get('safetyDraft', {}) || {};
     // URL 只能提升到紧急级别，不能降低依据当前事实算出的级别。
@@ -28,7 +28,22 @@ Page({
       { title: '记录变化', detail: '记下发生时间、部位、范围与变化；照片选填，不用于确诊。' },
       { title: result.level === 'consult' ? '整理就医信息' : '持续留意新表现', detail: result.level === 'consult' ? '可复制下方摘要，向专业人员说明事实。' : '出现加重或新的不适时，及时重新判断，不必等到复查时间。' }
     ];
-    this.setData({ level: result.level, info: copy[result.level], rules: result.matchedRules, steps,
+    const facts = draft.facts || {};
+    const summaryLines = [
+      '发生时间：' + (facts.occurredAt || '未填写'),
+      '接触类型：' + flow.typeNames[flow.normalizeType(draft.contactType)],
+      '受影响部位：' + (((facts.bodyParts || []).join('、')) || facts.bodyPart || '未填写'),
+      '主要表现：' + ((draft.symptoms || []).join('、') || '未填写'),
+      '额外关注：' + ((draft.systemicSymptoms || []).join('、') || '未填写'),
+      '影响范围：' + (draft.range || '未填写'),
+      '症状变化：' + (draft.trend || '未填写')
+    ];
+    const branchQuestions = flow.questions(draft.contactType, facts);
+    const recordLines = branchQuestions.map(q => q.title + '：' + (facts[q.key] || '未填写'));
+    if (facts.environment && !branchQuestions.some(question => question.key === 'environment')) recordLines.push('发生环境：' + facts.environment);
+    if (facts.exposure) recordLines.push('接触方式：' + facts.exposure);
+    if (draft.photo) recordLines.push('已添加本机照片');
+    this.setData({ level: result.level, info: copy[result.level], rules: result.matchedRules, steps, summaryLines, recordLines,
       allowStepBack: result.level !== 'emergency',
       primaryActionLabel: result.level === 'emergency' ? '立即拨打 120' : result.level === 'consult' ? '复制就医沟通摘要' : '查看本次事件记录' });
     this.saveEvent();
@@ -48,7 +63,7 @@ Page({
       const event = { ...previous, id: previous.id || store.id('event'), sessionId: draft.sessionId,
         type: flow.typeNames[flow.normalizeType(draft.contactType)], contactType: draft.contactType || 'unknown',
         level: flow.levelNames[this.data.level], riskLevel: this.data.level, place: previous.place || (draft.facts || {}).environment || '待补充',
-        body: (draft.facts || {}).bodyPart || previous.body || '待补充', symptoms: draft.symptoms || [],
+        body: ((draft.facts || {}).bodyParts || []).join('、') || (draft.facts || {}).bodyPart || previous.body || '待补充', bodyParts: (draft.facts || {}).bodyParts || [], symptoms: draft.symptoms || [], systemicSymptoms: draft.systemicSymptoms || [],
         range: draft.range || '', trend: draft.trend || '待观察', facts: draft.facts || {}, photo: draft.photo || '',
         dangerSignals: draft.dangerSignals || [], matchedRules: draft.matchedRules, ruleVersion: draft.ruleVersion,
         createdAt: previous.createdAt || flow.stamp(now), createdAtMs: previous.createdAtMs || now,
@@ -70,13 +85,17 @@ Page({
   call() { wx.makePhoneCall({ phoneNumber: '120' }); },
   copySummary() {
     const draft = this.draft || {}, facts = draft.facts || {};
-    const details = flow.questions(draft.contactType, facts).map(q => q.title + '：' + (facts[q.key] || '未填写'));
-    const summary = [ '接触类型：' + flow.typeNames[flow.normalizeType(draft.contactType)],
-      '当前表现：' + ((draft.symptoms || []).join('、') || '未填写'),
-      '影响范围：' + (draft.range || '未填写'), '变化趋势：' + (draft.trend || '未填写'), ...details,
+    const branchQuestions = flow.questions(draft.contactType, facts);
+    const details = [facts.bodyParts && facts.bodyParts.length ? '当前受影响部位：' + facts.bodyParts.join('、') : facts.bodyPart && '主要接触部位：' + facts.bodyPart, ...branchQuestions.map(q => q.title + '：' + (facts[q.key] || '未填写'))].filter(Boolean);
+    const extraFacts = [!branchQuestions.some(question => question.key === 'environment') && facts.environment && '发生环境：' + facts.environment, facts.insectSeen && '是否看清虫体：' + facts.insectSeen, facts.actionsTaken && '已做过的处理：' + facts.actionsTaken].filter(Boolean);
+    const summary = [ '发生时间：' + (facts.occurredAt || '不确定'), '接触类型：' + flow.typeNames[flow.normalizeType(draft.contactType)],
+      '当前表现：' + ((draft.symptoms || []).join('、') || '未填写'), '额外关注：' + ((draft.systemicSymptoms || []).join('、') || '未填写'),
+      '影响范围：' + (draft.range || '未填写'), '变化趋势：' + (draft.trend || '未填写'), ...details, ...extraFacts,
       '安全分流：' + flow.levelNames[this.data.level], '仅为事实记录与安全分流，不构成诊断。' ].join('\n');
     wx.setClipboardData({ data: summary });
   },
+  toggleSummary() { this.setData({ summaryOpen: !this.data.summaryOpen }); },
+  toggleRecord() { this.setData({ recordOpen: !this.data.recordOpen }); },
   primaryAction() {
     if (this.data.level === 'emergency') return this.call();
     if (this.data.level === 'consult') return this.copySummary();

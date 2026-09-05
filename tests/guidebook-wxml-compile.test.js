@@ -16,5 +16,12 @@ assert.ok(
   wxml.includes("{{compareDisabled ? 'disabled-btn' : ''}}"),
   '对比按钮应使用页面状态控制禁用样式'
 );
+assert.ok(wxml.includes('item.latin'), '图鉴卡片应展示学名');
+assert.ok(wxml.includes('item.summary'), '图鉴卡片应补充辨识概述');
+assert.ok(wxml.includes('resetFilters'), '空结果页应支持一键清除筛选');
+
+const pageStyle = fs.readFileSync(path.join(pageRoot, 'guidebook.wxss'), 'utf8');
+assert.strictEqual(pageStyle.includes('min-height:150rpx'), false, '图鉴页顶部应使用全局统一安全区');
+assert.ok(pageStyle.includes('.insect-card{display:flex'), '图鉴卡片应使用横向信息布局');
 
 console.log('guidebook WXML compile regression test passed');

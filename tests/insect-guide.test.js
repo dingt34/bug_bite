@@ -3,22 +3,22 @@ const fs = require('fs');
 const path = require('path');
 const guide = require('../miniprogram/utils/insect-guide.js');
 
-assert.strictEqual(guide.list().length, 29);
-assert.deepStrictEqual(
-  guide.list({ group: 'attached' }).map(item => item.id),
-  ['tick', 'brown_dog_tick', 'chigger', 'head_louse', 'scabies_mite']
-);
-assert.deepStrictEqual(
-  guide.list({ query: '床虱' }).map(item => item.id),
-  ['bedbug']
-);
+assert.strictEqual(guide.list().length, 45);
+assert.deepStrictEqual(guide.list({ group: 'attached' }).map(item => item.id), [
+  'tick', 'brown_dog_tick', 'chigger', 'head_louse', 'scabies_mite',
+  'hard_ticks_other', 'body_pubic_lice', 'leech'
+]);
+assert.deepStrictEqual(guide.list({ query: '床虱' }).map(item => item.id), ['bedbug', 'tropical_bedbug']);
 assert.ok(guide.list({ query: '宠物' }).some(item => item.id === 'flea'));
 assert.deepStrictEqual(guide.list({ query: 'Aedes albopictus' }).map(item => item.id), ['mosquito']);
 assert.deepStrictEqual(guide.list({ query: '杭州常见林业害虫' }).map(item => item.id), ['pine_caterpillar']);
 assert.deepStrictEqual(guide.list({ query: '三斑家蚊' }).map(item => item.id), ['culex_tritaeniorhynchus']);
-assert.ok(guide.list().every(item => item.imageCount === 3 && item.coverImage.endsWith('.webp')));
+assert.ok(guide.list().every(item => item.imageCount === 3 && /\.(webp|svg)$/.test(item.coverImage)));
 guide.list().forEach(summary => {
   const item = guide.getById(summary.id);
+  assert.ok(item.appearance && item.identificationKeys.length >= 3);
+  assert.ok(item.distribution && item.habitat && item.contactPattern && item.commonReaction);
+  assert.ok(item.firstActions.length >= 3 && item.caution);
   item.images.forEach(image => {
     const absolutePath = path.join(__dirname, '../miniprogram', image.src.replace(/^\//, ''));
     assert.ok(fs.existsSync(absolutePath), 'missing image: ' + image.src);

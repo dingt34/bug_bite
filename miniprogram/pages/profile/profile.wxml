@@ -1,5 +1,139 @@
-<view class="page with-tab"><view class="safe-top"></view><view class="between" style="height:96rpx"><view class="top-title-main">我的</view></view>
-<view class="card card-pad row"><image wx:if="{{user.avatar}}" class="avatar" src="{{user.avatar}}" mode="aspectFill"/><view wx:else class="circle circle-green avatar">林</view><view class="grow" style="margin-left:26rpx"><view class="h2">{{user.nickname}}</view><view class="tiny">{{user.region}}</view><view class="mini-btn" bindtap="edit">编辑个人档案</view></view><view class="profile-ring">80%</view></view>
-<view class="section-title">待处理</view><view class="status-grid"><view class="card card-pad" bindtap="events"><view class="tiny">待复查</view><view class="h3">{{event.id?event.type:'暂无待复查'}}</view><view class="tiny">{{event.id?event.reviewAt:'全部记录 '+eventCount+' 条'}}</view></view><view class="card card-pad" bindtap="plans"><view class="tiny">近期行程</view><view class="h3">丽水徒步</view><view class="tiny">还有 5 天</view></view></view>
-<view class="section-title">记录与计划</view><view class="stack gap-8"><view class="field" bindtap="events"><view class="circle circle-green small-icon"><image class="figma-icon sm" src="/assets/figma/all/s12-img2.svg"/></view><view class="grow" style="margin-left:22rpx"><view>我的事件</view><view class="tiny">{{eventCount?eventCount+' 条记录 · '+pendingEventCount+' 条待复查':'暂无记录'}}</view></view><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view><view class="field" bindtap="plans"><view class="circle circle-green small-icon"><image class="figma-icon sm" src="/assets/figma/all/s12-img12.svg"/></view><view class="grow" style="margin-left:22rpx"><view>我的行程</view><view class="tiny">3 个计划 · 2 份离线卡</view></view><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view><view class="field"><view class="circle circle-green small-icon"><image class="figma-icon sm" src="/assets/figma/all/s12-img3.svg"/></view><view class="grow" style="margin-left:22rpx"><view>提醒设置</view><view class="tiny">订阅消息与复查提醒</view></view><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view></view>
-<view class="section-title">AI 助手</view><view class="field" bindtap="aiNotes"><view class="circle circle-green small-icon"><text>AI</text></view><view class="grow" style="margin-left:22rpx"><view>AI 笔记</view><view class="tiny">{{aiNoteCount ? aiNoteCount + ' 条已保存回复' : '保存有用的 AI 回复'}}</view></view><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view><view class="section-title">账户与数据</view><view class="field" bindtap="privacy"><view class="circle" style="width:64rpx;height:64rpx;background:#ecefea"><image class="figma-icon sm" src="/assets/figma/all/s12-img1.svg"/></view><view class="grow" style="margin-left:22rpx"><view>隐私与数据</view><view class="tiny">本机、云端、社群与 AI 数据</view></view><image class="figma-icon sm" src="/assets/figma/all/s02-imgFrame2.svg"/></view></view>
+<view class="page with-tab profile-page">
+  <view class="safe-top"></view>
+  <view class="profile-topbar topbar-plain">
+    <view class="topbar-copy">
+      <view class="profile-title">我的</view>
+      <view class="profile-kicker">个人记录与数据中心</view>
+    </view>
+    <view class="mode-pill">{{cloudUser ? '云端模式' : '本机模式'}}</view>
+  </view>
+
+  <view class="profile-hero" bindtap="goLogin">
+    <view class="hero-glow glow-one"></view>
+    <view class="hero-glow glow-two"></view>
+    <view class="hero-main">
+      <view class="avatar">
+        <image wx:if="{{avatarUrl && !avatarLoadFailed}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
+        <text wx:else>{{avatarText}}</text>
+      </view>
+      <view class="user-info">
+        <view class="user-name">{{displayName}}</view>
+        <view class="user-sub">{{loginTip}}</view>
+      </view>
+      <view class="hero-action" wx:if="{{!loggedIn}}">登录</view>
+      <view class="identity-badge" wx:else>{{cloudUser ? '已连接' : '仅本机'}}</view>
+    </view>
+
+    <view class="hero-login-hint" wx:if="{{!loggedIn}}">登录后可统计你的发布、评论和收藏</view>
+
+    <view class="identity-row" wx:if="{{loggedIn}}">
+      <view class="identity-state"><text class="state-dot"></text>{{cloudUser ? '云端身份已连接' : '个人资料已保存在本机'}}</view>
+      <view class="identity-action" wx:if="{{cloudUser}}" catchtap="logout">退出身份</view>
+    </view>
+
+    <view class="hero-sync" wx:if="{{cloudUser}}">
+      <view class="sync-copy">
+        <view class="sync-title">微信云同步</view>
+        <view class="sync-sub">{{syncMessage || '计划与事件可跨设备恢复，社群内容独立保存在云端'}}</view>
+      </view>
+      <button class="sync-button" disabled="{{syncing}}" catchtap="syncCloud">{{syncing ? '同步中' : '立即同步'}}</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">数据概览</view>
+      <view class="section-caption">你的累计记录</view>
+    </view>
+    <view class="overview-card">
+      <view class="overview-head">
+        <view>
+          <view class="overview-title">安全记录</view>
+          <view class="overview-sub">行程准备与接触事件</view>
+        </view>
+        <view class="overview-total">{{summary.plans + summary.events}} 项</view>
+      </view>
+      <view class="overview-grid safety-grid">
+        <view class="overview-item" bindtap="goPlans">
+          <view class="overview-icon icon-green"><image src="/assets/figma/all/s12-img12.svg" mode="aspectFit" /></view>
+          <view><view class="overview-num">{{summary.plans}}</view><view class="overview-label">行程计划</view></view>
+        </view>
+        <view class="overview-item" bindtap="goEvents">
+          <view class="overview-icon icon-amber"><image src="/assets/figma/all/s12-img3.svg" mode="aspectFit" /></view>
+          <view><view class="overview-num">{{summary.events}}</view><view class="overview-label">接触事件</view></view>
+        </view>
+      </view>
+
+      <view class="overview-divider"></view>
+
+      <view class="overview-head community-head">
+        <view>
+          <view class="overview-title">社群参与</view>
+          <view class="overview-sub">分享、讨论与收藏记录</view>
+        </view>
+        <view class="overview-total">{{summary.posts + summary.comments + summary.collections}} 次</view>
+      </view>
+      <view class="overview-grid community-grid">
+        <view class="community-item" bindtap="goCommunity"><view class="overview-num">{{summary.posts}}</view><view class="overview-label">我的发布</view></view>
+        <view class="community-item" bindtap="goComments"><view class="overview-num">{{summary.comments}}</view><view class="overview-label">我的评论</view></view>
+        <view class="community-item" bindtap="goCollections"><view class="overview-num">{{summary.collections}}</view><view class="overview-label">我的收藏</view></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head">
+      <view class="section-title">近期记录</view>
+      <view class="section-caption">继续上次进度</view>
+    </view>
+
+    <view class="record-label">最近计划</view>
+    <view class="plan-card" wx:if="{{latestPlan}}" bindtap="goPlans">
+      <view class="record-icon icon-green"><image src="/assets/figma/all/s12-img12.svg" mode="aspectFit" /></view>
+      <view class="plan-content">
+        <view class="plan-name">{{latestPlan.destinationName || latestPlan.name || '未命名行程'}}</view>
+        <view class="plan-meta">{{latestPlan.month || latestPlan.startAt || latestPlan.date || '日期待补充'}}<text wx:if="{{latestPlan.activityType}}"> · {{latestPlan.activityType}}</text></view>
+        <view class="plan-tags" wx:if="{{latestPlan.riskTags && latestPlan.riskTags.length}}"><text class="tag" wx:for="{{latestPlan.riskTags}}" wx:key="*this">{{item}}</text></view>
+      </view>
+      <image class="record-arrow" src="/assets/figma/all/s02-imgFrame2.svg" mode="aspectFit" />
+    </view>
+    <view class="empty-tip" wx:else bindtap="goPlans">
+      <view class="empty-title">还没有行程计划</view>
+      <view class="empty-action">去准备一次安全出行</view>
+    </view>
+
+    <view class="record-label event-label">最近事件</view>
+    <view class="plan-card event-card" wx:if="{{latestEvent}}" bindtap="goEvents">
+      <view class="record-icon icon-amber"><image src="/assets/figma/all/s12-img2.svg" mode="aspectFit" /></view>
+      <view class="plan-content">
+        <view class="plan-name">{{latestEvent.contactTypeName}}</view>
+        <view class="plan-meta">{{latestEvent.occurredAt}}</view>
+        <view class="plan-tags"><text class="event-status risk-{{latestEvent.riskLevel}}">{{latestEvent.levelName}}</text></view>
+      </view>
+      <image class="record-arrow" src="/assets/figma/all/s02-imgFrame2.svg" mode="aspectFit" />
+    </view>
+    <view class="empty-tip" wx:else bindtap="goEvents">
+      <view class="empty-title">还没有接触事件</view>
+      <view class="empty-action">记录后可在这里快速复查</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-head"><view class="section-title">管理与设置</view></view>
+    <view class="menu-card">
+      <view class="menu-item" bindtap="goAiNotes">
+        <view class="menu-icon icon-green"><text>AI</text></view>
+        <view class="menu-content"><view class="menu-title">AI 笔记</view><view class="menu-sub">{{aiNoteCount ? aiNoteCount + ' 条已保存回复' : '保存有用的 AI 回复'}}</view></view>
+        <image class="menu-arrow" src="/assets/figma/all/s02-imgFrame2.svg" mode="aspectFit" />
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goPrivacy">
+        <view class="menu-icon icon-neutral"><image src="/assets/figma/all/s12-img1.svg" mode="aspectFit" /></view>
+        <view class="menu-content"><view class="menu-title">隐私与数据管理</view><view class="menu-sub">查看本机、云端、社群和 AI 数据</view></view>
+        <image class="menu-arrow" src="/assets/figma/all/s02-imgFrame2.svg" mode="aspectFit" />
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-note">虫咬识途 · {{cloudConfigured ? '云服务已配置' : '本地安全模式'}}</view>
+</view>
