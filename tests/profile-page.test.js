@@ -42,22 +42,22 @@ assert.strictEqual(wxssBraceDepth, 0, 'profile.wxss 花括号必须成对');
 let pageDefinition = null;
 const storage = {
   userInfo: { id: 'u1', displayName: '山野观察员', avatarText: '山' },
-  plans: [{ id: 'p1' }],
-  latestPlan: { id: 'p1', destinationName: '丽水', month: '8月' },
-  events: [
+  bugtrail_v4_plans: [{ id: 'p1', destinationName: '丽水', month: '8月' }],
+  bugtrail_v4_currentPlan: { id: 'p1', destinationName: '丽水', month: '8月' },
+  bugtrail_v4_events: [
     { id: 'e2', contactTypeName: '蜇伤', occurredAt: '今天', riskLevel: 'consult' },
     { id: 'e1', contactTypeName: '叮咬', occurredAt: '昨天', riskLevel: 'observe' }
   ],
-  posts: [{ id: 'post1' }],
-  postReactions: { post1: { collected: true } },
-  postComments: {
+  bugtrail_v4_posts: [{ id: 'post1' }],
+  bugtrail_v4_postReactions: { post1: { collected: true } },
+  bugtrail_v4_postComments: {
     post1: [
       { id: 'c1', authorId: 'u1', displayName: '山野观察员' },
       { id: 'c2', authorId: 'u2', displayName: '其他用户' }
     ]
   }
 };
-const app = { globalData: { userInfo: {}, latestPlan: storage.latestPlan } };
+const app = { globalData: { userInfo: {}, latestPlan: storage.bugtrail_v4_currentPlan } };
 
 global.Page = definition => { pageDefinition = definition; };
 global.getApp = () => app;
@@ -89,6 +89,11 @@ assert.strictEqual(page.data.summary.plans, 1);
 assert.strictEqual(page.data.summary.posts, 1);
 assert.strictEqual(page.data.summary.comments, 1);
 
+storage.bugtrail_v4_events.unshift({ id: 'e3', contactTypeName: '新接触', occurredAt: '刚刚', riskLevel: 'observe', createdAtTimestamp: Date.now() });
+page.onShow();
+assert.strictEqual(page.data.summary.events, 3, '重新进入“我的”页时应读取最新事件数量');
+assert.strictEqual(page.data.latestEvent.id, 'e3');
+
 page.goCommunity();
 assert.strictEqual(app.globalData.communityFilter, 'mine');
 assert.strictEqual(app.lastTabUrl, '/pages/community/community');
@@ -103,8 +108,8 @@ assert.strictEqual(app.lastTabUrl, '/pages/community/community');
 
 page.logout();
 assert.strictEqual(storage.userInfo, undefined);
-assert.strictEqual(storage.plans.length, 1);
-assert.strictEqual(storage.posts.length, 1);
+assert.strictEqual(storage.bugtrail_v4_plans.length, 1);
+assert.strictEqual(storage.bugtrail_v4_posts.length, 1);
 assert.strictEqual(page.data.loggedIn, false);
 
 console.log('profile page tests passed');

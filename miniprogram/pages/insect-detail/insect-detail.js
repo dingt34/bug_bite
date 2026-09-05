@@ -14,6 +14,7 @@ Page({
     photoCredit: '',
     images: [],
     mediaPending: false,
+    mediaNote: '',
     features: [],
     identificationKeys: [],
     appearance: '',
@@ -47,7 +48,8 @@ Page({
       photo: item.photo,
       photoCredit: item.photoCredit,
       images: item.images,
-      mediaPending: item.mediaStatus === 'PENDING_LICENSE',
+      mediaPending: Boolean(item.mediaNote),
+      mediaNote: item.mediaNote || '',
       // 已整理过的虫种显示关键特征和环境标签；
       // 其余用知识库里的概述与对比要点，不留空页
       features: item.features || [],

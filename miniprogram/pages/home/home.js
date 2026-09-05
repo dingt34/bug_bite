@@ -76,7 +76,11 @@ Page({
     });
   },
   danger() { wx.navigateTo({ url: '/pages/danger/danger?source=home' }); },
-  precheck() { wx.navigateTo({ url: '/pages/precheck/precheck' }); },
+  createPlan() { wx.navigateTo({ url: '/pages/precheck/precheck' }); },
+  improvePlan() {
+    const planId = this.data.plan && this.data.plan.id;
+    wx.navigateTo({ url: planId ? `/pages/precheck/precheck?planId=${encodeURIComponent(planId)}` : '/pages/precheck/precheck' });
+  },
   plans() { wx.navigateTo({ url: '/pages/my-plans/my-plans' }); },
   event() { wx.navigateTo({ url: `/pages/event-detail/event-detail?id=${this.data.event.id || 'event_mosquito'}` }); }
 });

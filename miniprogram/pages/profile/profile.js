@@ -58,13 +58,20 @@ Page({
     const avatarResolveToken = (this.avatarResolveToken || 0) + 1;
     this.avatarResolveToken = avatarResolveToken;
     const app = getApp();
-    const plans = wx.getStorageSync('plans') || [];
-    const latestPlan = wx.getStorageSync('latestPlan') || app.globalData.latestPlan || plans[0] || null;
-    const events = (wx.getStorageSync('events') || [])
+    const plans = store.get('plans', []) || [];
+    const latestPlan = store.get('currentPlan', null) || plans[0] || app.globalData.latestPlan || null;
+    const events = (store.get('events', []) || [])
       .map(decorateEvent)
       .sort((a, b) => (b.createdAtTimestamp || 0) - (a.createdAtTimestamp || 0));
+    const snapshot = privacy.readSnapshot(wx);
+    snapshot.plans = plans;
+    snapshot.events = store.get('events', []) || [];
+    snapshot.posts = store.get('posts', snapshot.posts || []);
+    snapshot.postReactions = store.get('postReactions', snapshot.postReactions || {});
+    snapshot.postComments = store.get('postComments', snapshot.postComments || {});
+    snapshot.offlineCard = store.get('offlineCard', snapshot.offlineCard || null);
     const summary = privacy.buildDataSummary(
-      privacy.readSnapshot(wx),
+      snapshot,
       communityCloud.readCachedStats(wx)
     );
     const isCloudUser = !!userInfo && userInfo.mode === 'wechat_cloud';
@@ -85,7 +92,7 @@ Page({
       latestPlan,
       latestEvent: events[0] || null,
       events: events.slice(0, 3),
-      aiNoteCount: (wx.getStorageSync('aiNotes') || []).length
+      aiNoteCount: (store.get('aiNotes', []) || []).length
     });
 
     if (storedAvatarUrl) {

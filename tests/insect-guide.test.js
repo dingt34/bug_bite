@@ -14,6 +14,20 @@ assert.deepStrictEqual(guide.list({ query: 'Aedes albopictus' }).map(item => ite
 assert.deepStrictEqual(guide.list({ query: '杭州常见林业害虫' }).map(item => item.id), ['pine_caterpillar']);
 assert.deepStrictEqual(guide.list({ query: '三斑家蚊' }).map(item => item.id), ['culex_tritaeniorhynchus']);
 assert.ok(guide.list().every(item => item.imageCount === 3 && /\.(webp|svg)$/.test(item.coverImage)));
+const addedIds = [
+  'hard_ticks_other', 'human_flea', 'body_pubic_lice', 'horse_deer_flies', 'tabanus', 'paper_wasp',
+  'common_ants', 'spider', 'pine_caterpillars_other', 'tussock_moth_larvae', 'cucumber_leaf_beetles',
+  'blister_beetles', 'tropical_bedbug', 'triatomine', 'tsetse_fly', 'leech'
+];
+addedIds.forEach(id => {
+  const item = guide.getById(id);
+  assert.ok(item.images[0].src.includes('/candidates/'), id + ' 应有独立封面图');
+  assert.ok(item.images[0].src.endsWith('.webp'));
+  assert.ok(item.mediaNote);
+  assert.ok(item.images.every(image => image.src.endsWith('.webp')), id + ' 的三张图都应为真实 WebP 图像');
+  assert.ok(item.images.every(image => image.sourceUrl), id + ' 的三张图都应保留真实来源');
+  assert.strictEqual(item.images.some(image => image.src.includes('/pending/')), false, id + ' 不得继续使用示意占位图');
+});
 guide.list().forEach(summary => {
   const item = guide.getById(summary.id);
   assert.ok(item.appearance && item.identificationKeys.length >= 3);

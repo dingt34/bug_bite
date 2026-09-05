@@ -17,13 +17,15 @@
   <view class="attention-grid"><view wx:for="{{systemicOptions}}" wx:key="label" class="attention-choice {{item.selected?'active':''}}" data-value="{{item.label}}" bindtap="toggleSystemic">{{item.label}}</view></view>
   <view class="section-title"><text>对日常活动的影响</text><text class="aside">单选</text></view>
   <view class="choice-grid impact-grid"><view wx:for="{{dailyImpactOptions}}" wx:key="label" class="choice {{item.selected?'active':''}}" data-value="{{item.label}}" bindtap="setDailyImpact">{{item.label}}</view></view>
-  <view class="supplement-head {{supplementOpen?'open':''}}" bindtap="toggleSupplement"><view class="grow"><view class="h3">补充观察线索与处理记录</view><view class="tiny">接触详情、环境、措施和照片均为选填</view></view><view class="supplement-status">{{supplementDone}}/{{supplementTotal}} 项已完成<image class="supplement-arrow {{supplementOpen?'open':''}}" src="/assets/figma/all/s08-imgFrame2.svg" mode="aspectFit"/></view></view>
-  <view wx:if="{{supplementOpen}}" class="card card-pad branch-card supplement-card">
-    <view class="h3">{{typeName}} 的接触情况</view><view class="tiny">只描述事实；不清楚时可选“不确定”</view>
-    <view wx:for="{{questions}}" wx:for-item="question" wx:key="key" class="branch-question">
-      <view class="question-label">{{question.title}}</view>
-      <view class="chip-row"><view wx:for="{{question.options}}" wx:for-item="option" wx:key="value" class="chip {{option.selected?'active':''}}" data-key="{{question.key}}" data-value="{{option.value}}" bindtap="answer">{{option.value}}</view></view>
+  <view wx:if="{{questions.length}}" class="required-contact-section">
+    <view class="section-title"><text>{{typeName}}的接触情况</text><text class="aside required-aside">必填</text></view>
+    <view wx:for="{{questions}}" wx:for-item="question" wx:key="key" class="required-question-card">
+      <view class="required-question-title">{{question.title}}</view>
+      <view class="choice-grid required-choice-grid"><view wx:for="{{question.options}}" wx:for-item="option" wx:key="value" class="choice {{option.selected?'active':''}}" data-key="{{question.key}}" data-value="{{option.value}}" bindtap="answer">{{option.value}}</view></view>
     </view>
+  </view>
+  <view class="supplement-head {{supplementOpen?'open':''}}" bindtap="toggleSupplement"><view class="grow"><view class="h3">补充观察线索与处理记录</view><view class="tiny">环境、虫体观察、处理措施和照片均为选填</view></view><view class="supplement-status">{{supplementDone}}/{{supplementTotal}} 项已完成<image class="supplement-arrow {{supplementOpen?'open':''}}" src="/assets/figma/all/s08-imgFrame2.svg" mode="aspectFit"/></view></view>
+  <view wx:if="{{supplementOpen}}" class="card card-pad branch-card supplement-card">
     <view wx:for="{{extraQuestions}}" wx:for-item="question" wx:key="key" class="branch-question">
       <view class="question-label">{{question.title}}<text class="optional-label">选填</text></view>
       <view class="chip-row"><view wx:for="{{question.options}}" wx:for-item="option" wx:key="value" class="chip {{option.selected?'active':''}}" data-key="{{question.key}}" data-value="{{option.value}}" bindtap="answerExtra">{{option.value}}</view></view>

@@ -38,6 +38,12 @@ assert.strictEqual(activityPage.data.activityIndex, 6);
 activityPage.toggleHabitat({ currentTarget: { dataset: { value: '城市公园' } } });
 assert.strictEqual(activityPage.data.optionalDone, 1);
 
+activityPage.toggleCompanion({ currentTarget: { dataset: { value: '独自出行' } } });
+activityPage.toggleCompanion({ currentTarget: { dataset: { value: '儿童' } } });
+assert.deepStrictEqual(activityPage.data.companions, ['儿童'], '选择同行对象后应自动取消“独自出行”');
+activityPage.toggleCompanion({ currentTarget: { dataset: { value: '独自出行' } } });
+assert.deepStrictEqual(activityPage.data.companions, ['独自出行'], '选择“独自出行”后应清除其他同行对象');
+
 const page = createPage({
   destination: '浙江省丽水市古堰画乡',
   dateValue: '2099-08-18',

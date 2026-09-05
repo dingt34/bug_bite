@@ -147,6 +147,7 @@ function build() {
       images: item.images || [],
       imageCount: (item.images || []).length,
       mediaStatus: item.mediaStatus || 'LICENSED',
+      mediaNote: item.mediaNote || '',
       summary: item.summary || '',
       compareClues: item.compareClues || '',
       appearance: item.appearance || '',

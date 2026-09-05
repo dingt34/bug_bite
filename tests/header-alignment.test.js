@@ -26,6 +26,9 @@ assert.ok(read('miniprogram/pages/ai/ai.wxss').includes('right:calc(100% + 10rpx
 assert.ok(!read('miniprogram/pages/precheck/precheck.wxss').includes('min-height:104rpx'));
 assert.ok(read('miniprogram/pages/precheck/precheck.wxml').includes('<picker mode="selector"'));
 assert.ok(read('miniprogram/pages/precheck-result/precheck-result.wxml').includes('<view class="safe-top"></view>'));
+assert.ok(read('miniprogram/pages/guide/guide.wxss').includes('.guide-page .progress { margin-top:30rpx; }'));
+assert.ok(read('miniprogram/pages/contact/contact.wxss').includes('.contact-page .progress { margin-top:30rpx; }'));
+assert.ok(read('miniprogram/pages/result/result.wxss').includes('.result-page .safe-top { min-height:16rpx; }'));
 
 const routeStyle = read('miniprogram/pages/route-plan/route-plan.wxss');
 assert.ok(routeStyle.includes('.map-back { font-size:var(--font-caption); line-height:1; font-weight:600; }'));

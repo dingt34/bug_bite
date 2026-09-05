@@ -6,6 +6,11 @@ const read = relative => fs.readFileSync(path.join(__dirname, '..', relative), '
 const guide = read('miniprogram/pages/guide/guide.wxml');
 const precheck = read('miniprogram/pages/precheck/precheck.wxml');
 const globalStyle = read('miniprogram/app.wxss');
+const guideRequiredStart = guide.indexOf('class="required-contact-section"');
+const guideSupplementStart = guide.indexOf('class="supplement-head');
+
+assert.ok(guideRequiredStart >= 0 && guideRequiredStart < guideSupplementStart, '接触分支必填项必须位于选填卡片之前');
+assert.ok(guide.includes('class="aside required-aside">必填</text>'), '接触分支问题必须明确标记为必填');
 
 ['supplement-head', 'supplement-status', 'supplement-arrow', 'supplement-card', 'branch-question', 'question-label'].forEach(className => {
   assert.ok(guide.includes(className), `描述症状页缺少共享结构：${className}`);

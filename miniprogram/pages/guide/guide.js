@@ -141,6 +141,14 @@ Page({
   },
   removePhoto() { this.change({ photo: '' }); },
   save() { this.persist(true); },
+  missingRequired(draft) {
+    if (!(draft.symptoms || []).length) return '请选择主要表现';
+    if (!draft.range) return '请选择影响范围';
+    if (!draft.trend) return '请选择症状变化';
+    const facts = draft.facts || {};
+    const missingQuestion = flow.questions(draft.contactType, facts).find(question => !facts[question.key]);
+    return missingQuestion ? `请完成：${missingQuestion.title}` : '';
+  },
   emergency() {
     this.persist(false);
     const draft = store.get('safetyDraft', {});
@@ -152,7 +160,7 @@ Page({
     if (this.data.submitting || !this.persist(false)) return;
     const draft = store.get('safetyDraft', {});
     if (!flow.complete(draft)) {
-      wx.showToast({ title: '请补全发生时间、表现、范围、变化和接触情况', icon: 'none' }); return;
+      wx.showToast({ title: this.missingRequired(draft) || '请补全必填信息', icon: 'none' }); return;
     }
     const result = flow.evaluate(draft);
     if (!flow.persist({ ...draft, ...result, step: 4 })) return;

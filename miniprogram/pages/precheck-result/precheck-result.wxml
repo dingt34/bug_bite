@@ -19,6 +19,6 @@
     </view>
   </view>
   <view class="card route-summary" wx:if="{{plan.route}}"><view class="route-title">已关联路线</view><view class="route-copy">{{plan.route.summary}} · {{plan.route.distance}} · {{plan.route.duration}}</view></view>
-  <view class="result-actions"><button wx:if="{{!isOffline}}" class="primary-btn" bindtap="save">保存行程进度</button><button class="secondary-btn" bindtap="saveOffline">{{offlineSaved?'更新离线安全卡':'保存离线安全卡'}}</button><button wx:if="{{!isOffline}}" class="text-action" bindtap="plans">查看我的行程</button></view>
+  <view class="result-actions"><view wx:if="{{!isOffline}}" class="autosave-note">清单进度已自动保存</view><button class="primary-btn" bindtap="saveOffline">{{offlineSaved?'更新离线安全卡':'保存离线安全卡'}}</button><view class="result-nav-actions"><button wx:if="{{!isOffline}}" class="text-action" bindtap="plans">查看我的行程</button><button class="text-action" bindtap="home">返回首页</button></view></view>
   <view class="safe-note">清单可离线查看；知识库仍为课程原型草稿。地点和季节只用于匹配准备提示，不代表疾病、虫种或虫媒风险概率。</view>
 </view>

@@ -37,7 +37,11 @@
 .trip-route-badge { position:absolute; right:20rpx; bottom:22rpx; min-width:72rpx; padding:8rpx 14rpx; border-radius:24rpx; background:#f2cf86; color:#fff; font-size:var(--font-caption); text-align:center; }
 .map-road { position:absolute; left:60rpx; top:-20rpx; width:22rpx; height:300rpx; background:#fff; border-radius:50%; transform:rotate(36deg); }
 .map-count { position:absolute; right:42rpx; bottom:64rpx; width:52rpx; height:52rpx; }
-.mini-btn { display:inline-flex; margin-top:46rpx; padding:16rpx 42rpx; border-radius:34rpx; background:#f1f2f4; color:#a0a3a9; font-size:var(--font-caption); }
+.trip-actions { position:relative; z-index:2; display:flex; width:calc(100% - 230rpx); gap:14rpx; margin-top:38rpx; }
+.mini-btn { display:flex; align-items:center; justify-content:center; min-width:0; height:64rpx; margin:0; padding:0 22rpx; border-radius:32rpx; font-size:var(--font-caption); font-weight:600; line-height:1; }
+.mini-btn::after { border:0; }
+.mini-btn-create { border:1rpx solid #d8e4dc; background:#fff; color:#36795a; }
+.mini-btn-improve { border:1rpx solid #dcebe1; background:#e7f2eb; color:#245f45; }
 .sync-pill { margin-top:30rpx; padding:22rpx 30rpx; border-radius:40rpx; background:#eef3f0; color:#9da39f; font-size:var(--font-caption); display:flex; align-items:center; justify-content:space-between; box-shadow:0 6rpx 18rpx rgba(31,42,37,.03); }
 .sync-main { display:flex; align-items:center; gap:14rpx; }
 .sync-icon { width:30rpx; height:30rpx; display:block; flex:none; }

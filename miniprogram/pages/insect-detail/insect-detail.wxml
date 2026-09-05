@@ -14,7 +14,7 @@
   <swiper class="species-gallery" indicator-dots circular>
     <swiper-item wx:for="{{images}}" wx:key="src"><view class="gallery-slide"><image class="gallery-image" src="{{item.src}}" mode="aspectFill"/><view class="gallery-caption"><view>{{index + 1}} / {{images.length}} · {{item.caption}}</view><view class="gallery-credit">{{item.credit}} · {{item.license}}</view></view></view></swiper-item>
   </swiper>
-  <view wx:if="{{mediaPending}}" class="media-pending">当前条目的已授权实拍图仍在审核；以上三图为观察方法示意，不作为虫体外形证据。</view>
+  <view wx:if="{{mediaPending}}" class="media-pending">{{mediaNote}}</view>
 
   <view class="notice" style="margin-top:28rpx;text-align:center;justify-content:center">外形和环境信息仅供对照，不构成虫种确诊</view>
 

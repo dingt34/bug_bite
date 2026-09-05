@@ -2,6 +2,7 @@ const assert = require('assert');
 
 let pageDefinition = null;
 let navigatedUrl = '';
+let lastToast = '';
 const storage = {};
 
 global.Page = definition => { pageDefinition = definition; };
@@ -9,8 +10,11 @@ global.wx = {
   getStorageSync(key) { return storage[key]; },
   setStorageSync(key, value) { storage[key] = value; },
   removeStorageSync(key) { delete storage[key]; },
-  navigateTo(options) { navigatedUrl = options.url; }
+  navigateTo(options) { navigatedUrl = options.url; },
+  showModal(options) { options.success({ confirm: true }); },
+  showToast(options) { lastToast = options.title; }
 };
+global.getApp = () => ({ globalData: { cloudReady: false } });
 
 const helpers = require('../miniprogram/pages/my-plans/my-plans.js');
 const markup = require('fs').readFileSync(require('path').join(__dirname, '../miniprogram/pages/my-plans/my-plans.wxml'), 'utf8');
@@ -58,5 +62,10 @@ page.open({ currentTarget: { dataset: { id: 'trip_real' } } });
 assert.strictEqual(navigatedUrl, '/pages/precheck-result/precheck-result?planId=trip_real');
 page.openOffline();
 assert.strictEqual(navigatedUrl, '/pages/precheck-result/precheck-result?source=offline');
+page.deletePlan({ currentTarget: { dataset: { id: 'trip_real' } } });
+assert.strictEqual(storage.bugtrail_v4_plans.some(item => item.id === 'trip_real'), false);
+assert.strictEqual(storage.bugtrail_v4_offlineCard, undefined, '删除计划时应一并移除对应离线卡');
+assert.strictEqual(page.data.planCount, 1);
+assert.strictEqual(lastToast, '行程计划已删除');
 
 console.log('my plans page tests passed');

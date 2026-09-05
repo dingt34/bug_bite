@@ -4,6 +4,60 @@ const REFERENCE_IMAGES = [
   { src: '/images/insect-guide/pending/03-context.svg', caption: '保留尺度与环境：候选类群需要结合地点和接触方式解释', alt: '虫体尺度与环境记录方法示意图', credit: '虫咬识途科学内容组', license: 'Original illustration', sourceUrl: '' }
 ];
 
+const CANDIDATE_COVERS = {
+  hard_ticks_other: { src:'/images/insect-guide/candidates/hard_ticks_other.webp', caption:'网纹革蜱代表成虫实物：观察八足、前端口器与背盾轮廓', alt:'网纹革蜱成虫真实照片', credit:'Wikimedia Commons contributor', license:'License on source page', sourceUrl:'https://commons.wikimedia.org/wiki/File:DermacentorReticulatus2_CF.jpg' },
+  human_flea: { src:'/images/insect-guide/candidates/human_flea.webp', caption:'耶鲁皮博迪博物馆收藏的雌性人蚤显微标本', alt:'雌性人蚤显微标本真实照片', credit:'Daniel J. Drew', license:'CC0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Pulex_irritans_(YPM_IZ_093766).jpeg' },
+  body_pubic_lice: { src:'/images/insect-guide/candidates/body_pubic_lice.webp', caption:'阴虱代表标本；组合条目中的体虱形态与其不同', alt:'阴虱显微标本图', credit:'Ed Uthman', license:'CC BY 2.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Crab_Louse_(Phthirus_pubis)_(1856546189).jpg' },
+  horse_deer_flies: { src:'/images/insect-guide/candidates/horse_deer_flies.webp', caption:'虻科代表成虫：观察粗壮身体、复眼与透明翅', alt:'虻科成虫实物图', credit:'Sylphe vert', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Tabanidae_sp._20210703_162759.jpg' },
+  tabanus: { src:'/images/insect-guide/candidates/tabanus.webp', caption:'虻属代表标本：不同种的体色与眼部花纹会有差异', alt:'虻属成虫标本图', credit:'Didier Descouens', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:(MHNT)_Tabanus_autumnalis.jpg' },
+  paper_wasp: { src:'/images/insect-guide/candidates/paper_wasp.webp', caption:'纸蜂属代表成虫：可见细腰与较长的足', alt:'纸蜂停栖在花上的实物图', credit:'RaminusFalcon', license:'CC BY-SA 3.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Polistes_on_Lilium.jpg' },
+  common_ants: { src:'/images/insect-guide/candidates/common_ants.webp', caption:'蚁科代表成虫侧面：观察弯折触角与收窄腰部', alt:'常见蚂蚁侧面微距图', credit:'Retro Lenses', license:'CC BY 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Portrait_of_an_ant,_profile_view.jpg' },
+  spider: { src:'/images/insect-guide/candidates/spider.webp', caption:'蜘蛛目代表成体：本图仅展示八足与身体分区，不代表全部蜘蛛', alt:'蜘蛛目代表成体微距图', credit:'JJ Harrison', license:'CC BY-SA 3.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Clynotis_severus,_AF_2.jpg' },
+  pine_caterpillars_other: { src:'/images/insect-guide/candidates/pine_caterpillars_other.webp', caption:'松毛虫属代表成虫；幼虫和不同种外观差异明显', alt:'松毛虫属代表成虫实物图', credit:'Hannes Lemme · Bugwood.org', license:'CC BY 3.0 US', sourceUrl:'https://commons.wikimedia.org/wiki/File:Dendrolimus_pini.jpg' },
+  tussock_moth_larvae: { src:'/images/insect-guide/candidates/tussock_moth_larvae.webp', caption:'毒蛾亚科代表幼虫：可见明显毛簇，不用于种级确认', alt:'毒蛾亚科代表幼虫实物图', credit:'Ryan Hodnett', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Rusty_Tussock_Moth_(Orgyia_antiqua)_Larva_-_Thunder_Bay,_Ontario_2012-07-06.jpg' },
+  cucumber_leaf_beetles: { src:'/images/insect-guide/candidates/cucumber_leaf_beetles.webp', caption:'黄守瓜代表成虫：观察小型椭圆甲虫轮廓', alt:'黄守瓜成虫实物图', credit:'Nativeplants garden', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Aulacophora_indica_(13982).jpg' },
+  blister_beetles: { src:'/images/insect-guide/candidates/blister_beetles.webp', caption:'芫菁科代表成虫：类群内部体形和颜色差异较大', alt:'芫菁科斑蝥类群实物图', credit:'Nativeplants garden', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Blister_Beetles,_Paithalmala.jpg' },
+  tropical_bedbug: { src:'/images/insect-guide/candidates/tropical_bedbug.webp', caption:'温带臭虫成虫真实近似种对照：不能据此确认热带臭虫', alt:'温带臭虫成虫真实照片，用作热带臭虫近似种对照', credit:'CDC / Piotr Naskrecki', license:'Public domain', sourceUrl:'https://commons.wikimedia.org/wiki/File:Adult_bed_bug%2C_Cimex_lectularius.jpg' },
+  triatomine: { src:'/images/insect-guide/candidates/triatomine.webp', caption:'锥蝽亚科代表成虫：仅适用于相应国际旅行场景', alt:'锥蝽亚科接吻虫实物图', credit:'Heigen Villacarlos', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Kissing_Bug.jpg' },
+  tsetse_fly: { src:'/images/insect-guide/candidates/tsetse_fly.webp', caption:'采采蝇属代表标本：仅用于非洲旅行场景参考', alt:'采采蝇属成虫标本图', credit:'Alan R Walker', license:'CC BY-SA 3.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Glossina-morsitans.jpg' },
+  leech: { src:'/images/insect-guide/candidates/leech.webp', caption:'水蛭代表个体：身体柔软分节，与硬蜱形态不同', alt:'中国水蛭实物图', credit:'Shizhao', license:'CC BY-SA 2.5', sourceUrl:'https://commons.wikimedia.org/wiki/File:Leech-china.JPG' }
+};
+
+function realPhoto(id, suffix, caption, sourceFile) {
+  return { src:`/images/insect-guide/candidates/${id}-${suffix}.webp`, caption, alt:caption, credit:'Wikimedia Commons contributor', license:'License on source page', sourceUrl:`https://commons.wikimedia.org/wiki/File:${sourceFile}` };
+}
+
+const CANDIDATE_GALLERIES = {
+  hard_ticks_other: [
+    realPhoto('hard_ticks_other', 2, '网纹革蜱另一角度实物，展示背盾花纹与足部结构', 'DermacentorReticulatus_CF.jpg'),
+    { src:'/images/insect-guide/rhipicephalus-sanguineus/03-sexes.webp', caption:'血红扇头蜱雌雄实物对照：硬蜱不同属种外观差异明显', alt:'血红扇头蜱雌雄真实照片', credit:'Daktaridudu', license:'CC BY-SA 4.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Rhipicephalus-sanguineus-female-male.jpg' }
+  ],
+  human_flea: [
+    { src:'/images/insect-guide/candidates/human_flea-3.webp', caption:'耶鲁皮博迪博物馆收藏的雄性人蚤显微标本', alt:'雄性人蚤显微标本真实照片', credit:'Daniel J. Drew', license:'CC0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Pulex_irritans_(YPM_IZ_093779).jpeg' },
+    { src:'/images/insect-guide/ctenocephalides-felis/01-overview.webp', caption:'猫栉首蚤真实近似种对照：蚤种仍需显微特征区分', alt:'猫栉首蚤侧面真实照片', credit:'Evanherk', license:'CC BY-SA 3.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Catflea_small.jpg' }
+  ],
+  body_pubic_lice: [
+    { src:'/images/insect-guide/candidates/body_pubic_lice-2.webp', caption:'雄性体虱背面显微实物：与阴虱的短宽体形不同', alt:'雄性体虱背面显微真实照片', credit:'Janice Harney Carr, CDC', license:'Public domain', sourceUrl:'https://commons.wikimedia.org/wiki/File:Body_lice.jpg' },
+    realPhoto('body_pubic_lice', 3, '阴虱实物近照：可见短宽、蟹状体形', 'Pthirus_pubis,_crab_louse.jpg')
+  ],
+  horse_deer_flies: [realPhoto('horse_deer_flies', 2, '虻科代表成虫实物侧面', 'Horse_Fly_(Tabanidae)_(15592717115).jpg'), realPhoto('horse_deer_flies', 3, '虻科代表成虫头部与复眼近照', 'Horse_Fly_(Tabanidae)_close-up_(14971999224).jpg')],
+  tabanus: [realPhoto('tabanus', 2, '牛虻属代表成虫实物背面', 'Tabanus_sudeticus-o.jpg'), realPhoto('tabanus', 3, '牛虻属代表成虫停栖姿态', 'Tabanus_sudeticus02.jpg')],
+  paper_wasp: [realPhoto('paper_wasp', 2, '纸蜂与开放式纸巢实物', 'Haus-Feldwespe_(Polistes_dominula)_Nest_focus_stack-20230607-RM-121713.jpg'), realPhoto('paper_wasp', 3, '纸蜂属代表成虫侧面实物', 'Polistes_sp_wasp.jpg')],
+  common_ants: [realPhoto('common_ants', 2, '蚁科代表工蚁实物侧面', 'Ant_(Formicidae)_-_Guelph,_Ontario_04.jpg'), realPhoto('common_ants', 3, '同一蚁科代表个体的另一实物角度', 'Ant_(Formicidae)_-_Guelph,_Ontario_05.jpg')],
+  spider: [realPhoto('spider', 2, '园蛛代表成体背面实物，展示八足与身体分区', 'Argiope_spider_female_adult_on_her_web_dorsal_view_black_background_Don_Det_Laos.jpg'), realPhoto('spider', 3, '跳蛛停在手指上的真实尺度参照', 'Plexippus_petersi_(jumping_spider)_on_a_human_finger_at_golden_hour.jpg')],
+  pine_caterpillars_other: [realPhoto('pine_caterpillars_other', 2, '松毛虫属代表幼虫实物', 'Dendrolimus_pini_(Lasiocampidae)_-_Pine-tree_Lappet_moth_caterpillar_(10797371035).jpg'), realPhoto('pine_caterpillars_other', 3, '松毛虫属代表幼虫在松林环境中的实物', 'Lieberoser_Heide_Dendrolimus_pini_caterpillar_01.JPG')],
+  tussock_moth_larvae: [realPhoto('tussock_moth_larvae', 2, '毒蛾亚科代表幼虫实物：可见成束体毛', 'Calliteara_grotei_larva_436094912.jpg'), realPhoto('tussock_moth_larvae', 3, '另一毒蛾亚科幼虫实物，展示类群差异', 'Laelia_coenosa_larva_200274171.jpg')],
+  cucumber_leaf_beetles: [realPhoto('cucumber_leaf_beetles', 2, '黄守瓜在叶片孔洞中的真实生态照片', 'A_leaf_beetle_(Aulacophora_indica)_peeking_from_a_leaf_hole_of_an_Alnus_nepalensis_tree_(cropped).jpg'), realPhoto('cucumber_leaf_beetles', 3, '黄守瓜停在植物叶片上的真实照片', 'Leaf_beetle_(Aulacophora_indica)_on_Tulasi_Plant_(1).jpg')],
+  blister_beetles: [realPhoto('blister_beetles', 2, '雨后芫菁科代表成虫实物近照', 'A_Blister_Beetle_Drenched_In_Rain._01.jpg'), realPhoto('blister_beetles', 3, '同一芫菁科代表成虫的另一实物角度', 'A_Blister_Beetle_Drenched_In_Rain._02.jpg')],
+  tropical_bedbug: [
+    { src:'/images/insect-guide/cimex-lectularius/02-female.webp', caption:'温带臭虫雌成虫真实近似种对照：观察扁平椭圆体形', alt:'温带臭虫雌成虫真实照片', credit:'Gilles San Martin', license:'CC BY-SA 2.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Adult_Female_Bed_Bug_-_Cimex_lectularius_-_Bug_length_approximately_5_mm.jpg' },
+    { src:'/images/insect-guide/cimex-lectularius/03-evidence.webp', caption:'床具缝隙中的臭虫活动实物证据', alt:'床具缝隙中的臭虫真实环境照片', credit:'NY State IPM Program, Cornell University', license:'CC BY 2.0', sourceUrl:'https://commons.wikimedia.org/wiki/File:Bed_Bug_Evidence_(11555819853).jpg' }
+  ],
+  triatomine: [realPhoto('triatomine', 2, '锥蝽亚科若虫实物，展示未成熟阶段外观', 'M.pallidipennis_N4_(Puebla).jpg'), realPhoto('triatomine', 3, '锥蝽亚科代表个体真实照片', 'Triatominae_subfamily_(13476544643).jpg')],
+  tsetse_fly: [realPhoto('tsetse_fly', 2, '采采蝇成虫标本真实照片', 'Glossina-morsitans-adult-tsetse-fly-2.jpg'), realPhoto('tsetse_fly', 3, '非洲自然环境中的采采蝇实物', 'Tsetse_Fly_-_Glossina_species,_Gorongosa_National_Park,_Mozambique_(42453576002).jpg')],
+  leech: [realPhoto('leech', 2, '叶片上的水蛭真实生态照片', 'A_leech_on_the_leaf..jpg'), realPhoto('leech', 3, '水蛭伸展状态的真实照片', 'Leech_(30968457826).jpg')]
+};
+
 const SOURCES = {
   cdcTick: { title: 'CDC · What to Do After a Tick Bite', url: 'https://www.cdc.gov/ticks/after-a-tick-bite/index.html' },
   cdcFlea: { title: 'CDC · About Fleas', url: 'https://www.cdc.gov/fleas/about/index.html' },
@@ -27,8 +81,14 @@ const ACTIONS = {
 function record(config) {
   const item = Object.assign({
     aliases: [], accent: '#61786c', zhejiangStatus: '', confusedWith: [],
-    mediaStatus: 'PENDING_LICENSE', images: REFERENCE_IMAGES, caution: '当前为候选类群页；三张图为观察方法示意，不是物种确证照片。'
+    mediaStatus: 'MIXED_MEDIA', images: REFERENCE_IMAGES, caution: '普通照片通常只能支持类群级候选，不能代替专业虫体鉴定。'
   }, config);
+  const cover = CANDIDATE_COVERS[item.id];
+  if (cover) {
+    item.images = [cover].concat(CANDIDATE_GALLERIES[item.id] || []);
+    item.mediaStatus = 'LICENSED';
+    item.mediaNote = '三张均为有来源记录的真实图像；类群代表图和近似种对照不能替代专业种级鉴定。';
+  }
   item.firstActions = item.firstActions || ACTIONS[item.actionType || 'bite'];
   item.sources = (item.sourceKeys || ['nhsBites']).map(key => SOURCES[key]).filter(Boolean);
   delete item.actionType;

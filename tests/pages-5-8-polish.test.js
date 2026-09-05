@@ -79,7 +79,7 @@ test('guide: no-symptom choice mutually exclusive; complete without photo', () =
 });
 test('guide: attached requires branch facts; incomplete answers cannot generate result', () => {
   reset(); draft({ contactType: 'attached', facts: {} }); const p = page('guide');
-  p.next(); assert.equal(calls.at(-1)[0], 'toast');
+  p.next(); assert.deepEqual(calls.at(-1), ['toast', '请完成：发现附着至今约多久？']);
   for (const [key, value] of Object.entries({ attachedTime: '刚发现', bodyPart: '躯干', removed: '仍未移除' })) {
     p.answer({ currentTarget: { dataset: { key, value } } });
   }

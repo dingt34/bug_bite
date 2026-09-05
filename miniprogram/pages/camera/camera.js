@@ -1,5 +1,6 @@
 const nav = require('../../utils/nav');
 const cloud = require('../../utils/cloud');
+const flow = require('../../utils/safety-flow');
 
 Page({
   data: {
@@ -56,6 +57,11 @@ Page({
       .catch(error => wx.showToast({ title: error.message || '识别失败', icon: 'none' }))
       .finally(() => { wx.hideLoading(); this.setData({ identifying: false }); });
   },
-  record() { wx.navigateTo({ url: '/pages/guide/guide?type=unknown' }); },
-  danger() { wx.navigateTo({ url: '/pages/danger/danger?source=camera' }); }
+  startSafetyRecord() {
+    const draft = Object.assign(flow.newDraft(), { photo: this.data.photo || '' });
+    if (!flow.persist(draft)) return;
+    wx.navigateTo({ url: '/pages/danger/danger?source=camera' });
+  },
+  record() { this.startSafetyRecord(); },
+  danger() { this.startSafetyRecord(); }
 });

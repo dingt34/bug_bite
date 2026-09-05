@@ -42,6 +42,7 @@ Page({
   back() { nav.back(); },
   edit() { wx.redirectTo({ url: `/pages/precheck/precheck?planId=${this.data.plan.id}` }); },
   plans() { wx.navigateTo({ url: '/pages/my-plans/my-plans' }); },
+  home() { wx.switchTab({ url: '/pages/home/home' }); },
 
   toggle(event) {
     if (this.data.isOffline) return;

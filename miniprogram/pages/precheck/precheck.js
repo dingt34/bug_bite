@@ -98,7 +98,18 @@ Page({
   editEnvironment() { this.setData({ expanded: !this.data.expanded }); },
   toggleList(key, values, event) { const value = event.currentTarget.dataset.value; const current = this.data[key].slice(); const index = current.indexOf(value); if (index >= 0) current.splice(index, 1); else current.push(value); this.change({ [key]: current, [`${key.slice(0, -1)}Options`]: options(values, current) }); },
   toggleHabitat(event) { this.toggleList('habitats', HABITATS, event); },
-  toggleCompanion(event) { this.toggleList('companions', COMPANIONS, event); },
+  toggleCompanion(event) {
+    const value = event.currentTarget.dataset.value;
+    let companions = this.data.companions.slice();
+    if (value === '独自出行') {
+      companions = companions.indexOf(value) >= 0 ? [] : ['独自出行'];
+    } else {
+      companions = companions.filter(item => item !== '独自出行');
+      const index = companions.indexOf(value);
+      if (index >= 0) companions.splice(index, 1); else companions.push(value);
+    }
+    this.change({ companions, companionOptions: options(COMPANIONS, companions) });
+  },
   toggleGear(event) { const value = event.currentTarget.dataset.value; const gears = value === '暂未准备' ? ['暂未准备'] : this.data.gears.filter(item => item !== '暂未准备'); const index = gears.indexOf(value); if (index >= 0) gears.splice(index, 1); else gears.push(value); this.change({ gears, gearOptions: options(GEARS, gears) }); },
   chooseOvernight(event) { const overnight = event.currentTarget.dataset.value; this.change({ overnight, overnightOptions: options(OVERNIGHT, overnight) }); },
   route() { store.remove('routeDraft'); this.awaitingRoute = true; wx.navigateTo({ url: '/pages/route-plan/route-plan?from=precheck', fail: () => { this.awaitingRoute = false; } }); },

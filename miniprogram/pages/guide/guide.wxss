@@ -23,6 +23,7 @@
 .form-footer { margin-top:24rpx; padding-bottom:calc(56rpx + env(safe-area-inset-bottom)); }
 .form-footer .safe-note { margin-top:20rpx; color:#69736e; text-align:left; padding-left:2rpx; }
 .guide-page .safe-top { min-height:16rpx; }
+.guide-page .progress { margin-top:30rpx; }
 .guide-page { font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; font-variant-numeric:tabular-nums; }
 .danger-reminder { margin-top:20rpx; padding:20rpx 22rpx; display:flex; align-items:center; border:2rpx solid #ef433c; border-radius:30rpx; background:#fff; }
 .danger-reminder-icon { width:72rpx; height:72rpx; flex:none; margin-right:20rpx; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#ffddd8; color:#ea4038; font-size:var(--font-page-title); font-weight:800; }
@@ -37,3 +38,9 @@
 .body-part-grid .choice, .impact-grid .choice { min-height:88rpx; font-size:var(--font-card-title); }
 .guide-page .branch-question .chip { background:#fff; color:#59645e; border:2rpx solid transparent; box-shadow:0 8rpx 22rpx rgba(31,42,37,.08); }
 .guide-page .branch-question .chip.active { background:#e5f0e9; color:#23684c; border-color:#5b9a7d; box-shadow:0 8rpx 22rpx rgba(47,125,91,.12); }
+.required-contact-section { margin-top:8rpx; }
+.required-aside { color:#b4574f!important; font-weight:600!important; }
+.required-question-card { margin-top:12rpx; padding:22rpx; border-radius:28rpx; background:#fff; box-shadow:0 8rpx 22rpx rgba(31,42,37,.045); }
+.required-question-title { margin-bottom:16rpx; color:#344b3f; font-size:var(--font-body); font-weight:600; line-height:1.45; }
+.guide-page .required-choice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.guide-page .required-choice-grid .choice { justify-content:center; text-align:center; white-space:normal; }

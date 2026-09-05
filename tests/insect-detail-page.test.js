@@ -55,6 +55,8 @@ const candidate = Object.assign({}, definition, {
 candidate.onLoad({ id: 'spider' });
 assert.strictEqual(candidate.data.images.length, 3);
 assert.strictEqual(candidate.data.mediaPending, true);
-assert.ok(candidate.data.caution.includes('不是物种确证照片'));
+assert.ok(candidate.data.images[0].src.includes('/candidates/spider.webp'));
+assert.ok(candidate.data.mediaNote.includes('真实图像'));
+assert.strictEqual(candidate.data.images.some(image => image.src.includes('/pending/')), false);
 
 console.log('insect detail page tests passed');

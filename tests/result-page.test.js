@@ -1,4 +1,15 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+
+const template = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/result/result.wxml'), 'utf8');
+const styles = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/result/result.wxss'), 'utf8');
+assert.ok(template.includes('action-link-edit'));
+assert.ok(template.includes('action-link-record'));
+assert.ok(template.includes('action-link-home'));
+assert.ok(styles.includes('.action-links { display:grid;grid-template-columns:repeat(3,minmax(0,1fr))'));
+assert.ok(styles.includes('.action-link-record { border:1rpx solid #d4e6da;background:#e7f2eb'));
+assert.ok(styles.includes('.result-page .safe-top { min-height:16rpx; }'));
 
 let definition;
 let redirectedUrl = '';

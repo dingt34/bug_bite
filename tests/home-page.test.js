@@ -1,7 +1,9 @@
 const assert = require('node:assert/strict')
 
-global.Page = () => {}
-global.wx = {}
+let pageDefinition
+let navigatedUrl = ''
+global.Page = definition => { pageDefinition = definition }
+global.wx = { navigateTo(options) { navigatedUrl = options.url } }
 
 const home = require('../miniprogram/pages/home/home.js')
 
@@ -22,5 +24,15 @@ const nearest = home.getNearestUpcomingPlan([
   { id: 'next', startDate: '2026-10-05', destinationName: '杭州' }
 ], now)
 assert.equal(nearest.id, 'next')
+
+const page = Object.assign({}, pageDefinition, { data: { plan: { id: 'plan-1' } } })
+page.improvePlan()
+assert.equal(navigatedUrl, '/pages/precheck/precheck?planId=plan-1')
+page.createPlan()
+assert.equal(navigatedUrl, '/pages/precheck/precheck')
+
+const homeMarkup = require('node:fs').readFileSync(require('node:path').join(__dirname, '../miniprogram/pages/home/home.wxml'), 'utf8')
+assert.ok(homeMarkup.includes('bindtap="createPlan">创建计划'))
+assert.ok(homeMarkup.includes('wx:if="{{plan.id}}" class="mini-btn mini-btn-improve" bindtap="improvePlan">完善计划'))
 
 console.log('home page tests passed')
