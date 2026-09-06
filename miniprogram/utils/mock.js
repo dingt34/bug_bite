@@ -212,20 +212,6 @@ const DEMO_EVENTS = [
   }
 ];
 
-// ===== 本地识别演示数据（固定候选，不请求外部识别服务）=====
-const RECOGNITION_MOCK = {
-  provider: 'local_demo',
-  providerName: '本地模拟识别',
-  versionName: '演示版',
-  candidates: [
-    { name: '中华按蚊', score: 0.87 },
-    { name: '白纹伊蚊', score: 0.65 },
-    { name: '致倦库蚊', score: 0.42 }
-  ],
-  uncertain: true,
-  note: '这是固定演示候选，不代表照片的真实识别结果；安全判断以症状和危险信号为准。'
-};
-
 module.exports = {
   CONTACT_TYPES,
   DANGER_SIGNALS,
@@ -241,6 +227,5 @@ module.exports = {
   COMPANIONS,
   GEARS,
   POSTS,
-  DEMO_EVENTS,
-  RECOGNITION_MOCK
+  DEMO_EVENTS
 };

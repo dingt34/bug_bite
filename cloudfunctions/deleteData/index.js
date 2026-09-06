@@ -31,6 +31,21 @@ async function removeFilesFromRecords(collection, where) {
   return total;
 }
 
+async function removeRecognitionJobs(openid) {
+  const files = [];
+  let total = 0;
+  while (true) {
+    const rows = await db.collection('recognition_jobs').where({ ownerOpenid: openid }).field({ _id: true, fileId: true }).limit(100).get();
+    if (!rows.data.length) break;
+    rows.data.forEach(row => { if (row.fileId && files.indexOf(row.fileId) === -1) files.push(row.fileId); });
+    await Promise.all(rows.data.map(row => db.collection('recognition_jobs').doc(row._id).remove()));
+    total += rows.data.length;
+    if (rows.data.length < 100) break;
+  }
+  if (files.length) await cloud.deleteFile({ fileList: files }).catch(error => console.warn('deleteFile', error));
+  return total;
+}
+
 async function removeOwnedPosts(openid) {
   let total = 0;
   while (true) {
@@ -75,12 +90,13 @@ exports.main = async event => {
     }
     if (action === 'account') {
       const ownedPosts = await removeOwnedPosts(OPENID);
-      const collections = ['plans', 'events', 'reviews', 'reminders', 'ai_audits', 'recognition_results'];
+      const collections = ['plans', 'events', 'reviews', 'reminders', 'ai_audits'];
       let deleted = ownedPosts;
       for (const name of collections) {
         if (name === 'events' || name === 'reviews') deleted += await removeFilesFromRecords(name, { ownerOpenid: OPENID });
         else deleted += await removeWhere(name, { ownerOpenid: OPENID });
       }
+      deleted += await removeRecognitionJobs(OPENID);
       deleted += await removeWhere('community_comments', { ownerOpenid: OPENID });
       deleted += await removeWhere('community_reactions', { ownerOpenid: OPENID });
       deleted += await removeWhere('community_reports', { reporterOpenid: OPENID });

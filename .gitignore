@@ -1,5 +1,8 @@
 # Dependencies and generated local files
 node_modules/
+.venv-bioclip/
+__pycache__/
+.pytest_cache/
 .DS_Store
 *.log
 

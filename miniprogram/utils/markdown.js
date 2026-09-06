@@ -7,12 +7,29 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function safeImageSource(value) {
+  const source = String(value || '').trim();
+  if (/^https:\/\//i.test(source)) return escapeHtml(source);
+  if (/^\/(?:images|assets)\//i.test(source)) return escapeHtml(source);
+  return '';
+}
+
 function renderInline(value) {
-  return escapeHtml(value)
+  const images = [];
+  const withImageTokens = String(value || '').replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, (_, alt, source) => {
+    const safeSource = safeImageSource(source);
+    if (!safeSource) return alt;
+    const token = `@@MARKDOWN_IMAGE_${images.length}@@`;
+    images.push(`<img src="${safeSource}" alt="${escapeHtml(alt)}" />`);
+    return token;
+  });
+  let html = escapeHtml(withImageTokens)
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/__([^_]+)__/g, '<strong>$1</strong>')
     .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  images.forEach((image, index) => { html = html.replace(`@@MARKDOWN_IMAGE_${index}@@`, image); });
+  return html;
 }
 
 function renderMarkdown(value) {
@@ -89,5 +106,6 @@ function renderMarkdown(value) {
 
 module.exports = {
   escapeHtml,
+  safeImageSource,
   renderMarkdown
 };
