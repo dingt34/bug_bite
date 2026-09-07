@@ -1,7 +1,12 @@
 const store = require('../../utils/store');
 const nav = require('../../utils/nav');
 const flow = require('../../utils/safety-flow');
-const labels = ['红肿', '瘙痒', '疼痛', '发热感', '水疱', '出血', '麻木', '其他', '暂无明显表现'];
+const labels = ['红肿', '瘙痒', '疼痛', '发热感', '水疱', '出血', '渗液/脓液', '红肿范围扩大', '麻木', '其他', '暂无明显表现'];
+const bodyPartLabels = ['头皮/耳后', '眼周', '口唇/口腔', '颈部', '上肢', '下肢', '躯干', '手足', '其他/不确定'];
+
+function normalizeBodyPart(value) {
+  return String(value || '').replace(/\s*\/\s*/g, '/');
+}
 Page({
   data: {
     type: 'unknown', typeName: '', symptoms: [], bodyParts: [], bodyPartOptions: [], systemicSymptoms: [], systemicOptions: [], dailyImpact: '', dailyImpactOptions: [], facts: {}, questions: [],
@@ -23,7 +28,8 @@ Page({
     const facts = { occurredAt: '不确定', ...savedFacts };
     const symptoms = (draft.symptoms || []).filter(s => labels.includes(s));
     const systemicSymptoms = draft.systemicSymptoms || [];
-    const bodyParts = facts.bodyParts || (facts.bodyPart ? [facts.bodyPart] : []);
+    const bodyParts = (facts.bodyParts || (facts.bodyPart ? [facts.bodyPart] : [])).map(normalizeBodyPart);
+    facts.bodyParts = bodyParts;
     this.setData({ type, typeName: flow.typeNames[type], facts, questions: flow.questions(type, facts), extraQuestions: this.extraQuestions(facts, type), symptoms, bodyParts, bodyPartOptions: this.bodyPartOptions(bodyParts), systemicSymptoms,
       options: labels.map(label => ({ label, selected: symptoms.includes(label) })),
       systemicOptions: this.systemicOptions(systemicSymptoms), dailyImpact: facts.dailyImpact || '', dailyImpactOptions: this.dailyImpactOptions(facts.dailyImpact || ''),
@@ -62,7 +68,7 @@ Page({
     this.change({ symptoms, options: labels.map(label => ({ label, selected: symptoms.includes(label) })) });
   },
   bodyPartOptions(selected = []) {
-    return ['头皮 / 耳后', '眼周', '口唇 / 口腔', '颈部', '上肢', '下肢', '躯干', '手足', '其他 / 不确定'].map(label => ({ label, selected: selected.includes(label) }));
+    return bodyPartLabels.map(label => ({ label, selected: selected.includes(label) }));
   },
   toggleBodyPart(event) {
     const value = event.currentTarget.dataset.value;

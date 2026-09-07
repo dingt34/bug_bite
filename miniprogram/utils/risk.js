@@ -1,7 +1,11 @@
 // 接触后分级规则（课程演示版）
 // 规则只使用危险信号、症状、趋势和受伤范围；图片识别结果不参与分级。
 
-const RULE_VERSION = 'contact-demo-1.3.0';
+const RULE_VERSION = 'contact-demo-1.3.1';
+
+function normalizeOption(value) {
+  return String(value || '').replace(/\s*\/\s*/g, '/');
+}
 
 function hasAnswer(question, answers) {
   const value = answers[question.key];
@@ -42,7 +46,7 @@ function evaluateRisk(contactType, answers) {
     match('symptoms_worsening', '症状较上次记录加重或出现新的表现');
   }
 
-  const bodyParts = answers.bodyParts || [];
+  const bodyParts = (answers.bodyParts || []).map(normalizeOption);
   const sensitiveParts = bodyParts.filter(item => item === '眼周' || item === '口唇/口腔');
   if (sensitiveParts.length) {
     match('sensitive_area', '症状涉及需要特别关注的部位：' + sensitiveParts.join('、'));
