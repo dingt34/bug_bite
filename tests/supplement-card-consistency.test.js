@@ -4,6 +4,7 @@ const path = require('path');
 
 const read = relative => fs.readFileSync(path.join(__dirname, '..', relative), 'utf8');
 const guide = read('miniprogram/pages/guide/guide.wxml');
+const guideLogic = read('miniprogram/pages/guide/guide.js');
 const precheck = read('miniprogram/pages/precheck/precheck.wxml');
 const globalStyle = read('miniprogram/app.wxss');
 const guideRequiredStart = guide.indexOf('class="required-contact-section"');
@@ -18,6 +19,10 @@ assert.ok(guide.includes('class="aside required-aside">必填</text>'), '接触�
 });
 
 assert.ok(guide.includes('<image class="supplement-arrow'));
+assert.ok(guideLogic.includes("'口唇/口腔'"), '身体部位必须使用风险规则可识别的标准值');
+assert.strictEqual(guideLogic.includes("'口唇 / 口腔'"), false, '页面不应继续生成带空格的旧部位值');
+assert.ok(guideLogic.includes("'渗液/脓液'"), '主要表现应提供渗液/脓液选项');
+assert.ok(guideLogic.includes("'红肿范围扩大'"), '主要表现应提供红肿范围扩大选项');
 assert.ok(precheck.includes('<image class="supplement-arrow'));
 assert.strictEqual(/[⌃⌄]/.test(guide.match(/<view class="supplement-head[\s\S]*?<\/view><\/view>/)[0]), false);
 assert.strictEqual(/[⌃⌄]/.test(precheck.match(/<view class="supplement-head[\s\S]*?<\/view><\/view>/)[0]), false);

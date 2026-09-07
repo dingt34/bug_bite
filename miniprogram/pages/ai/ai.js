@@ -215,12 +215,16 @@ Page({
     cloud.call('aiAssistant', {
       messages: requestMessages,
       selectedRecordIds: attachedIds
-    }, { timeout: 35000 }).then(result => {
+    }, { timeout: 70000 }).then(result => {
       const scrollToken = this.data.scrollToken + 1;
       this.setData({ messages: before.concat(createMessage('ai', result.answer, '', attachedIds)), scrollToken, scrollIntoView: `chat-bottom-${scrollToken}` });
-    }).catch(() => {
+    }).catch(error => {
       const scrollToken = this.data.scrollToken + 1;
-      this.setData({ messages: before.concat(createMessage('ai', 'AI 助手暂时未连接。若症状正在加重，请先进入安全判断；其他功能仍可正常使用。', '', attachedIds, true)), scrollToken, scrollIntoView: `chat-bottom-${scrollToken}` });
+      const raw = String(error && (error.message || error.code) || '');
+      const message = /timeout|超时/i.test(raw)
+        ? '本次回复生成时间较长，未能在等待时间内完成。你可以点击下方重新尝试；若症状正在加重，请先进入安全判断。'
+        : 'AI 助手暂时未连接。若症状正在加重，请先进入安全判断；其他功能仍可正常使用。';
+      this.setData({ messages: before.concat(createMessage('ai', message, '', attachedIds, true)), scrollToken, scrollIntoView: `chat-bottom-${scrollToken}` });
     }).then(() => this.setData({ sending: false }));
   },
 

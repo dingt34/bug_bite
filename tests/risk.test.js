@@ -11,7 +11,9 @@ assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'tren
 assert.strictEqual(mock.SPECIFIC_QUESTIONS.bite[0].options.includes('大量多处'), false);
 assert.strictEqual(mock.SPECIFIC_QUESTIONS.sting[0].options.includes('大量多处'), false);
 assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'bodyParts').options.includes('眼周'), true);
+assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'bodyParts').options.includes('口唇/口腔'), true);
 assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'localSymptoms').options.includes('渗液/脓液'), true);
+assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'localSymptoms').options.includes('红肿范围扩大'), true);
 assert.strictEqual(mock.COMMON_QUESTIONS.find(question => question.key === 'dailyImpact').options.includes('无法正常活动'), true);
 assert.deepStrictEqual(
   mock.REVIEW_QUESTIONS.common.map(question => question.key),
@@ -47,6 +49,25 @@ assert.strictEqual(
     trend: '基本不变',
     count: '少数几处',
     distribution: '分散在多个部位'
+  }).level,
+  'consult'
+);
+
+assert.strictEqual(
+  risk.evaluateRisk('bite', {
+    bodyParts: ['口唇 / 口腔'],
+    systemicSymptoms: ['无明显'],
+    localSymptoms: ['红肿'],
+    trend: '基本不变'
+  }).level,
+  'consult'
+);
+
+assert.strictEqual(
+  risk.evaluateRisk('bite', {
+    systemicSymptoms: ['无明显'],
+    localSymptoms: ['红肿范围扩大'],
+    trend: '基本不变'
   }).level,
   'consult'
 );

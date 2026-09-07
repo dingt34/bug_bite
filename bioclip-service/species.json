@@ -1,0 +1,497 @@
+[
+  {
+    "objectId": "mosquito",
+    "name": "白纹伊蚊",
+    "scientificName": "Aedes albopictus",
+    "modelLabel": "Aedes albopictus",
+    "referenceImages": [
+      "aedes-albopictus/01-overview.webp",
+      "aedes-albopictus/02-dorsal.webp",
+      "aedes-albopictus/03-wall.webp"
+    ]
+  },
+  {
+    "objectId": "culex_tritaeniorhynchus",
+    "name": "三带喙库蚊",
+    "scientificName": "Culex tritaeniorhynchus",
+    "modelLabel": "Culex tritaeniorhynchus",
+    "referenceImages": [
+      "culex-tritaeniorhynchus/01-overview.webp",
+      "culex-tritaeniorhynchus/02-side.webp",
+      "culex-tritaeniorhynchus/03-detail.webp"
+    ]
+  },
+  {
+    "objectId": "anopheles_sinensis",
+    "name": "中华按蚊",
+    "scientificName": "Anopheles sinensis",
+    "modelLabel": "Anopheles sinensis",
+    "referenceImages": [
+      "anopheles-sinensis/01-feeding.webp",
+      "anopheles-sinensis/02-illustration.webp",
+      "anopheles-sinensis/03-pupa.webp"
+    ]
+  },
+  {
+    "objectId": "armigeres_subalbatus",
+    "name": "骚扰阿蚊",
+    "scientificName": "Armigeres subalbatus",
+    "modelLabel": "Armigeres subalbatus",
+    "referenceImages": [
+      "armigeres-subalbatus/01-overview.webp",
+      "armigeres-subalbatus/02-side.webp",
+      "armigeres-subalbatus/03-specimen.webp"
+    ]
+  },
+  {
+    "objectId": "culex_pipiens",
+    "name": "致倦库蚊",
+    "scientificName": "Culex pipiens quinquefasciatus",
+    "modelLabel": "Culex pipiens quinquefasciatus",
+    "referenceImages": [
+      "culex-quinquefasciatus/01-feeding.webp",
+      "culex-quinquefasciatus/02-illustration.webp",
+      "culex-quinquefasciatus/03-overview.webp"
+    ]
+  },
+  {
+    "objectId": "aedes_aegypti",
+    "name": "埃及伊蚊",
+    "scientificName": "Aedes aegypti",
+    "modelLabel": "Aedes aegypti",
+    "referenceImages": [
+      "aedes-aegypti/01-dorsal.webp",
+      "aedes-aegypti/02-overview.webp",
+      "aedes-aegypti/03-feeding.webp"
+    ]
+  },
+  {
+    "objectId": "flea",
+    "name": "猫栉首蚤",
+    "scientificName": "Ctenocephalides felis",
+    "modelLabel": "Ctenocephalides felis",
+    "referenceImages": [
+      "ctenocephalides-felis/01-overview.webp",
+      "ctenocephalides-felis/02-specimen.webp",
+      "ctenocephalides-felis/03-head.webp"
+    ]
+  },
+  {
+    "objectId": "bedbug",
+    "name": "温带臭虫",
+    "scientificName": "Cimex lectularius",
+    "modelLabel": "Cimex lectularius",
+    "referenceImages": [
+      "cimex-lectularius/01-adult.webp",
+      "cimex-lectularius/02-female.webp",
+      "cimex-lectularius/03-evidence.webp"
+    ]
+  },
+  {
+    "objectId": "biting_midge",
+    "name": "蠓",
+    "scientificName": "Culicoides spp.",
+    "modelLabel": "Culicoides spp.",
+    "referenceImages": [
+      "culicoides/01-overview.webp",
+      "culicoides/02-on-skin.webp",
+      "culicoides/03-feeding.webp"
+    ]
+  },
+  {
+    "objectId": "sandfly",
+    "name": "白蛉",
+    "scientificName": "Phlebotomus chinensis",
+    "modelLabel": "Phlebotomus chinensis",
+    "referenceImages": [
+      "phlebotomus/01-bloodfed.webp",
+      "phlebotomus/02-resting.webp",
+      "phlebotomus/03-specimen.webp"
+    ]
+  },
+  {
+    "objectId": "stable_fly",
+    "name": "厩螫蝇",
+    "scientificName": "Stomoxys calcitrans",
+    "modelLabel": "Stomoxys calcitrans",
+    "referenceImages": [
+      "stomoxys-calcitrans/01-overview.webp",
+      "stomoxys-calcitrans/02-detail.webp",
+      "stomoxys-calcitrans/03-behavior.webp"
+    ]
+  },
+  {
+    "objectId": "black_fly",
+    "name": "蚋（黑蝇）",
+    "scientificName": "Simulium spp.",
+    "modelLabel": "Simulium spp.",
+    "referenceImages": [
+      "simulium/01-overview.webp",
+      "simulium/02-detail.webp",
+      "simulium/03-behavior.webp"
+    ]
+  },
+  {
+    "objectId": "tick",
+    "name": "长角血蜱",
+    "scientificName": "Haemaphysalis longicornis",
+    "modelLabel": "Haemaphysalis longicornis",
+    "referenceImages": [
+      "haemaphysalis-longicornis/01-overview.webp",
+      "haemaphysalis-longicornis/02-key.webp",
+      "haemaphysalis-longicornis/03-detail.webp"
+    ]
+  },
+  {
+    "objectId": "brown_dog_tick",
+    "name": "血红扇头蜱",
+    "scientificName": "Rhipicephalus sanguineus",
+    "modelLabel": "Rhipicephalus sanguineus",
+    "referenceImages": [
+      "rhipicephalus-sanguineus/01-overview.webp",
+      "rhipicephalus-sanguineus/02-side.webp",
+      "rhipicephalus-sanguineus/03-sexes.webp"
+    ]
+  },
+  {
+    "objectId": "chigger",
+    "name": "恙螨（恙虫）",
+    "scientificName": "Leptotrombidium deliense",
+    "modelLabel": "Leptotrombidium deliense",
+    "referenceImages": [
+      "leptotrombidium/01-overview.webp",
+      "leptotrombidium/02-larva.webp",
+      "leptotrombidium/03-stylostome.webp"
+    ]
+  },
+  {
+    "objectId": "head_louse",
+    "name": "头虱",
+    "scientificName": "Pediculus humanus capitis",
+    "modelLabel": "Pediculus humanus capitis",
+    "referenceImages": [
+      "pediculus-humanus-capitis/01-adult.webp",
+      "pediculus-humanus-capitis/02-cdc.webp",
+      "pediculus-humanus-capitis/03-on-hair.webp"
+    ]
+  },
+  {
+    "objectId": "scabies_mite",
+    "name": "疥螨",
+    "scientificName": "Sarcoptes scabiei",
+    "modelLabel": "Sarcoptes scabiei",
+    "referenceImages": [
+      "sarcoptes-scabiei/01-microscope.webp",
+      "sarcoptes-scabiei/02-adult.webp",
+      "sarcoptes-scabiei/03-mite.webp"
+    ]
+  },
+  {
+    "objectId": "bee_wasp",
+    "name": "黄脚胡蜂",
+    "scientificName": "Vespa velutina",
+    "modelLabel": "Vespa velutina",
+    "referenceImages": [
+      "vespa-velutina/01-overview.webp",
+      "vespa-velutina/02-side.webp",
+      "vespa-velutina/03-detail.webp"
+    ]
+  },
+  {
+    "objectId": "vespa_mandarinia",
+    "name": "金环胡蜂",
+    "scientificName": "Vespa mandarinia",
+    "modelLabel": "Vespa mandarinia",
+    "referenceImages": [
+      "vespa-mandarinia/01-queen.webp",
+      "vespa-mandarinia/02-side.webp",
+      "vespa-mandarinia/03-head.webp"
+    ]
+  },
+  {
+    "objectId": "apis_cerana",
+    "name": "中华蜜蜂",
+    "scientificName": "Apis cerana",
+    "modelLabel": "Apis cerana",
+    "referenceImages": [
+      "apis-cerana/01-worker.webp",
+      "apis-cerana/02-overview.webp",
+      "apis-cerana/03-foraging.webp"
+    ]
+  },
+  {
+    "objectId": "ant",
+    "name": "红火蚁",
+    "scientificName": "Solenopsis invicta",
+    "modelLabel": "Solenopsis invicta",
+    "referenceImages": [
+      "solenopsis-invicta/01-colony.webp",
+      "solenopsis-invicta/02-workers.webp",
+      "solenopsis-invicta/03-closeup.webp"
+    ]
+  },
+  {
+    "objectId": "scolopendra_subspinipes_mutilans",
+    "name": "少棘蜈蚣",
+    "scientificName": "Scolopendra subspinipes mutilans",
+    "modelLabel": "Scolopendra subspinipes mutilans",
+    "referenceImages": [
+      "scolopendra-subspinipes/01-overview.webp",
+      "scolopendra-subspinipes/02-body.webp",
+      "scolopendra-subspinipes/03-head.webp"
+    ]
+  },
+  {
+    "objectId": "house_centipede",
+    "name": "花蚰蜒",
+    "scientificName": "Thereuopoda clunifera",
+    "modelLabel": "Thereuopoda clunifera",
+    "referenceImages": [
+      "thereuopoda/01-overview.webp",
+      "thereuopoda/02-head.webp",
+      "thereuopoda/03-habitat.webp"
+    ]
+  },
+  {
+    "objectId": "chinese_scorpion",
+    "name": "东亚钳蝎",
+    "scientificName": "Mesobuthus martensii",
+    "modelLabel": "Mesobuthus martensii",
+    "referenceImages": [
+      "mesobuthus-martensii/01-overview.webp",
+      "mesobuthus-martensii/02-dorsal.webp",
+      "mesobuthus-martensii/03-live.webp"
+    ]
+  },
+  {
+    "objectId": "rove_beetle",
+    "name": "梭毒隐翅虫",
+    "scientificName": "Paederus fuscipes",
+    "modelLabel": "Paederus fuscipes",
+    "referenceImages": [
+      "paederus-fuscipes/01-overview.webp",
+      "paederus-fuscipes/02-side.webp",
+      "paederus-fuscipes/03-detail.webp"
+    ]
+  },
+  {
+    "objectId": "caterpillar",
+    "name": "褐边绿刺蛾",
+    "scientificName": "Parasa consocia",
+    "modelLabel": "Parasa consocia",
+    "referenceImages": [
+      "parasa-consocia/01-larva.webp",
+      "parasa-consocia/02-specimen.webp",
+      "parasa-consocia/03-adult.webp"
+    ]
+  },
+  {
+    "objectId": "tea_tussock_moth",
+    "name": "茶毛虫",
+    "scientificName": "Euproctis pseudoconspersa",
+    "modelLabel": "Euproctis pseudoconspersa",
+    "referenceImages": [
+      "euproctis-pseudoconspersa/01-larvae.webp",
+      "euproctis-pseudoconspersa/02-adult.webp",
+      "euproctis-pseudoconspersa/03-video-frame.webp"
+    ]
+  },
+  {
+    "objectId": "pine_caterpillar",
+    "name": "马尾松毛虫",
+    "scientificName": "Dendrolimus punctatus",
+    "modelLabel": "Dendrolimus punctatus",
+    "referenceImages": [
+      "dendrolimus-punctatus/01-view.webp",
+      "dendrolimus-punctatus/02-view.webp",
+      "dendrolimus-punctatus/03-view.webp"
+    ]
+  },
+  {
+    "objectId": "blister_beetle",
+    "name": "豆芫菁",
+    "scientificName": "Epicauta gorhami",
+    "modelLabel": "Epicauta gorhami",
+    "referenceImages": [
+      "epicauta-gorhami/01-overview.webp",
+      "epicauta-gorhami/02-related.webp",
+      "epicauta-gorhami/03-perched.webp"
+    ]
+  },
+  {
+    "objectId": "hard_ticks_other",
+    "name": "硬蜱（其他常见种）",
+    "scientificName": "Ixodes spp.; Dermacentor spp.",
+    "modelLabel": "Ixodes spp. or Dermacentor spp.",
+    "referenceImages": [
+      "candidates/hard_ticks_other.webp",
+      "candidates/hard_ticks_other-2.webp",
+      "rhipicephalus-sanguineus/03-sexes.webp"
+    ]
+  },
+  {
+    "objectId": "human_flea",
+    "name": "人蚤",
+    "scientificName": "Pulex irritans",
+    "modelLabel": "Pulex irritans",
+    "referenceImages": [
+      "candidates/human_flea.webp",
+      "candidates/human_flea-3.webp",
+      "ctenocephalides-felis/01-overview.webp"
+    ]
+  },
+  {
+    "objectId": "body_pubic_lice",
+    "name": "体虱／阴虱",
+    "scientificName": "Pediculus humanus humanus / Pthirus pubis",
+    "modelLabel": "Pediculus humanus humanus or Pthirus pubis",
+    "referenceImages": [
+      "candidates/body_pubic_lice.webp",
+      "candidates/body_pubic_lice-2.webp",
+      "candidates/body_pubic_lice-3.webp"
+    ]
+  },
+  {
+    "objectId": "horse_deer_flies",
+    "name": "鹿虻、虻类",
+    "scientificName": "Tabanidae",
+    "modelLabel": "Tabanidae",
+    "referenceImages": [
+      "candidates/horse_deer_flies.webp",
+      "candidates/horse_deer_flies-2.webp",
+      "candidates/horse_deer_flies-3.webp"
+    ]
+  },
+  {
+    "objectId": "tabanus",
+    "name": "牛虻",
+    "scientificName": "Tabanus spp.",
+    "modelLabel": "Tabanus spp.",
+    "referenceImages": [
+      "candidates/tabanus.webp",
+      "candidates/tabanus-2.webp",
+      "candidates/tabanus-3.webp"
+    ]
+  },
+  {
+    "objectId": "paper_wasp",
+    "name": "纸蜂",
+    "scientificName": "Polistes spp.",
+    "modelLabel": "Polistes spp.",
+    "referenceImages": [
+      "candidates/paper_wasp.webp",
+      "candidates/paper_wasp-2.webp",
+      "candidates/paper_wasp-3.webp"
+    ]
+  },
+  {
+    "objectId": "common_ants",
+    "name": "大头家蚁／常见蚂蚁",
+    "scientificName": "Formicidae",
+    "modelLabel": "Formicidae",
+    "referenceImages": [
+      "candidates/common_ants.webp",
+      "candidates/common_ants-2.webp",
+      "candidates/common_ants-3.webp"
+    ]
+  },
+  {
+    "objectId": "spider",
+    "name": "蜘蛛（非物种级）",
+    "scientificName": "Araneae",
+    "modelLabel": "Araneae",
+    "referenceImages": [
+      "candidates/spider.webp",
+      "candidates/spider-2.webp",
+      "candidates/spider-3.webp"
+    ]
+  },
+  {
+    "objectId": "pine_caterpillars_other",
+    "name": "松毛虫类（其他种）",
+    "scientificName": "Dendrolimus spp.",
+    "modelLabel": "Dendrolimus spp.",
+    "referenceImages": [
+      "candidates/pine_caterpillars_other.webp",
+      "candidates/pine_caterpillars_other-2.webp",
+      "candidates/pine_caterpillars_other-3.webp"
+    ]
+  },
+  {
+    "objectId": "tussock_moth_larvae",
+    "name": "毒蛾幼虫类（其他种）",
+    "scientificName": "Erebidae: Lymantriinae",
+    "modelLabel": "Erebidae: Lymantriinae",
+    "referenceImages": [
+      "candidates/tussock_moth_larvae.webp",
+      "candidates/tussock_moth_larvae-2.webp",
+      "candidates/tussock_moth_larvae-3.webp"
+    ]
+  },
+  {
+    "objectId": "cucumber_leaf_beetles",
+    "name": "黄守瓜等瓜叶甲",
+    "scientificName": "Chrysomelidae",
+    "modelLabel": "Chrysomelidae",
+    "referenceImages": [
+      "candidates/cucumber_leaf_beetles.webp",
+      "candidates/cucumber_leaf_beetles-2.webp",
+      "candidates/cucumber_leaf_beetles-3.webp"
+    ]
+  },
+  {
+    "objectId": "blister_beetles",
+    "name": "斑蝥类",
+    "scientificName": "Meloidae",
+    "modelLabel": "Meloidae",
+    "referenceImages": [
+      "candidates/blister_beetles.webp",
+      "candidates/blister_beetles-2.webp",
+      "candidates/blister_beetles-3.webp"
+    ]
+  },
+  {
+    "objectId": "tropical_bedbug",
+    "name": "热带臭虫",
+    "scientificName": "Cimex hemipterus",
+    "modelLabel": "Cimex hemipterus",
+    "referenceImages": [
+      "candidates/tropical_bedbug.webp",
+      "cimex-lectularius/02-female.webp",
+      "cimex-lectularius/03-evidence.webp"
+    ]
+  },
+  {
+    "objectId": "triatomine",
+    "name": "锥蝽",
+    "scientificName": "Triatominae",
+    "modelLabel": "Triatominae",
+    "referenceImages": [
+      "candidates/triatomine.webp",
+      "candidates/triatomine-2.webp",
+      "candidates/triatomine-3.webp"
+    ]
+  },
+  {
+    "objectId": "tsetse_fly",
+    "name": "采采蝇",
+    "scientificName": "Glossina spp.",
+    "modelLabel": "Glossina spp.",
+    "referenceImages": [
+      "candidates/tsetse_fly.webp",
+      "candidates/tsetse_fly-2.webp",
+      "candidates/tsetse_fly-3.webp"
+    ]
+  },
+  {
+    "objectId": "leech",
+    "name": "水蛭（非节肢动物）",
+    "scientificName": "Hirudinea",
+    "modelLabel": "Hirudinea",
+    "referenceImages": [
+      "candidates/leech.webp",
+      "candidates/leech-2.webp",
+      "candidates/leech-3.webp"
+    ]
+  }
+]

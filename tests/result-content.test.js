@@ -1,6 +1,9 @@
 const assert = require('assert');
 const resultContent = require('../miniprogram/utils/result-content.js');
 
+assert.ok(resultContent.observe.review.includes('2 小时后复查'));
+assert.ok(resultContent.observe.review.includes('连续记录 3 天'));
+
 const tickAdvice = resultContent.getResultContent('observe', 'attachment');
 assert.ok(tickAdvice.actions.some(item => item.includes('细尖镊子')));
 assert.ok(tickAdvice.actions.some(item => item.includes('不要用油脂')));

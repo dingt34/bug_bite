@@ -1,0 +1,16 @@
+{
+  "name": "bug-bite-recognition-worker",
+  "version": "1.0.0",
+  "private": true,
+  "main": "worker.js",
+  "scripts": {
+    "start": "node worker.js",
+    "test": "node ../tests/recognition-worker.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@cloudbase/js-sdk": "^3.9.2"
+  }
+}

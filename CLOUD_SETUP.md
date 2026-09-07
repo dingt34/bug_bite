@@ -19,6 +19,7 @@
 - `reviews`：保存每次复查的结构化结果。
 - `reminders`：保存用户主动设置的复查提醒。
 - `ai_audits`：只记录 AI 检索使用的知识库版本、对象编号和用户主动选择的记录编号，不保存图片。
+- `recognition_jobs`：保存待处理、处理中和已完成的虫体识别任务；只允许云函数和识别工作端访问。
 - `community_posts`：保存所有用户可见的公共帖子和互动计数。
 - `community_comments`：保存公共评论。
 - `community_reactions`：保存用户对帖子的点赞、收藏，以及对评论的赞踩状态。
@@ -37,6 +38,7 @@
 - `cloudfunctions/deleteData`
 - `cloudfunctions/reminder`
 - `cloudfunctions/aiAssistant`
+- `cloudfunctions/identifyInsect`
 - `cloudfunctions/routePlan`
 
 部署环境必须与 `ENV_ID` 指向的环境一致。
@@ -96,3 +98,19 @@
 发送个人记录时仅发送用户本次主动勾选的文字摘要（每次最多 3 条），不发送历史图片；成功发送后选择会自动清空。知识库内容位于 `cloudfunctions/aiAssistant/knowledge-base`，更新后需要重新部署该云函数。
 
 “AI 助手”统一调用 `aiAssistant`，避免多套 AI 服务混用。
+
+## BioCLIP 2 虫体识别
+
+1. 在云数据库创建 `recognition_jobs`，权限设为“小程序客户端不可读写”。
+2. 重新部署 `identifyInsect`。小程序会上传图片、创建队列任务，并自动轮询结果。
+3. 在云开发控制台的“环境设置 → API 密钥”创建服务端 API Key；该密钥只交给本机工作端，不能写入代码或小程序。
+4. 启动本机 BioCLIP 服务，确认 `/health` 返回 `ready=true` 且 `prototypeCount=45`。
+5. 另开终端运行：
+
+```powershell
+.\recognition-worker\run-local.ps1
+```
+
+脚本会隐藏输入内容并提示粘贴 CloudBase 服务端 API Key，然后启动队列工作端。
+
+识别只采用这一条队列链路，不再由小程序或云函数直接访问 BioCLIP。工作端每两秒领取一项任务，最多自动重试三次；成功或最终失败后会删除识别原图。电脑离线期间任务留在云端，恢复运行后继续处理。BioCLIP 返回的是图鉴候选，不用于医疗诊断、病原体判断或安全分级。

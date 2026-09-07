@@ -1,96 +1,89 @@
 const cloud = require('wx-server-sdk');
-const qwen = require('./qwen-client');
 const knowledge = require('./knowledge-retrieval');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
+const db = cloud.database();
 
-const MAX_BASE64_LENGTH = 8 * 1024 * 1024;
+const JOB_COLLECTION = 'recognition_jobs';
+const JOB_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 
-async function loadImageBase64(event) {
-  let imageBase64 = String(event && event.imageBase64 || '').replace(/^data:image\/[\w+.-]+;base64,/, '');
-  if (!imageBase64 && event && event.fileId) {
-    const file = await cloud.downloadFile({ fileID: String(event.fileId) });
-    imageBase64 = file.fileContent.toString('base64');
-  }
-  if (!imageBase64) throw new Error('请先拍摄或选择图片');
-  if (imageBase64.length > MAX_BASE64_LENGTH) throw new Error('图片过大，请重新拍摄');
-  return imageBase64;
-}
-
-function buildVisionMessages(imageBase64, description) {
-  return [
-    {
-      role: 'system',
-      content: [
-        '你是“虫咬识途”的虫体图片候选分析器，只返回 JSON，不要输出 Markdown。',
-        '只描述图中可见的体型、颜色、足、翅、体节和环境线索；不做医疗诊断、病原体推测或风险分级。',
-        '候选只能从以下 45 项知识库名录中选择，最多 3 个 objectId；看不清、不是虫体或只有皮损时返回空数组：',
-        knowledge.catalogPromptText(),
-        'JSON 格式：{"candidateIds":["object_id"],"visibleFeatures":["可见特征"],"uncertainty":"不确定性说明"}'
-      ].join('\n')
-    },
-    {
-      role: 'user',
-      content: [
-        { type: 'text', text: String(description || '请根据可见特征给出虫体候选。').slice(0, 500) },
-        { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + imageBase64 } }
-      ]
-    }
-  ];
-}
-
-function normalizeAnalysis(content, fallbackText) {
-  const payload = qwen.parseJsonObject(content);
-  const candidateIds = knowledge.resolveCandidateIds(payload.candidateIds, fallbackText, 3);
-  return {
-    candidateIds,
-    visibleFeatures: (Array.isArray(payload.visibleFeatures) ? payload.visibleFeatures : [])
-      .map(value => String(value || '').trim()).filter(Boolean).slice(0, 8),
-    uncertainty: String(payload.uncertainty || '').trim().slice(0, 300)
-  };
-}
-
-async function identify(event) {
-  const apiKey = String(process.env.DASHSCOPE_API_KEY || '').trim();
-  if (!apiKey) throw new Error('请先配置 DASHSCOPE_API_KEY');
-  const imageBase64 = await loadImageBase64(event || {});
-  const description = String(event && event.description || '');
-  const content = await qwen.complete({
-    apiKey,
-    baseUrl: process.env.DASHSCOPE_BASE_URL || qwen.DEFAULT_BASE_URL,
-    model: process.env.AI_MODEL || qwen.DEFAULT_MODEL,
-    messages: buildVisionMessages(imageBase64, description),
-    temperature: 0,
-    maxTokens: 500,
-    timeout: 30000
-  });
-  const analysis = normalizeAnalysis(content, description);
+function presentAnalysis(analysis, description = '') {
+  const candidateIds = knowledge.resolveCandidateIds(
+    (analysis.candidates || []).map(item => item.objectId), '', 3
+  );
   const facts = knowledge.extractSafetyFacts(description);
-  const entries = knowledge.retrieve(analysis.candidateIds, facts, description);
+  const entries = knowledge.retrieve(candidateIds, facts, '');
   return {
     candidates: entries.map(entry => ({
       objectId: entry.objectId,
       name: entry.organism.commonName,
       scientificName: entry.organism.scientificName,
       summary: entry.organism.summary,
-      actionLevel: entry.action.level
+      actionLevel: entry.action.level,
+      score: Number(((analysis.candidates || []).find(item => item.objectId === entry.objectId) || {}).score || 0)
     })),
-    visibleFeatures: analysis.visibleFeatures,
-    uncertainty: analysis.uncertainty || (entries.length ? '仅为图鉴候选，需结合尺寸和环境继续核对。' : '画面不足以给出可靠候选。'),
+    visibleFeatures: [],
+    uncertainty: entries.length
+      ? 'BioCLIP 仅提供图片相似候选，请结合虫体尺寸、拍摄地点和图鉴特征继续核对。'
+      : '图片质量不足、主体并非虫体，或候选可信度未达到当前阈值。',
     knowledgeVersion: knowledge.VERSION,
+    visionModel: analysis.model || 'BioCLIP 2',
+    modelMetrics: {
+      topScore: Number(analysis.topScore || 0),
+      margin: Number(analysis.margin || 0),
+      uncertain: Boolean(analysis.uncertain)
+    },
     disclaimer: '图像候选只作为图鉴线索，不用于确诊、病原体判断或安全分级。'
   };
 }
 
+async function enqueue(event, openid) {
+  const fileId = String(event && event.fileId || '').trim();
+  if (!openid) throw new Error('无法确认微信身份');
+  if (!/^cloud:\/\//.test(fileId)) throw new Error('图片尚未上传到云端');
+  const result = await db.collection(JOB_COLLECTION).add({ data: {
+    ownerOpenid: openid,
+    fileId,
+    description: String(event && event.description || '').trim().slice(0, 500),
+    status: 'pending',
+    attempts: 0,
+    createdAtMs: Date.now(),
+    createdAt: db.serverDate(),
+    updatedAt: db.serverDate()
+  } });
+  return { jobId: result._id, status: 'pending' };
+}
+
+async function getJobStatus(event, openid) {
+  const jobId = String(event && event.jobId || '').trim();
+  if (!openid) throw new Error('无法确认微信身份');
+  if (!JOB_ID_PATTERN.test(jobId)) throw new Error('识别任务编号无效');
+  let document;
+  try { document = (await db.collection(JOB_COLLECTION).doc(jobId).get()).data; }
+  catch (_) { document = null; }
+  if (!document || document.ownerOpenid !== openid) throw new Error('识别任务不存在');
+  const response = {
+    jobId,
+    status: document.status,
+    message: String(document.errorMessage || '')
+  };
+  if (document.status === 'done') response.result = presentAnalysis(document.analysis || {}, document.description || '');
+  return response;
+}
+
 exports.main = async event => {
   try {
-    return { ok: true, data: await identify(event || {}) };
+    const action = String(event && event.action || '');
+    const { OPENID } = cloud.getWXContext();
+    if (action === 'enqueue') return { ok: true, data: await enqueue(event || {}, OPENID) };
+    if (action === 'status') return { ok: true, data: await getJobStatus(event || {}, OPENID) };
+    return { ok: false, code: 'INVALID_ACTION', message: '不支持的识别操作，请重新编译小程序' };
   } catch (error) {
     console.error('identifyInsect', error && error.message ? error.message : 'unknown error');
     return { ok: false, code: 'RECOGNITION_FAILED', message: error && error.message || '暂时无法识别，请继续使用环境与症状问答' };
   }
 };
 
-exports.identify = identify;
-exports.loadImageBase64 = loadImageBase64;
-exports.normalizeAnalysis = normalizeAnalysis;
+exports.presentAnalysis = presentAnalysis;
+exports.enqueue = enqueue;
+exports.getJobStatus = getJobStatus;

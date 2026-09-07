@@ -36,12 +36,12 @@ assert.deepStrictEqual(community.listPosts([
 ], [], {}, 'all', 3000, { region: '湖州' }).map(item => item.id), ['city_suffix']);
 
 const communityTemplate = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/community/community.wxml'), 'utf8');
-const publishTemplate = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/post-publish/post-publish.wxml'), 'utf8');
+const publishTemplate = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/publish/publish.wxml'), 'utf8');
 const precheckTemplate = fs.readFileSync(path.join(__dirname, '../miniprogram/pages/precheck/precheck.wxml'), 'utf8');
 assert.ok(!communityTemplate.includes('setContentType'));
 assert.ok(communityTemplate.includes('wx:if="{{item.routePlan}}"'));
-assert.ok(publishTemplate.includes('添加路线（选填）'));
-assert.ok(publishTemplate.includes('chooseRoute'));
+assert.ok(publishTemplate.includes('关联路线'));
+assert.ok(publishTemplate.includes('planRoute'));
 assert.ok(precheckTemplate.includes('路线规划（选填）'));
 
 console.log('route community feature tests passed');
