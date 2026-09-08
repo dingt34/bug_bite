@@ -31,7 +31,7 @@
         <view class="circle circle-green camera-choice-icon"><image class="icon-svg" src="/assets/figma/s17-imgBug1.svg" mode="aspectFit"/></view>
         <view class="camera-choice-copy">
           <view class="h3 camera-choice-title">{{identifying?'正在识别…':'虫体识别'}}</view>
-          <view class="tiny">{{identifying && recognitionStage ? recognitionStage : 'BioCLIP 视觉比对，返回候选与图片'}}</view>
+          <view class="tiny">{{identifying && recognitionStage ? recognitionStage : '本机 BioCLIP 比对，不上传图片'}}</view>
         </view>
         <image class="camera-choice-arrow" src="/assets/figma/all/s08-imgFrame2.svg" mode="aspectFit"/>
       </view>
@@ -63,8 +63,8 @@
     <view class="recognition-modal" catchtap="noop">
       <view class="recognition-modal-head">
         <view>
-          <view class="recognition-modal-title">BioCLIP 2 虫体分析</view>
-          <view class="recognition-modal-subtitle">视觉模型比对 45 种图鉴与真实参考图片</view>
+          <view class="recognition-modal-title">BioCLIP 2 本地演示</view>
+          <view class="recognition-modal-subtitle">开发者工具本机运行 · 比对 45 种图鉴 · 图片不上传</view>
         </view>
         <view class="recognition-modal-close" bindtap="closeRecognitionResult" aria-label="关闭">×</view>
       </view>

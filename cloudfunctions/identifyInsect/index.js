@@ -5,7 +5,34 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
 const JOB_COLLECTION = 'recognition_jobs';
+const RUNTIME_DOC_ID = 'runtime-primary';
+const HEARTBEAT_MAX_AGE_MS = 45 * 1000;
 const JOB_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
+
+class RecognitionError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.code = code;
+  }
+}
+
+async function getRuntimeHealth() {
+  let runtime;
+  try { runtime = (await db.collection(JOB_COLLECTION).doc(RUNTIME_DOC_ID).get()).data; }
+  catch (_) { runtime = null; }
+  const ageMs = runtime ? Math.max(0, Date.now() - Number(runtime.heartbeatAtMs || 0)) : null;
+  const online = Boolean(runtime && runtime.ready && ageMs <= HEARTBEAT_MAX_AGE_MS);
+  return {
+    online,
+    status: online ? 'online' : 'offline',
+    model: runtime && runtime.model || 'BioCLIP 2',
+    device: runtime && runtime.device || '',
+    catalogSize: Number(runtime && runtime.catalogSize || 0),
+    prototypeCount: Number(runtime && runtime.prototypeCount || 0),
+    heartbeatAgeMs: ageMs,
+    message: online ? '识别服务运行正常' : '识别服务尚未启动，请先启动本地识别工作端'
+  };
+}
 
 function presentAnalysis(analysis, description = '') {
   const candidateIds = knowledge.resolveCandidateIds(
@@ -41,6 +68,8 @@ async function enqueue(event, openid) {
   const fileId = String(event && event.fileId || '').trim();
   if (!openid) throw new Error('无法确认微信身份');
   if (!/^cloud:\/\//.test(fileId)) throw new Error('图片尚未上传到云端');
+  const health = await getRuntimeHealth();
+  if (!health.online) throw new RecognitionError('RECOGNITION_OFFLINE', health.message);
   const result = await db.collection(JOB_COLLECTION).add({ data: {
     ownerOpenid: openid,
     fileId,
@@ -75,15 +104,21 @@ exports.main = async event => {
   try {
     const action = String(event && event.action || '');
     const { OPENID } = cloud.getWXContext();
+    if (action === 'health') return { ok: true, data: await getRuntimeHealth() };
     if (action === 'enqueue') return { ok: true, data: await enqueue(event || {}, OPENID) };
     if (action === 'status') return { ok: true, data: await getJobStatus(event || {}, OPENID) };
     return { ok: false, code: 'INVALID_ACTION', message: '不支持的识别操作，请重新编译小程序' };
   } catch (error) {
     console.error('identifyInsect', error && error.message ? error.message : 'unknown error');
-    return { ok: false, code: 'RECOGNITION_FAILED', message: error && error.message || '暂时无法识别，请继续使用环境与症状问答' };
+    return {
+      ok: false,
+      code: error && error.code || 'RECOGNITION_FAILED',
+      message: error && error.message || '暂时无法识别，请继续使用环境与症状问答'
+    };
   }
 };
 
 exports.presentAnalysis = presentAnalysis;
 exports.enqueue = enqueue;
 exports.getJobStatus = getJobStatus;
+exports.getRuntimeHealth = getRuntimeHealth;

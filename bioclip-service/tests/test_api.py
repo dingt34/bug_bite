@@ -23,6 +23,13 @@ def test_health_exposes_catalog_without_loading_model():
     response = TestClient(service.app).get("/health")
     assert response.status_code == 200
     assert response.json()["catalogSize"] == 45
+    assert response.json()["version"] == "2.0.0"
+
+
+def test_liveness_does_not_depend_on_model_readiness():
+    response = TestClient(service.app).get("/health/live")
+    assert response.status_code == 200
+    assert response.json()["ok"] is True
 
 
 def test_identify_requires_api_key():

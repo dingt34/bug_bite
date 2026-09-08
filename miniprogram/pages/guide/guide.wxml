@@ -18,7 +18,7 @@
   <view class="section-title"><text>对日常活动的影响</text><text class="aside">单选</text></view>
   <view class="choice-grid impact-grid"><view wx:for="{{dailyImpactOptions}}" wx:key="label" class="choice {{item.selected?'active':''}}" data-value="{{item.label}}" bindtap="setDailyImpact">{{item.label}}</view></view>
   <view wx:if="{{questions.length}}" class="required-contact-section">
-    <view class="section-title"><text>{{typeName}}的接触情况</text><text class="aside required-aside">必填</text></view>
+    <view class="section-title"><text>{{typeName}}的情况</text><text class="aside">单选</text></view>
     <view wx:for="{{questions}}" wx:for-item="question" wx:key="key" class="required-question-card">
       <view class="required-question-title">{{question.title}}</view>
       <view class="choice-grid required-choice-grid"><view wx:for="{{question.options}}" wx:for-item="option" wx:key="value" class="choice {{option.selected?'active':''}}" data-key="{{question.key}}" data-value="{{option.value}}" bindtap="answer">{{option.value}}</view></view>

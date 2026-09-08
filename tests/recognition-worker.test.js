@@ -20,6 +20,15 @@ assert.throws(() => worker.required('MISSING', {}), /MISSING/);
   }), 'http://127.0.0.1:8000'), true);
   assert.strictEqual(await worker.modelReady(async () => { throw new Error('offline'); }, 'http://127.0.0.1:8000'), false);
 
+  let runtimePayload;
+  await worker.writeRuntimeStatus({
+    serverDate: () => 'server-time',
+    collection: () => ({ doc: () => ({ set: async value => { runtimePayload = value.data; } }) })
+  }, { ready: true, model: 'BioCLIP 2', device: 'cuda', catalogSize: 45, prototypeCount: 45, workerId: 'worker-test' });
+  assert.strictEqual(runtimePayload.status, 'online');
+  assert.strictEqual(runtimePayload.prototypeCount, 45);
+  assert.strictEqual(runtimePayload.workerId, 'worker-test');
+
   await assert.rejects(() => worker.identifyImage(async () => ({
     ok: false,
     status: 503,

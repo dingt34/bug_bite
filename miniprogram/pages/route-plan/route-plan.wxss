@@ -6,6 +6,7 @@
 .map-back { font-size:var(--font-caption); line-height:1; font-weight:600; }
 .map-pick { font-size:var(--font-page-title); line-height:1; font-weight:400; }
 .map-back { left: 28rpx; }
+.map-back-icon { width:40rpx; height:40rpx; }
 .map-pick { right: 28rpx; top: 126rpx; color: #557067; font-size:var(--font-section-title); line-height: 72rpx; }
 .route-sheet { position: relative; z-index: 5; min-height: 640rpx; margin-top: -48rpx; padding: 18rpx 30rpx 34rpx; border-radius: 48rpx 48rpx 36rpx 36rpx; background: #FFFFFF; box-shadow: 0 -8rpx 34rpx rgba(35, 57, 47, .08); }
 .sheet-handle { width: 86rpx; height: 8rpx; margin: 0 auto 28rpx; border-radius: 8rpx; background: #D4D7D5; }
@@ -69,5 +70,7 @@
 .environment-chips { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 14rpx; }
 .environment-chip { padding: 13rpx 22rpx; border: 2rpx solid transparent; border-radius: 28rpx; background: #F0F1F2; color: #7F8883; font-size:var(--font-caption); }
 .environment-chip.active { border-color: #8CBCA0; background: #E9F4EC; color: #2E7D5B; font-weight: 600; }
+.environment-chips { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10rpx; }
+.environment-chip { min-height:92rpx; padding:10rpx 8rpx; border-radius:24rpx; display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.25; font-size:30rpx; }
 .route-confirm-button { margin-top: 30rpx; }
 .route-notice { margin-top: 14rpx; color: #A0A6A2; font-size:var(--font-caption); line-height: 1.55; text-align: center; }

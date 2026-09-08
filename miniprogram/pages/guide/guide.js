@@ -14,7 +14,7 @@ Page({
     trends: ['正在减轻', '基本不变', '逐渐加重', '刚发现 / 不确定'],
     occurredAtOptions: ['不确定', '刚发现', '1 小时内', '今天', '1–3 天前', '4–7 天前', '1–2 周前', '超过 2 周'],
     occurredAt: '', occurredAtIndex: 0, range: '', trend: '', photo: '', photoSaving: false, submitting: false,
-    supplementOpen: false, extraQuestions: [], supplementDone: 0, supplementTotal: 6, saveStatus: '内容仅保存在本机'
+    supplementOpen: false, extraQuestions: [], supplementDone: 0, supplementTotal: 0, saveStatus: '内容仅保存在本机'
   },
   onLoad(query = {}) {
     const draft = store.get('safetyDraft', {});
@@ -30,7 +30,9 @@ Page({
     const systemicSymptoms = draft.systemicSymptoms || [];
     const bodyParts = (facts.bodyParts || (facts.bodyPart ? [facts.bodyPart] : [])).map(normalizeBodyPart);
     facts.bodyParts = bodyParts;
-    this.setData({ type, typeName: flow.typeNames[type], facts, questions: flow.questions(type, facts), extraQuestions: this.extraQuestions(facts, type), symptoms, bodyParts, bodyPartOptions: this.bodyPartOptions(bodyParts), systemicSymptoms,
+    const questions = flow.questions(type, facts);
+    const extraQuestions = this.extraQuestions(facts, type);
+    this.setData({ type, typeName: flow.typeNames[type], facts, questions, extraQuestions, supplementTotal: extraQuestions.length, symptoms, bodyParts, bodyPartOptions: this.bodyPartOptions(bodyParts), systemicSymptoms,
       options: labels.map(label => ({ label, selected: symptoms.includes(label) })),
       systemicOptions: this.systemicOptions(systemicSymptoms), dailyImpact: facts.dailyImpact || '', dailyImpactOptions: this.dailyImpactOptions(facts.dailyImpact || ''),
       occurredAt: facts.occurredAt, occurredAtIndex: Math.max(0, this.data.occurredAtOptions.indexOf(facts.occurredAt)),
@@ -51,12 +53,15 @@ Page({
   },
   change(values) {
     this.edited = true;
-    this.setData(values, () => this.setData({ supplementDone: this.countSupplement(this.data.facts, this.data.type, { photo: this.data.photo }) }, () => this.persist(false)));
+    this.setData(values, () => {
+      const questions = flow.questions(this.data.type, this.data.facts);
+      const extraQuestions = this.extraQuestions(this.data.facts, this.data.type);
+      this.setData({ questions, extraQuestions, supplementTotal: extraQuestions.length, supplementDone: this.countSupplement(this.data.facts, this.data.type) }, () => this.persist(false));
+    });
   },
   countSupplement(facts = {}, type = this.data.type, draft = {}) {
-    const branch = flow.questions(type, facts).filter(question => facts[question.key]).length;
     const generic = ['environment', 'insectSeen', 'actionsTaken'].filter(key => facts[key]).length;
-    return Math.min(6, branch + generic + (draft.photo ? 1 : 0));
+    return Math.min(3, generic);
   },
   toggle(event) {
     const value = event.currentTarget.dataset.value;

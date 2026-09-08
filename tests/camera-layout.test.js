@@ -14,7 +14,7 @@ assert.ok(markup.includes('class="camera-choice-list"'));
 assert.ok(style.includes('.camera-choice-list{display:flex;gap:16rpx}'));
 assert.ok(style.includes('.camera-choice-list>.camera-choice-card{position:relative;display:flex;flex:1;flex-direction:column'));
 assert.ok(style.includes('.camera-choice-list>.camera-choice-card{flex-direction:row;align-items:center;min-height:170rpx}'));
-assert.ok(markup.includes('BioCLIP 视觉比对，返回候选与图片'));
+assert.ok(markup.includes('本机 BioCLIP 比对，不上传图片'));
 assert.ok(markup.includes('记录接触与症状变化，不作诊断'));
 
 console.log('camera layout tests passed');

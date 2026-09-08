@@ -4,19 +4,25 @@
 
 ## 本机启动
 
-项目根目录已经使用 `.venv-bioclip` 隔离 Python 依赖。启动时传入一个足够长的随机密钥：
+首次部署或环境损坏时，在项目根目录执行干净安装：
 
 ```powershell
-.\bioclip-service\run-local.ps1 -ApiKey 'replace-with-a-long-random-secret'
+.\bioclip-service\install-local.ps1
 ```
 
-首次识别会下载并加载 `imageomics/bioclip-2` 权重。健康检查：
+本地演示时，在项目根目录运行：
+
+```powershell
+.\start-local-demo.ps1
+```
+
+脚本只启动本机 BioCLIP 服务，不需要 CloudBase API Key。保持该窗口开启，然后在微信开发者工具中选择真实虫体图片。健康检查：
 
 ```text
 GET http://127.0.0.1:8000/health
 ```
 
-服务会在开始接受请求前完成模型与45项视觉原型加载；健康检查应返回 `ready=true`、`prototypeCount=45`。
+就绪检查应返回 `ready=true`、`device=cuda`、`prototypeCount=45`。`/health/live` 仅表示进程存活，不能替代就绪检查。
 
 ## 同步 45 项标签
 
@@ -28,33 +34,10 @@ node scripts/export-bioclip-catalog.js
 
 提交前确认 `bioclip-service/species.json` 仍为 45 项。
 
-## Linux GPU 容器
-
-服务器需先安装 NVIDIA 驱动、Docker 和 NVIDIA Container Toolkit，然后在项目根目录执行：
-
-```bash
-docker build -f bioclip-service/Dockerfile -t bug-bite-bioclip .
-docker run -d --restart unless-stopped --gpus all \
-  -p 127.0.0.1:8000:8000 \
-  -e BIOCLIP_API_KEY='replace-with-a-long-random-secret' \
-  -v bioclip-cache:/root/.cache/huggingface \
-  --name bug-bite-bioclip bug-bite-bioclip
-```
-
-使用 Nginx 或 Caddy 将公开 HTTPS 域名反向代理到 `127.0.0.1:8000`。不要直接公开 8000 端口。
-
-公网部署时，只有 `recognition-worker` 需要设置服务地址与密钥；微信小程序和 `identifyInsect` 云函数均不直接访问该端口。
-
 ## 阈值校准
 
 默认阈值只是保守起点。正式上线前应使用项目真实拍摄条件下的已知45类、目录外虫种、皮损照片和模糊照片校准 `BIOCLIP_MIN_SCORE` 与 `BIOCLIP_MIN_MARGIN`。
 
 ## 本机演示
 
-使用本仓库默认的本机工作端配置启动服务：
-
-```powershell
-.\bioclip-service\run-local.ps1 -ApiKey 'local-bioclip-deployment-key'
-```
-
-随后启动 `recognition-worker`。编译小程序后进入“识别”，通过拍照或相册选择真实虫体图片，再点击“虫体识别”。真机和开发者工具采用完全相同的排队与结果刷新流程。
+运行一键入口。编译小程序后进入“识别”，选择真实虫体图片并点击“虫体识别”。页面直接读取微信临时图片并请求 `127.0.0.1:8000`，图片不会上传云端。该模式仅支持与 BioCLIP 服务运行在同一台电脑上的微信开发者工具，不支持真机。

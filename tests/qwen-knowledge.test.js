@@ -29,9 +29,11 @@ assert.match(identifySource, /action === 'enqueue'/);
 assert.match(identifySource, /action === 'status'/);
 assert.match(fs.readFileSync(path.join(root, 'miniprogram/pages/ai/ai.js'), 'utf8'), /timeout:\s*70000/);
 const cameraSource = fs.readFileSync(path.join(root, 'miniprogram/pages/camera/camera.js'), 'utf8');
-assert.match(cameraSource, /action:\s*'enqueue'/);
-assert.match(cameraSource, /action:\s*'status'/);
-assert.match(cameraSource, /timeout:\s*15000/);
+assert.match(cameraSource, /http:\/\/127\.0\.0\.1:8000/);
+assert.match(cameraSource, /\/v1\/identify/);
+assert.match(cameraSource, /timeout:\s*120000/);
+assert.doesNotMatch(cameraSource, /action:\s*'enqueue'/);
+assert.doesNotMatch(cameraSource, /action:\s*'status'/);
 
 const allWxml = fs.readdirSync(path.join(root, 'miniprogram', 'pages'), { withFileTypes: true })
   .filter(entry => entry.isDirectory())
@@ -41,4 +43,4 @@ const allWxml = fs.readdirSync(path.join(root, 'miniprogram', 'pages'), { withFi
 assert.ok(!allWxml.includes('figma-menu'), '右上角三点菜单应全部移除');
 assert.ok(!fs.readFileSync(path.join(root, 'miniprogram/pages/contact/contact.wxml'), 'utf8').includes('自动保存'));
 
-console.log('检查通过：BioCLIP 虫体识别、千问助手、45 项知识库、安全事实和 UI 约束。');
+console.log('检查通过：本机 BioCLIP 虫体识别、千问助手、45 项知识库、安全事实和 UI 约束。');

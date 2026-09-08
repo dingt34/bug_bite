@@ -6,6 +6,9 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$workerRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent $workerRoot
+$python = Join-Path $projectRoot '.venv-bioclip\Scripts\python.exe'
 
 function Read-SecretText([string]$PromptText) {
   $secureValue = Read-Host $PromptText -AsSecureString
@@ -26,11 +29,17 @@ if ([string]::IsNullOrWhiteSpace($CloudBaseApiKey)) {
 if ([string]::IsNullOrWhiteSpace($BioClipApiKey)) {
   $BioClipApiKey = 'local-bioclip-deployment-key'
 }
+if (-not (Test-Path -LiteralPath $python)) {
+  throw 'BioCLIP Python environment is missing. Run bioclip-service\install-local.ps1 first.'
+}
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+  throw 'Node.js 18 or newer is required.'
+}
 
 $env:RECOGNITION_CLOUDBASE_ENV = $EnvironmentId
 $env:RECOGNITION_CLOUDBASE_API_KEY = $CloudBaseApiKey
 $env:BIOCLIP_API_URL = $BioClipUrl
 $env:BIOCLIP_API_KEY = $BioClipApiKey
 
-Set-Location $PSScriptRoot
-node worker.js
+Set-Location $workerRoot
+node supervisor.js
