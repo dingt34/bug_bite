@@ -17,3 +17,4 @@
 .route-warning { margin-top:16rpx; }
 .precheck-page .form-footer { margin-top:36rpx; padding-bottom:env(safe-area-inset-bottom); }
 .precheck-page .safe-note { margin-top:20rpx; color:#69736e; }
+.precheck-page .supplement-card { box-shadow:0 14rpx 40rpx rgba(31,42,37,.07); }

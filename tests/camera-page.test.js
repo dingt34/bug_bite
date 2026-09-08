@@ -16,6 +16,15 @@ assert.ok(!template.includes('demoMode'), '识别页不应保留开发者工具�
 let pageDefinition = null;
 let navigatedUrl = '';
 const storage = {};
+const localRequests = [];
+const recognitionResult = {
+  candidates: [{ objectId: 'mosquito', name: '白纹伊蚊', scientificName: 'Aedes albopictus', score: 0.82 }],
+  uncertain: false,
+  topScore: 0.82,
+  margin: 0.6,
+  model: 'BioCLIP 2',
+  device: 'cuda'
+};
 
 global.Page = definition => { pageDefinition = definition; };
 global.getApp = () => ({ globalData: { cloudReady: false } });
@@ -25,26 +34,17 @@ global.wx = {
   getSystemInfoSync() { return { platform: 'devtools' }; },
   navigateTo(options) { navigatedUrl = options.url; },
   showToast() {},
+  showModal() {},
   showLoading() {},
   hideLoading() {},
-  cloud: {
-    uploadFile() { return Promise.resolve({ fileID: 'cloud://recognition/test.jpg' }); },
-    deleteFile() { return Promise.resolve({ fileList: [] }); }
+  getFileSystemManager() {
+    return { readFile(options) { options.success({ data: 'base64-image-data' }); } };
+  },
+  request(options) {
+    localRequests.push(options);
+    if (options.url.endsWith('/health')) options.success({ statusCode: 200, data: { ready: true, device: 'cuda', prototypeCount: 45 } });
+    else options.success({ statusCode: 200, data: recognitionResult });
   }
-};
-
-const cloud = require('../miniprogram/utils/cloud.js');
-cloud.available = () => true;
-const recognitionResult = {
-  candidates: [{ objectId: 'mosquito', name: '白纹伊蚊', scientificName: 'Aedes albopictus', summary: '黑白相间的伊蚊候选。' }],
-  visibleFeatures: ['足部可见白色环带'],
-  uncertainty: '仍需结合胸背花纹继续核对。',
-  disclaimer: '只作为图鉴线索，不用于确诊。'
-};
-cloud.call = (_name, data) => {
-  if (data.action === 'enqueue') return Promise.resolve({ jobId: 'job-demo', status: 'pending' });
-  if (data.action === 'status') return Promise.resolve({ jobId: 'job-demo', status: 'done', result: recognitionResult });
-  return Promise.resolve(recognitionResult);
 };
 
 require('../miniprogram/pages/camera/camera.js');
@@ -76,10 +76,14 @@ assert.strictEqual(storage.bugtrail_v4_safetyDraft.photo, '');
   await new Promise(resolve => setTimeout(resolve, 20));
   assert.strictEqual(recognitionPage.data.identifying, false);
   assert.strictEqual(recognitionPage.data.recognitionModalVisible, true, '识别完成后应自动打开结果弹窗');
-  assert.strictEqual(recognitionPage.data.recognitionStage, '', '识别完成后应清除队列状态文案');
+  assert.strictEqual(recognitionPage.data.recognitionStage, '', '识别完成后应清除本机状态文案');
   assert.strictEqual(recognitionPage.data.candidates[0].photo, '/images/insect-guide/aedes-albopictus/01-overview.webp');
   assert.strictEqual(recognitionPage.data.candidates[0].rank, 1);
-  assert.strictEqual(recognitionPage.data.recognitionDisclaimer, '只作为图鉴线索，不用于确诊。');
+  assert.ok(recognitionPage.data.recognitionDisclaimer.includes('不用于确诊'));
+  assert.strictEqual(localRequests.length, 2, '本地识别应只调用健康检查和识别接口');
+  assert.strictEqual(localRequests[0].url, 'http://127.0.0.1:8000/health');
+  assert.strictEqual(localRequests[1].url, 'http://127.0.0.1:8000/v1/identify');
+  assert.strictEqual(localRequests[1].data.imageBase64, 'base64-image-data');
   recognitionPage.closeRecognitionResult();
   assert.strictEqual(recognitionPage.data.recognitionModalVisible, false);
   recognitionPage.openRecognitionResult();

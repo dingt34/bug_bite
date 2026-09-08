@@ -2,9 +2,9 @@
   "name": "bug-bite-recognition-worker",
   "version": "1.0.0",
   "private": true,
-  "main": "worker.js",
+  "main": "supervisor.js",
   "scripts": {
-    "start": "node worker.js",
+    "start": "node supervisor.js",
     "test": "node ../tests/recognition-worker.test.js"
   },
   "engines": {

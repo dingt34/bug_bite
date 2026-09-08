@@ -1,7 +1,9 @@
 const nav = require('../../utils/nav');
-const cloud = require('../../utils/cloud');
 const flow = require('../../utils/safety-flow');
 const species = require('../../utils/species');
+
+const LOCAL_RECOGNITION_URL = 'http://127.0.0.1:8000';
+const LOCAL_RECOGNITION_KEY = 'local-bioclip-deployment-key';
 
 Page({
   data: {
@@ -17,7 +19,6 @@ Page({
     } catch (_) { this.setData({ usePlaceholder: false }); }
   },
   onShow() { nav.syncTab(this, 2); },
-  onUnload() { if (this.recognitionPollTimer) clearTimeout(this.recognitionPollTimer); },
   home() { wx.switchTab({ url: '/pages/home/home' }); },
   error(event) { this.setData({ error: event.detail.errMsg || '无法使用摄像头', usePlaceholder: true }); },
   clearResult() {
@@ -86,41 +87,54 @@ Page({
     });
   },
   guidebook() { wx.navigateTo({ url: '/pages/guidebook/guidebook' }); },
-  identifyThroughCloud() {
-    const cloudPath = `recognition/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-    let enqueued = false;
-    this.setData({ recognitionStage: '正在上传图片…' });
-    return wx.cloud.uploadFile({ cloudPath, filePath: this.data.photo })
-      .then(({ fileID }) => cloud.call('identifyInsect', { action: 'enqueue', fileId: fileID }, { timeout: 15000 })
-        .then(job => {
-          if (!job || !job.jobId) throw new Error('云端未返回识别任务编号');
-          enqueued = true;
-          this.setData({ recognitionStage: '云端排队中…' });
-          return this.waitForRecognitionJob(job.jobId, 0);
-        })
-        .catch(error => {
-          if (!enqueued) wx.cloud.deleteFile({ fileList: [fileID] }).catch(() => {});
-          throw error;
-        }));
+  requestLocal(options) {
+    return new Promise((resolve, reject) => {
+      wx.request(Object.assign({}, options, {
+        success: response => {
+          if (response.statusCode >= 200 && response.statusCode < 300) resolve(response.data || {});
+          else reject(new Error(response.data && response.data.detail || `本机识别服务返回 ${response.statusCode}`));
+        },
+        fail: error => reject(new Error(error && error.errMsg || '无法连接本机识别服务'))
+      }));
+    });
   },
-  waitForRecognitionJob(jobId, attempt) {
-    if (attempt >= 60) return Promise.reject(new Error('CLOUD_TIMEOUT'));
-    return cloud.call('identifyInsect', { action: 'status', jobId }, { timeout: 15000 })
-      .then(job => {
-        if (job.status === 'done' && job.result) return job.result;
-        if (job.status === 'failed') throw new Error(job.message || '本机识别失败，请重试');
-        this.setData({ recognitionStage: job.status === 'processing' ? 'BioCLIP 2 正在识别…' : '等待识别工作端…' });
-        return new Promise(resolve => {
-          this.recognitionPollTimer = setTimeout(() => resolve(this.waitForRecognitionJob(jobId, attempt + 1)), 2000);
+  readPhotoBase64() {
+    return new Promise((resolve, reject) => {
+      wx.getFileSystemManager().readFile({
+        filePath: this.data.photo,
+        encoding: 'base64',
+        success: result => resolve(result.data),
+        fail: error => reject(new Error(error && error.errMsg || '无法读取所选图片'))
+      });
+    });
+  },
+  identifyLocally() {
+    this.setData({ recognitionStage: '正在连接本机模型…' });
+    return this.requestLocal({ url: `${LOCAL_RECOGNITION_URL}/health`, method: 'GET', timeout: 8000 })
+      .then(health => {
+        if (!health.ready) throw new Error(health.error || '本机模型尚未就绪');
+        this.setData({ recognitionStage: '正在读取图片…' });
+        return this.readPhotoBase64();
+      })
+      .then(imageBase64 => {
+        this.setData({ recognitionStage: 'BioCLIP 2 正在识别…' });
+        return this.requestLocal({
+          url: `${LOCAL_RECOGNITION_URL}/v1/identify`,
+          method: 'POST',
+          timeout: 120000,
+          header: {
+            Authorization: `Bearer ${LOCAL_RECOGNITION_KEY}`,
+            'content-type': 'application/json'
+          },
+          data: { imageBase64 }
         });
       });
   },
   identify() {
     if (this.data.identifying) return;
     if (!this.data.photo) { wx.showToast({ title: '请先拍摄或选择图片', icon: 'none' }); return; }
-    if (!cloud.available()) { wx.showToast({ title: '请先开通云开发环境', icon: 'none' }); return; }
     this.setData({ identifying: true }); this.clearResult(); wx.showLoading({ title: '正在识别…', mask: true });
-    this.identifyThroughCloud()
+    this.identifyLocally()
       .then(result => {
         const presentation = this.buildRecognitionPresentation(result || {});
         this.setData({
@@ -136,9 +150,16 @@ Page({
       })
       .catch(error => {
         const raw = String(error && (error.message || error.errMsg || error.code) || '');
-        const title = /云端未返回识别任务编号|UNKNOWN_ACTION|INVALID_ACTION|不支持的识别操作/.test(raw)
-          ? '请重新部署识别云函数'
-          : (/timeout|超时|CLOUD_TIMEOUT/i.test(raw) ? '分析时间较长，请重试，照片已保留' : (raw || '识别失败'));
+        const offline = /request:fail|无法连接|ECONNREFUSED|本机模型尚未就绪/i.test(raw);
+        if (offline) {
+          wx.showModal({
+            title: '本机模型未启动',
+            content: '请在电脑运行 start-local-demo.ps1，看到 ready=true 后再试。当前图片不会上传云端。',
+            showCancel: false
+          });
+          return;
+        }
+        const title = /timeout|超时/i.test(raw) ? '本机分析时间较长，请重试' : (raw || '识别失败');
         wx.showToast({ title, icon: 'none' });
       })
       .finally(() => { wx.hideLoading(); this.setData({ identifying: false, recognitionStage: '' }); });

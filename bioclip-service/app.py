@@ -1,9 +1,11 @@
 import base64
 import io
 import json
+import logging
 import os
 import secrets
 import threading
+import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
@@ -17,12 +19,15 @@ from pydantic import BaseModel, Field
 SERVICE_DIR = Path(__file__).resolve().parent
 CATALOG_PATH = SERVICE_DIR / "species.json"
 MODEL_NAME = "hf-hub:imageomics/bioclip-2"
+SERVICE_VERSION = "2.0.0"
 NEGATIVE_LABELS = [
     "a photograph without a visible animal",
     "a skin lesion without a visible arthropod",
     "an unclear or severely blurred arthropod",
     "an arthropod outside the supported species catalog",
 ]
+
+logger = logging.getLogger("bugbite.bioclip")
 
 
 class IdentifyRequest(BaseModel):
@@ -33,11 +38,14 @@ class ModelRuntime:
     def __init__(self) -> None:
         self.catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
         self.by_label = {item["modelLabel"]: item for item in self.catalog}
+        if len(self.by_label) != len(self.catalog):
+            raise RuntimeError("species.json contains duplicate modelLabel values")
         self.device = os.getenv("BIOCLIP_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
         self.top_k = max(1, min(5, int(os.getenv("BIOCLIP_TOP_K", "3"))))
         self.min_score = float(os.getenv("BIOCLIP_MIN_SCORE", "0.18"))
         self.min_margin = float(os.getenv("BIOCLIP_MIN_MARGIN", "0.03"))
         self.max_image_bytes = int(os.getenv("BIOCLIP_MAX_IMAGE_BYTES", str(6 * 1024 * 1024)))
+        self.max_image_pixels = int(os.getenv("BIOCLIP_MAX_IMAGE_PIXELS", str(24 * 1024 * 1024)))
         self.text_weight = min(1.0, max(0.0, float(os.getenv("BIOCLIP_TEXT_WEIGHT", "0.35"))))
         self.reference_root = Path(os.getenv(
             "BIOCLIP_REFERENCE_ROOT",
@@ -47,46 +55,71 @@ class ModelRuntime:
         self.classifier = None
         self.prototype_embeddings: dict[str, torch.Tensor] = {}
         self.load_error = ""
-        self.lock = threading.Lock()
+        self.load_lock = threading.Lock()
+        self.inference_lock = threading.Lock()
+
+    @property
+    def ready(self) -> bool:
+        return self.classifier is not None and len(self.prototype_embeddings) == len(self.catalog)
 
     def load(self) -> None:
-        if self.classifier is not None:
+        if self.ready:
             return
-        try:
-            from bioclip.predict import CustomLabelsClassifier
+        with self.load_lock:
+            if self.ready:
+                return
+            self.classifier = None
+            self.prototype_embeddings = {}
+            self.load_error = ""
+            try:
+                from bioclip.predict import CustomLabelsClassifier
 
-            self.classifier = CustomLabelsClassifier(cls_ary=self.labels, model_str=MODEL_NAME, device=self.device)
-            self._load_prototypes()
-        except Exception as exc:  # surfaced through health endpoint
-            self.load_error = str(exc)
-            raise
+                classifier = CustomLabelsClassifier(
+                    cls_ary=self.labels,
+                    model_str=MODEL_NAME,
+                    device=self.device,
+                )
+                prototypes = self._load_prototypes(classifier)
+                if len(prototypes) != len(self.catalog):
+                    missing = sorted(set(self.by_label) - set(prototypes))
+                    raise RuntimeError(f"missing reference images for {len(missing)} catalog entries")
+                self.classifier = classifier
+                self.prototype_embeddings = prototypes
+            except Exception as exc:
+                self.classifier = None
+                self.prototype_embeddings = {}
+                self.load_error = str(exc)
+                logger.exception("BioCLIP model loading failed")
+                raise
 
-    def _load_prototypes(self) -> None:
+    def _load_prototypes(self, classifier: Any) -> dict[str, torch.Tensor]:
+        prototypes: dict[str, torch.Tensor] = {}
         for item in self.catalog:
-            paths = [self.reference_root / value for value in item.get("referenceImages", [])]
             images = []
-            for path in paths:
+            for value in item.get("referenceImages", []):
+                path = self.reference_root / value
                 if path.is_file():
                     with Image.open(path) as image:
                         images.append(image.convert("RGB"))
             if not images:
                 continue
-            features = self.classifier.create_image_features(images)
+            features = classifier.create_image_features(images)
             prototype = features.mean(dim=0)
-            self.prototype_embeddings[item["modelLabel"]] = torch.nn.functional.normalize(prototype, dim=0)
+            prototypes[item["modelLabel"]] = torch.nn.functional.normalize(prototype, dim=0)
+        return prototypes
 
     def predict_ranked(self, image: Image.Image) -> list[dict[str, float | str]]:
+        if not self.classifier:
+            raise RuntimeError("BioCLIP model is not ready")
         image_feature = self.classifier.create_image_features([image])[0]
         text_similarities = image_feature @ self.classifier.txt_embeddings
         similarities = []
         for index, label in enumerate(self.labels):
             text_similarity = text_similarities[index]
             prototype = self.prototype_embeddings.get(label)
-            if prototype is None:
-                similarity = text_similarity
-            else:
-                visual_similarity = image_feature @ prototype
-                similarity = self.text_weight * text_similarity + (1.0 - self.text_weight) * visual_similarity
+            similarity = text_similarity if prototype is None else (
+                self.text_weight * text_similarity + (1.0 - self.text_weight) * (image_feature @ prototype)
+            )
             similarities.append(similarity)
         probabilities = torch.softmax(torch.stack(similarities) * 20.0, dim=0)
         return sorted(
@@ -108,7 +141,11 @@ class ModelRuntime:
             raise HTTPException(status_code=413, detail="image is too large")
         try:
             image = Image.open(io.BytesIO(raw))
+            if image.width * image.height > self.max_image_pixels:
+                raise HTTPException(status_code=413, detail="image has too many pixels")
             image.load()
+        except HTTPException:
+            raise
         except (UnidentifiedImageError, OSError) as exc:
             raise HTTPException(status_code=400, detail="unsupported image") from exc
         if image.width < 32 or image.height < 32:
@@ -116,8 +153,9 @@ class ModelRuntime:
         return image.convert("RGB")
 
     def identify(self, image: Image.Image) -> dict[str, Any]:
-        self.load()
-        with self.lock, torch.inference_mode():
+        if not self.ready:
+            self.load()
+        with self.inference_lock, torch.inference_mode():
             ranked = self.predict_ranked(image)
         supported = [item for item in ranked if item.get("classification") in self.by_label]
         negatives = [item for item in ranked if item.get("classification") in NEGATIVE_LABELS]
@@ -141,6 +179,7 @@ class ModelRuntime:
             for item in supported[: self.top_k]
         ]
         return {
+            "requestId": str(uuid.uuid4()),
             "candidates": candidates,
             "uncertain": uncertain,
             "topScore": round(best_score, 6),
@@ -155,11 +194,14 @@ runtime = ModelRuntime()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    runtime.load()
+    try:
+        runtime.load()
+    except Exception:
+        pass
     yield
 
 
-app = FastAPI(title="虫咬识途 BioCLIP 2 Service", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="虫咬识途 BioCLIP 2 Service", version=SERVICE_VERSION, lifespan=lifespan)
 
 
 def require_api_key(authorization: str = Header(default="")) -> None:
@@ -171,20 +213,45 @@ def require_api_key(authorization: str = Header(default="")) -> None:
         raise HTTPException(status_code=401, detail="invalid API key")
 
 
-@app.get("/health")
-def health() -> dict[str, Any]:
+def health_payload() -> dict[str, Any]:
     return {
-        "ok": not runtime.load_error,
-        "ready": runtime.classifier is not None,
+        "ok": runtime.ready,
+        "ready": runtime.ready,
+        "version": SERVICE_VERSION,
         "model": "BioCLIP 2",
         "device": runtime.device,
+        "cudaAvailable": torch.cuda.is_available(),
         "catalogSize": len(runtime.catalog),
         "prototypeCount": len(runtime.prototype_embeddings),
         "error": runtime.load_error or None,
     }
 
 
+@app.get("/health/live")
+def live() -> dict[str, Any]:
+    return {"ok": True, "version": SERVICE_VERSION}
+
+
+@app.get("/health")
+@app.get("/health/ready")
+def health() -> dict[str, Any]:
+    return health_payload()
+
+
+@app.post("/admin/reload", dependencies=[Depends(require_api_key)])
+def reload_model() -> dict[str, Any]:
+    runtime.classifier = None
+    runtime.prototype_embeddings = {}
+    runtime.load()
+    return health_payload()
+
+
 @app.post("/v1/identify", dependencies=[Depends(require_api_key)])
 def identify(request: IdentifyRequest) -> dict[str, Any]:
-    image = runtime.decode_image(request.imageBase64)
-    return runtime.identify(image)
+    try:
+        image = runtime.decode_image(request.imageBase64)
+        return runtime.identify(image)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"BioCLIP unavailable: {exc}") from exc
